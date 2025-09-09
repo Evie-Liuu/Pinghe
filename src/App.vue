@@ -1,6 +1,6 @@
 
 <template>
-  <nav>
+  <nav class="absolute">
     <router-link to="/">首頁</router-link> |
     <router-link to="/about">關於</router-link> |
     <router-link to="/actions">行動</router-link>

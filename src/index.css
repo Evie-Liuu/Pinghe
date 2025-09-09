@@ -2,13 +2,19 @@
 
 @theme {
   --font-huninn: 'jf-openhuninn', 'sans-serif';
-  --color-brown-400: #71451c;
+
+  --color-orange-300: #F78F3C;
+  --color-orange-600: #DE6028;
+
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: "Potta One", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  /* 增加字距，視覺上變細 */
+  /* color: transparent; */
+  /* -webkit-text-stroke: 0.1px #000; */
 }
