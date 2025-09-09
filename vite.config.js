@@ -12,6 +12,11 @@ export default defineConfig({
   base: "/Pinghe/",
   build: {
     outDir: "docs",  // 打包輸出到 docs/
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      }
+    }
   },
   resolve: {
     alias: {
