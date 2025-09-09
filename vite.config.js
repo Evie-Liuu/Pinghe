@@ -10,9 +10,12 @@ export default defineConfig({
     tailwindcss()
   ],
   base: "/Pinghe/",
+  build: {
+    outDir: "docs",  // 打包輸出到 docs/
+  },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // @ 指向 src 目录
+      '@': path.resolve(__dirname, './src'), // @ 指向 src 目錄
     },
   },
 })
