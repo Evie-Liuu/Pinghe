@@ -9,7 +9,7 @@
           'transition-all duration-3000 ease-out',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
-        class="flex items-right justify-center lg:justify-start lg:gap-5 w-full lg:pt-10"
+        class="w-full flex items-right justify-center lg:gap-5 lg:pt-10 lg:translate-x-30"
       >
         <picture>
           <img
@@ -27,25 +27,25 @@
           'transition-all duration-3000 ease-out',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
-        class="flex flex-col pt-8 lg:pt-0 lg:gap-5 items-center justify-center text-xl lg:text-2xl"
+        class="inline-flex flex-col pt-8 lg:pt-0 lg:gap-5 items-center justify-center text-xl lg:text-2xl"
       >
-        <router-link to="/about">
-          <span
-            class="flex items-center justify-center rounded-full font-bold bg-orange-300 p-2 px-5"
-            >校園探索</span
-          >
-        </router-link>
-        <router-link to="/actions">
-          <span
-            class="flex items-center justify-center rounded-full font-bold bg-orange-300 p-2 px-5"
-            >SDGs行動</span
-          ></router-link
+        <router-link
+          to="/about"
+          class="self-stretch rounded-full font-bold bg-orange-300 p-2 px-5"
         >
-        <router-link to="/sdgs" class="lg:-translate-x-1/6">
-          <span
-            class="flex items-center justify-center rounded-full font-bold bg-orange-300 p-2 px-5"
-            >SDGs成果</span
-          ></router-link
+          <span>校園探索</span>
+        </router-link>
+        <router-link
+          to="/actions"
+          class="self-stretch rounded-full font-bold bg-orange-300 p-2 px-5"
+        >
+          <span>SDGs行動</span></router-link
+        >
+        <router-link
+          to="/sdgs"
+          class="self-stretch lg:-translate-x-1/6 rounded-full font-bold bg-orange-300 p-2 px-5"
+        >
+          <span>SDGs成果</span></router-link
         >
       </div>
     </section>

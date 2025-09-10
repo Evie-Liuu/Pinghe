@@ -7,7 +7,7 @@
             4
         ],
         "intro": "全校讀論語 星期四讀經和鎮長。",
-        "img_url": "story-bg.webp",
+        "img_url": "figure3.png",
         "description": "全校讀論語 星期四讀經和鎮長。"
     },
     {
@@ -18,7 +18,7 @@
             4
         ],
         "intro": "精彩的舞蹈表演，獲得滿堂彩。",
-        "img_url": "story-bg.webp",
+        "img_url": "figure2.png",
         "description": "精彩的舞蹈表演，獲得滿堂彩。"
     },
     {
@@ -40,7 +40,7 @@
             11
         ],
         "intro": "",
-        "img_url": "story-bg.webp",
+        "img_url": "figure1.png",
         "description": ""
     }
 ]

@@ -2,7 +2,7 @@
   <div class="relative w-full max-w-6xl mx-auto">
     <Swiper
       :initial-slide="props.initialIndex"
-      :centered-slides="true"
+      :centered-slides="false"
       :space-between="20"
       :loop="props.images.length > currentSlidesPerView"
       :navigation="true"
@@ -16,17 +16,19 @@
         class="relative"
         v-slot="{ isActive }"
       >
-        <div @click="handleSlideClick(isActive, img.id, index)">
+        <div @click="handleSlideClick(isActive, img.id, index)" class="h-full">
           <img
             :src="getImageUrl(props.path + (img.img_url || 'lightBulb.png'))"
             :alt="`slide-${index}`"
-            class="rounded-2xl transition-all duration-300 ease-in-out w-full h-full object-cover"
+            class="rounded-2xl overflow-hidden transition-all duration-300 ease-in-out w-full h-full object-cover"
           />
           <div
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-orange-300/70 text-center rounded-lg px-2"
           >
             <p>{{ img.title }}</p>
-            <p class="text-left text-sm">{{ img.intro }}</p>
+            <p class="text-sm text-justify leading-relaxed">
+              {{ img.intro }}
+            </p>
           </div>
         </div>
       </SwiperSlide>
@@ -58,8 +60,8 @@ const props = defineProps({
   },
   initialIndex: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
 });
 
 const swiperOptions = {
@@ -78,6 +80,12 @@ const onSwiper = (swiper) => {
   currentSlidesPerView.value = swiper.params.slidesPerView;
 };
 
+const goToStory = (id) => {
+  if (swiperInstance) {
+    sessionStorage.setItem("lastStoryIndex", swiperInstance.realIndex);
+  }
+  router.push({ name: "story-detail", params: { id } });
+};
 const handleSlideClick = (isActive, id, index) => {
   if (isActive) {
     goToStory(id);
@@ -86,13 +94,6 @@ const handleSlideClick = (isActive, id, index) => {
       swiperInstance.slideToLoop(index);
     }
   }
-};
-
-const goToStory = (id) => {
-  if (swiperInstance) {
-    sessionStorage.setItem('lastStoryIndex', swiperInstance.realIndex);
-  }
-  router.push({ name: "story-detail", params: { id } });
 };
 
 const goNext = () => {

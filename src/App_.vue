@@ -26,8 +26,8 @@
       class="flex flex-row items-center gap-2"
     >
       <img
-        src="@/assets/images/Logo.png"
-        alt="School Logo Watercolor"
+        src="@/assets/images/logo.png"
+        alt="School Logo"
         :class="{ hidden: $route.path === '/' }"
         class="relative z-20 inset-0 w-1/11 object-center md:w-1/15"
       />
@@ -55,6 +55,73 @@
     </button>
 
     <!-- Menu -->
+    <div
+      v-if="$route.path !== '/'"
+      :class="[
+        'fixed top-0 left-0 w-full flex flex-col justify-center items-center gap-8 transition-transform duration-300 ease-in-out md:relative md:h-[4rem] md:w-auto md:bg-transparent md:flex-row md:gap-3 text-xl md:text-2xl md:whitespace-nowrap',
+        isMenuOpen ? 'h-screen' : 'h-0',
+        isMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+        isMenuOpen
+          ? 'bg-[url(@/assets/images/Mobile/mobile_Bcakground_2.png)] bg-cover bg-center overflow-hidden'
+          : '',
+      ]"
+      class="text-white md:text-black md:text-shadow-none"
+    >
+      <div class="absolute z-[-10] inset-0 bg-black/40 md:hidden"></div>
+      <router-link
+        to="/"
+        class="px-8 text-rice-500 text-shadow-3d"
+        @click="isMenuOpen = false"
+        :class="{
+          'pointer-events-none text-orange-300': $route.path === '/',
+        }"
+      >
+        <div class="p-3">首頁</div>
+      </router-link>
+      <router-link
+        to="/about"
+        class="px-4 text-rice-500 text-shadow-3d"
+        @click="isMenuOpen = false"
+        :class="{
+          'pointer-events-none text-orange-300': $route.path === '/about',
+        }"
+      >
+        <div class="p-3">
+          <span v-if="$route.path !== '/about'">校園探索</span>
+          <span v-else>EXPLORATION</span>
+        </div>
+      </router-link>
+      <router-link
+        to="/actions"
+        class="px-4 text-rice-500 text-shadow-3d"
+        @click="isMenuOpen = false"
+        :class="{
+          'pointer-events-none text-orange-300': $route.path === '/actions',
+        }"
+      >
+        <div class="p-3 md:p-3">
+          <span v-if="$route.path !== '/actions'">SDGs行動</span>
+          <span v-else>SDGs ACTION</span>
+        </div>
+      </router-link>
+      <router-link
+        to="/sdgs"
+        class="px-4 text-rice-500 text-shadow-3d"
+        @click="isMenuOpen = false"
+        :class="{
+          'pointer-events-none text-orange-300':
+            $route.path === '/sdgs' || $route.path.includes('/story'),
+        }"
+      >
+        <div class="p-3">
+          <span
+            v-if="$route.path !== '/sdgs' && !$route.path.includes('/story')"
+            >SDGs成果</span
+          >
+          <span v-else>SDGs RESULT</span>
+        </div>
+      </router-link>
+    </div>
   </nav>
   <router-view />
 </template>
