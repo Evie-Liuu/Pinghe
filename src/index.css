@@ -49,7 +49,7 @@ body {
 
 @media (max-width: 768px) {
   .page-background {
-    background-image: url("@/assets/images/mobile_Bcakground_1.png");
+    background-image: url("@/assets/images/Mobile/mobile_Bcakground_1.png");
   }
 }
 

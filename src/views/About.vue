@@ -11,7 +11,7 @@
       </div>
     </div>
     <main
-      class="absolute bottom-0 w-screen h-screen lg:max-h-280 flex justify-center items-center bg-center overflow-hidden bg-no-repeat bg-[url('@/assets/images/var02/Mobile_BackColor_N.png')] bg-cover lg:bg-[url('@/assets/images/var02/BackColor_N.png')] lg:bg-auto"
+      class="absolute bottom-0 w-screen h-screen lg:max-h-280 flex justify-center items-center"
     >
       <div
         class="relative w-full h-2/3 2xl:w-320 2xl:h-180 mx-auto translate-y-0 2xl:translate-y-4"
