@@ -29,72 +29,73 @@
           </span>
           ：{{ info.title }}
         </h2>
-        <p class="mb-2">
-          <CJKSub align="center">
-            <template #zh>
-              <span class="text-lg md:text-xl">時間</span>
-            </template>
-            <template #en>Time</template>
-          </CJKSub>
-          ：{{
-            info.startTime.length
-              ? new Date(info.startTime * 1000).toLocaleDateString() +
-                " ~ " +
-                new Date(info.endTime * 1000).toLocaleDateString()
-              : "無"
-          }}
-        </p>
-        <p class="text-md mb-2">
-          <CJKSub align="left">
-            <template #zh>
-              <span class="text-lg md:text-xl">成員</span>
-            </template>
-            <template #en>Member</template>
-          </CJKSub>
-          ：{{ info.group }}
-        </p>
-        <p class="text-md mb-2">
-          <CJKSub align="left">
-            <template #zh>
-              <span class="text-lg md:text-xl">描述</span>
-            </template>
-            <template #en>Description</template>
-          </CJKSub>
-          ：{{ info.intro }}
-        </p>
-        <div class="flex items-center w-full md:w-70 gap-3">
-          <CJKSub align="left">
-            <template #zh>
-              <span class="text-lg md:text-xl">進度</span>
-            </template>
-            <template #en>Progress</template>
-          </CJKSub>
-          ：
-          <!-- Progress Bar -->
-          <div
-            class="relative flex-1 bg-gray-200 rounded-full h-2 overflow-hidden"
-          >
-            <div
-              class="h-2 rounded-full transition-all duration-500"
-              :class="progressColor(info.progress)"
-              :style="{ width: info.progress + '%' }"
-            ></div>
-          </div>
-          <!-- Percentage Number -->
-          <span class="w-10 text-sm text-gray-700 text-left">
-            {{ info.progress }}%
-          </span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+            <p class="mb-2">
+              <CJKSub align="center">
+                <template #zh>
+                  <span class="text-lg md:text-xl">時間</span>
+                </template>
+                <template #en>Time</template>
+              </CJKSub>
+              ：{{
+                info.startTime.length
+                  ? new Date(info.startTime * 1000).toLocaleDateString() +
+                    " ~ " +
+                    new Date(info.endTime * 1000).toLocaleDateString()
+                  : "無"
+              }}
+            </p>
+            <p class="text-md mb-2">
+              <CJKSub align="left">
+                <template #zh>
+                  <span class="text-lg md:text-xl">成員</span>
+                </template>
+                <template #en>Member</template>
+              </CJKSub>
+              ：{{ info.group }}
+            </p>
+            <p class="text-md mb-2 md:col-span-2">
+              <CJKSub align="left">
+                <template #zh>
+                  <span class="text-lg md:text-xl">描述</span>
+                </template>
+                <template #en>Description</template>
+              </CJKSub>
+              ：{{ info.intro }}
+            </p>
+            <div class="flex items-center w-full md:w-70 gap-3 md:col-span-2">
+              <CJKSub align="left">
+                <template #zh>
+                  <span class="text-lg md:text-xl">進度</span>
+                </template>
+                <template #en>Progress</template>
+              </CJKSub>
+              ：
+              <!-- Progress Bar -->
+              <div
+                class="relative flex-1 bg-gray-200 rounded-full h-2 overflow-hidden"
+              >
+                <div
+                  class="h-2 rounded-full transition-all duration-500"
+                  :class="progressColor(info.progress)"
+                  :style="{ width: info.progress + '%' }"
+                ></div>
+              </div>
+              <!-- Percentage Number -->
+              <span class="w-10 text-sm text-gray-700 text-left">
+                {{ info.progress }}%
+              </span>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-2 md:col-span-2">
+              <span
+                v-for="t in info.types"
+                :key="t"
+                class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ typeTags[t].title }}
+              </span>
+            </div>
         </div>
-        <div class="flex flex-wrap gap-2 mt-2">
-          <span
-            v-for="t in info.types"
-            :key="t"
-            class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
-          >
-            {{ typeTags[t].title }}
-          </span>
-        </div>
-        <!-- <p class="text-gray-600 text-sm text-center">更多</p> -->
       </div>
     </div>
   </div>

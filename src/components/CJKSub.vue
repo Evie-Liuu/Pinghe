@@ -1,11 +1,7 @@
 <template>
   <div class="cjk-sub" :class="align">
     <div class="cjk-text" ref="zhRef"><slot name="zh" /></div>
-    <div
-      class="en-text"
-      ref="enRef"
-      :style="enStyle"
-    >
+    <div class="en-text" ref="enRef" :style="enStyle">
       <slot name="en" />
     </div>
   </div>
@@ -24,14 +20,20 @@ const zhWidth = ref(0);
 const enWidth = ref(0);
 
 const enStyle = computed(() => {
-    if (zhWidth.value > 0 && enWidth.value > 0 && enWidth.value > zhWidth.value) {
-        const scale = zhWidth.value / enWidth.value;
-        return {
-            transform: `scaleX(${scale})`,
-            transformOrigin: props.align === 'left' ? 'left' : (props.align === 'right' ? 'right' : 'center')
-        };
-    }
-    return {};
+  if (zhWidth.value > 0 && enWidth.value > 0 && enWidth.value > zhWidth.value) {
+    const scale = zhWidth.value / enWidth.value;
+    return {
+      transform: `scaleX(${scale})`,
+      width: zhWidth.value + "px",
+      transformOrigin:
+        props.align === "left"
+          ? "left"
+          : props.align === "right"
+          ? "right"
+          : "center",
+    };
+  }
+  return {};
 });
 
 onMounted(async () => {
