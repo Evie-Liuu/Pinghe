@@ -29,24 +29,54 @@
         ]"
         class="inline-flex flex-col pt-8 lg:pt-0 lg:gap-5 items-center justify-center text-xl lg:text-2xl"
       >
-        <router-link
-          to="/about"
-          class="self-stretch rounded-full font-bold bg-orange-300 p-2 px-5"
-        >
-          <span>校園探索</span>
-        </router-link>
-        <router-link
-          to="/actions"
-          class="self-stretch rounded-full font-bold bg-orange-300 p-2 px-5"
-        >
-          <span>SDGs行動</span></router-link
-        >
-        <router-link
-          to="/sdgs"
-          class="self-stretch lg:-translate-x-1/6 rounded-full font-bold bg-orange-300 p-2 px-5"
-        >
-          <span>SDGs成果</span></router-link
-        >
+        <!-- Button 1 -->
+        <div class="relative group self-stretch">
+          <router-link
+            to="/about"
+            class="relative block rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+          >
+            <span
+              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              >校園探索</span
+            >
+            <span
+              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              >Explore →</span
+            >
+          </router-link>
+        </div>
+        <!-- Button 2 -->
+        <div class="relative group self-stretch">
+          <router-link
+            to="/actions"
+            class="relative block rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+          >
+            <span
+              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              >SDGs行動</span
+            >
+            <span
+              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              >Actions →</span
+            >
+          </router-link>
+        </div>
+        <!-- Button 3 -->
+        <div class="relative group self-stretch">
+          <router-link
+            to="/sdgs"
+            class="relative block lg:-translate-x-1/6 rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+          >
+            <span
+              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              >SDGs成果</span
+            >
+            <span
+              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              >Results →</span
+            >
+          </router-link>
+        </div>
       </div>
     </section>
 
