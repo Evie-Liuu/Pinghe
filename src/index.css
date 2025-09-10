@@ -14,6 +14,7 @@ body {
   font-style: normal;
   font-size: 1.6rem;
   letter-spacing: 0.05em;
+  color: white;
   /* 增加字距，視覺上變細 */
   /* color: transparent; */
   /* -webkit-text-stroke: 0.1px #000; */

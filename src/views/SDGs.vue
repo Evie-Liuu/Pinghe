@@ -1,5 +1,5 @@
 <template>
-  <div class="page-background content-scroller">
+  <div class="page-background content-scroller h-screen flex flex-col">
     <header class="pt-25 w-full shadow-md z-10 bg-header text-rice-500">
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
@@ -14,38 +14,74 @@
         <div class="w-1/3"></div>
       </div>
     </header>
-    <main
-      class="grid grid-cols-1 md:grid-cols-3 gap-5 p-4 md:px-50 pt-10 text-center text-2xl md:text-3xl md:h-3/4"
-    >
-      <div
-        class="group col-span-1 md:col-span-1 h-48 md:h-auto text-shadow-lg/30 border p-4 bg-[url(@/assets/images/lightBulb.png)] bg-cover bg-top overflow-hidden flex items-center justify-center animate-fade-in-left animate-delay-100 text-white text-shadow-3d border-black"
-      >
-        <!-- <div class="absolute inset-0 bg-black/40"></div> -->
-        數據呈現
-      </div>
-      <div
-        class="group col-span-1 md:col-span-1 h-48 md:h-auto text-shadow-lg/30 border p-4 bg-[url(@/assets/images/lightBulb.png)] bg-cover bg-top overflow-hidden flex items-center justify-center animate-fade-in-left animate-delay-200 text-white text-shadow-3d border-black"
-      >
-        <!-- <div class="absolute inset-0 bg-black/40"></div> -->
-        下載資源
-      </div>
-
+    <main class="flex flex-col gap-5 w-full px-4 md:p-15 md:px-30 pt-10 flex-1">
+      <!-- Cards -->
       <router-link
-        class="group col-span-1 md:col-span-1 h-48 md:h-auto text-shadow-lg/30 border p-4 bg-[url(@/assets/images/lightBulb.png)] bg-cover bg-center overflow-hidden flex items-center justify-center animate-fade-in-left animate-delay-300 hover:shadow-[10px_5px_10px_-3px_rgba(0,0,0,0.8)] hover:font-bold text-white text-shadow-3d border-black"
-        to="/story"
+        v-for="info in infos"
+        :to="info.to"
+        :key="info.id"
+        :class="[
+          'group flex flex-col md:flex-row rounded-lg overflow-hidden flex-1 hover:scale-105',
+          { 'md:flex-row-reverse': info.title === '資源下載' },
+        ]"
+        @click="goToStory(info.id)"
       >
-        <!-- <div
-        class="absolute inset-0 bg-black/40 lg:group-hover:hidden hidden lg:block"
-      ></div> -->
-        故事牆</router-link
-      >
+        <div class="relative w-full h-64 md:h-auto md:w-1/2">
+          <img
+            src="../assets/images/lightBulb.png"
+            alt="Card Image"
+            class="absolute inset-0 w-full h-full object-cover object-center"
+          />
+        </div>
+        <div class="relative md:w-1/2 text-center bg-white/40">
+          <div class="bg-orange-300 pb-1">
+            <CJKSub align="center">
+              <template #zh>{{ info.title }}</template>
+              <template #en>{{ info.en }}</template>
+            </CJKSub>
+          </div>
+          <p>
+            {{ info.content }}
+          </p>
+        </div>
+      </router-link>
     </main>
   </div>
 </template>
 <script setup>
+import { ref } from "vue";
+import CJKSub from "@/components/CJKSub.vue";
+
 // import { inject } from "vue";
 
 // const handleAppScroll = inject("handleAppScroll");
+
+const infos = ref([
+  {
+    id: 1,
+    to: "",
+    title: "數據呈現",
+    en: "Data Presentation",
+    img_url: "",
+    content: "成效視覺化",
+  },
+  {
+    id: 2,
+    to: "",
+    title: "資源下載",
+    en: "Resource Download",
+    img_url: "",
+    content: "提供活動簡章",
+  },
+  {
+    id: 3,
+    to: "/story",
+    title: "故事牆",
+    en: "Story Wall",
+    img_url: "",
+    content: "共同實踐的精采回憶",
+  },
+]);
 </script>
 <style scoped>
 </style>
