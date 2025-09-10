@@ -4,7 +4,12 @@
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
           <router-link to="/" class="back-home-btn">
-            <span class="text">回首頁</span>
+            <span class="text">
+              <CJKSub align="center">
+                <template #zh>回首頁</template>
+                <template #en>Home</template>
+              </CJKSub>
+            </span>
             <span class="icon">←</span>
           </router-link>
         </div>
