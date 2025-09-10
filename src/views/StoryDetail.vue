@@ -4,7 +4,12 @@
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
           <router-link to="/story" class="back-home-btn">
-            <span class="text">回上頁</span>
+            <span class="text">
+              <CJKSub align="center">
+                <template #zh>回上頁</template>
+                <template #en>Return</template>
+              </CJKSub>
+            </span>
             <span class="icon">←</span>
           </router-link>
         </div>
@@ -116,6 +121,7 @@
 import { ref, computed, inject } from "vue";
 import infos from "@/data/Story.json";
 import typeTags from "@/data/SDGs_goal.json";
+import CJKSub from "@/components/CJKSub.vue";
 
 // const handleAppScroll = inject("handleAppScroll");
 

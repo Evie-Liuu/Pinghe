@@ -4,7 +4,12 @@
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
           <router-link to="/" class="back-home-btn">
-            <span class="text">回首頁</span>
+            <span class="text">
+              <CJKSub align="center">
+                <template #zh>回首頁</template>
+                <template #en>Home</template>
+              </CJKSub>
+            </span>
             <span class="icon">←</span>
           </router-link>
         </div>
@@ -15,29 +20,29 @@
       </div>
     </header>
     <main
-        class="p-10 flex flex-col justify-center items-center gap-8 max-w-7xl md:mx-auto"
+      class="p-10 flex flex-col justify-center items-center gap-8 max-w-7xl md:mx-auto"
+    >
+      <HeaderFilter
+        @update:filters="handleFilterUpdate"
+        class="flex flex-wrap justify-center items-center gap-4"
+      ></HeaderFilter>
+      <ActionCard
+        :filteredInfo="paginatedActions"
+        class="flex flex-col gap-5 w-full px-4 md:px-0"
+      ></ActionCard>
+      <div
+        v-if="allFilteredInfos.length === 0"
+        class="text-center text-gray-500 mt-8"
       >
-        <HeaderFilter
-          @update:filters="handleFilterUpdate"
-          class="flex flex-wrap justify-center items-center gap-4"
-        ></HeaderFilter>
-        <ActionCard
-          :filteredInfo="paginatedActions"
-          class="flex flex-col gap-5 w-full px-4 md:px-0"
-        ></ActionCard>
-        <div
-          v-if="allFilteredInfos.length === 0"
-          class="text-center text-gray-500 mt-8"
-        >
-          <p>找不到符合條件的行動。</p>
-        </div>
-        <PageLabel
-          class="flex justify-center items-center gap-4 mt-8"
-          :totalItems="allFilteredInfos.length"
-          :itemsPerPage="itemsPerPage"
-          v-model="currentPage"
-        ></PageLabel>
-      </main>
+        <p>找不到符合條件的行動。</p>
+      </div>
+      <PageLabel
+        class="flex justify-center items-center gap-4 mt-8"
+        :totalItems="allFilteredInfos.length"
+        :itemsPerPage="itemsPerPage"
+        v-model="currentPage"
+      ></PageLabel>
+    </main>
   </div>
 </template>
 <script setup>
@@ -47,6 +52,7 @@ import typeTags from "@/data/SDGs_goal.json";
 import HeaderFilter from "@/components/HeaderFilter.vue";
 import ActionCard from "@/components/ActionCard.vue";
 import PageLabel from "@/components/PageLabel.vue";
+import CJKSub from "@/components/CJKSub.vue";
 
 // const handleAppScroll = inject("handleAppScroll");
 

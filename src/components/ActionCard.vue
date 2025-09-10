@@ -1,26 +1,42 @@
 <template>
   <div v-bind="$attrs">
     <div
-      class="animate-fade-in-up cursor-pointer w-full md:max-w-7xl md:mx-auto min-h-96 md:min-h-80 bg-pblue-300 text-pblue-700 font-bold rounded-xl shadow-md overflow-hidden flex flex-col md:flex-row hover:scale-105"
+      class="animate-fade-in-up cursor-pointer w-full md:max-w-7xl md:mx-auto min-h-96 md:max-h-80 bg-pblue-300 text-pblue-700 font-bold rounded-xl shadow-md overflow-hidden flex flex-col md:flex-row hover:scale-105"
       v-for="info in filteredInfo"
       :key="info.id"
       @click="goToActions(info.id)"
     >
       <div
-        class="w-full md:w-auto flex items-end justify-center md:justify-end md:pr-10"
+        class="w-full md:w-2/5 flex items-end justify-center md:justify-end md:pr-10"
       >
         <img
           src="@/assets/images/lightBulb2.png"
           alt="Card Image"
-          class="w-[170px] md:w-[290px]"
+          class="w-full h-full object-cover object-center"
         />
       </div>
       <div
         class="p-6 md:p-15 md:ps-55 flex flex-col justify-center w-full md:flex-1 text-sm md:text-lg"
       >
-        <h2 class="text-xl md:text-2xl mb-2 md:mb-4">主題：{{ info.title }}</h2>
+        <h2 class="text-xl md:text-2xl mb-2 md:mb-2">
+          <span>
+            <CJKSub align="center">
+              <template #zh>
+                <span class="text-xl md:text-2xl">主題</span>
+              </template>
+              <template #en>Issue</template>
+            </CJKSub>
+          </span>
+          ：{{ info.title }}
+        </h2>
         <p class="mb-2">
-          時間：{{
+          <CJKSub align="center">
+            <template #zh>
+              <span class="text-lg md:text-xl">時間</span>
+            </template>
+            <template #en>Time</template>
+          </CJKSub>
+          ：{{
             info.startTime.length
               ? new Date(info.startTime * 1000).toLocaleDateString() +
                 " ~ " +
@@ -28,10 +44,32 @@
               : "無"
           }}
         </p>
-        <p class="text-md mb-2">成員：{{ info.group }}</p>
-        <p class="text-md mb-2">描述：{{ info.intro }}</p>
+        <p class="text-md mb-2">
+          <CJKSub align="left">
+            <template #zh>
+              <span class="text-lg md:text-xl">成員</span>
+            </template>
+            <template #en>Member</template>
+          </CJKSub>
+          ：{{ info.group }}
+        </p>
+        <p class="text-md mb-2">
+          <CJKSub align="left">
+            <template #zh>
+              <span class="text-lg md:text-xl">描述</span>
+            </template>
+            <template #en>Description</template>
+          </CJKSub>
+          ：{{ info.intro }}
+        </p>
         <div class="flex items-center w-full md:w-70 gap-3">
-          進度：
+          <CJKSub align="left">
+            <template #zh>
+              <span class="text-lg md:text-xl">進度</span>
+            </template>
+            <template #en>Progress</template>
+          </CJKSub>
+          ：
           <!-- Progress Bar -->
           <div
             class="relative flex-1 bg-gray-200 rounded-full h-2 overflow-hidden"
@@ -62,8 +100,9 @@
   </div>
 </template>
 <script setup>
-// import { defineProps } from "vue";
 import { useRouter } from "vue-router";
+import CJKSub from "@/components/CJKSub.vue";
+
 const router = useRouter();
 
 import typeTags from "@/data/SDGs_goal.json";

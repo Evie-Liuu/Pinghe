@@ -22,17 +22,33 @@
     <main
       class="p-10 flex flex-col justify-center items-center gap-8 md:my-auto"
     >
-      <ImageCarousel :images="carouselImages" :path="path" />
+      <ImageCarousel
+        :images="carouselImages"
+        :path="path"
+        :initial-index="initialSlideIndex"
+      />
     </main>
   </div>
 </template>
 <script setup>
+import { ref, onMounted } from "vue";
 import carouselImages from "@/data/Story.json";
 import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 
-const path = "../assets/images/"
+const path = "../assets/images/";
 
+const initialSlideIndex = ref(0);
+
+onMounted(() => {
+  const storedIndex = sessionStorage.getItem("lastStoryIndex");
+  console.log(storedIndex);
+
+  if (storedIndex) {
+    initialSlideIndex.value = parseInt(storedIndex, 10);
+    // sessionStorage.removeItem('lastStoryIndex'); // Decide if you want to clear it
+  }
+});
 </script>
 <style scoped>
 </style>
