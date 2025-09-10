@@ -62,6 +62,7 @@ const filters = ref({
   time: "all",
   startDate: "",
   endDate: "",
+  keyword: "",
 });
 const currentPage = ref(1);
 const itemsPerPage = 3;
@@ -123,6 +124,13 @@ const allFilteredInfos = computed(() => {
         return projectStart <= filterEnd && projectEnd >= filterStart;
       });
     }
+  }
+
+  // Filter by keyword
+  if (filters.value.keyword) {
+    result = result.filter(info =>
+      info.title.toLowerCase().includes(filters.value.keyword.toLowerCase())
+    );
   }
 
   return result;
