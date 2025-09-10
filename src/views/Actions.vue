@@ -1,5 +1,5 @@
 <template>
-  <div class="page-background content-scroller">
+  <div class="page-background content-scroller" @scroll="handleAppScroll">
     <header class="relative z-5 pt-25 w-full shadow-md bg-header text-rice-500">
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
@@ -28,7 +28,7 @@
       ></HeaderFilter>
       <ActionCard
         :filteredInfo="paginatedActions"
-        class="flex flex-col gap-5 w-full px-4 md:px-0"
+        class="flex flex-col gap-10 w-full md:px-0"
       ></ActionCard>
       <div
         v-if="allFilteredInfos.length === 0"
@@ -54,7 +54,7 @@ import ActionCard from "@/components/ActionCard.vue";
 import PageLabel from "@/components/PageLabel.vue";
 import CJKSub from "@/components/CJKSub.vue";
 
-// const handleAppScroll = inject("handleAppScroll");
+const handleAppScroll = inject("handleAppScroll");
 
 const allActions = ref(infosData);
 const filters = ref({
