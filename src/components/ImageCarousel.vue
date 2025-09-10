@@ -1,8 +1,8 @@
 <template>
-  <div class="relative w-full max-w-6xl mx-auto">
+  <div class="relative w-full max-w-7xl mx-auto md:mt-15">
     <Swiper
       :initial-slide="props.initialIndex"
-      :centered-slides="false"
+      :centered-slides="true"
       :space-between="20"
       :loop="props.images.length > currentSlidesPerView"
       :navigation="true"

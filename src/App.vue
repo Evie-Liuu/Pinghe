@@ -29,7 +29,7 @@
         src="@/assets/images/Logo.gif"
         alt="School Logo"
         :class="{ hidden: $route.path === '/' }"
-        class="relative z-20 inset-0 w-1/11 object-center md:w-1/15"
+        class="relative z-20 inset-0 w-1/11 object-center md:w-1/20"
       />
       <div
         :class="{ hidden: $route.path === '/' }"

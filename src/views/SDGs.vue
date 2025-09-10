@@ -40,7 +40,7 @@
         </div>
         <div class="relative md:w-1/2 text-center bg-white/40">
           <div class="bg-orange-300 pb-1">
-            <CJKSub align="center">
+            <CJKSub align="left">
               <template #zh>{{ info.title }}</template>
               <template #en>{{ info.en }}</template>
             </CJKSub>

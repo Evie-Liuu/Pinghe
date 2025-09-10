@@ -1,5 +1,5 @@
 <template>
-  <div class="page-background content-scroller h-screen flex flex-col">
+  <div class="page-background content-scroller h-screen flex flex-col" @scroll="handleAppScroll">
     <header class="relative z-5 pt-25 w-full shadow-md bg-header text-rice-500">
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
@@ -20,10 +20,14 @@
       </div>
     </header>
     <main
-      class="p-10 flex flex-col justify-center items-center gap-8 md:my-auto"
+      class="p-10 flex flex-col justify-center items-center gap-8 "
     >
+      <HeaderFilter
+        @update:filters="handleFilterUpdate"
+        class="flex flex-wrap justify-center items-center gap-4"
+      ></HeaderFilter>
       <ImageCarousel
-        :images="carouselImages"
+        :images="allFilteredInfos"
         :path="path"
         :initial-index="initialSlideIndex"
       />
@@ -31,10 +35,11 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, inject } from "vue";
 import carouselImages from "@/data/Story.json";
 import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
+import HeaderFilter from "@/components/HeaderFilter.vue";
 
 const path = "../assets/images/";
 
@@ -48,6 +53,68 @@ onMounted(() => {
     initialSlideIndex.value = parseInt(storedIndex, 10);
     // sessionStorage.removeItem('lastStoryIndex'); // Decide if you want to clear it
   }
+});
+
+const handleAppScroll = inject("handleAppScroll");
+
+const allInfos = ref(carouselImages);
+const filters = ref({
+  sdgs: [],
+  time: "all",
+  startDate: "",
+  endDate: "",
+});
+const currentPage = ref(1);
+const itemsPerPage = 6;
+
+const handleFilterUpdate = (newFilters) => {
+  filters.value = newFilters;
+  currentPage.value = 1; // Reset page when filters change
+};
+
+const allFilteredInfos = computed(() => {
+  let result = allInfos.value;
+
+  // Filter by SDGs
+  if (filters.value.sdgs.length > 0) {
+    result = result.filter(
+      (info) =>
+        info.types &&
+        info.types.some((type) => filters.value.sdgs.includes(type))
+    );
+  }
+
+  // Filter by time
+  if (filters.value.time !== "all") {
+    const now = new Date();
+    result = result.filter((info) => {
+      if (!info.time || String(info.time).trim() === "") return false;
+      const infoDate = new Date(Number(info.time) * 1000);
+
+      if (filters.value.time === "day") {
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+        return infoDate >= yesterday;
+      } else if (filters.value.time === "week") {
+        const lastWeek = new Date();
+        lastWeek.setDate(now.getDate() - 7);
+        return infoDate >= lastWeek;
+      } else if (
+        filters.value.time === "custom" &&
+        filters.value.startDate &&
+        filters.value.endDate
+      ) {
+        const start = new Date(filters.value.startDate);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(filters.value.endDate);
+        end.setHours(23, 59, 59, 999);
+        return infoDate >= start && infoDate <= end;
+      }
+      return true; // Should not happen if time is not 'all', but as a fallback
+    });
+  }
+
+  return result;
 });
 </script>
 <style scoped>
