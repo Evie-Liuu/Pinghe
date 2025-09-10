@@ -18,3 +18,90 @@ body {
   /* color: transparent; */
   /* -webkit-text-stroke: 0.1px #000; */
 }
+
+
+
+.back-home-btn .icon {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .back-home-btn .text {
+    display: none;
+  }
+
+  .back-home-btn .icon {
+    display: inline;
+    font-size: 1.5rem;
+  }
+}
+
+
+.page-background {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-image: url("@/assets/images/Background_1.png");
+  background-size: cover;
+  background-position: center;
+}
+
+@media (max-width: 768px) {
+  .page-background {
+    background-image: url("@/assets/images/mobile_Bcakground_1.png");
+  }
+}
+
+.content-scroller {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 1;
+  /* Ensure content is above clouds */
+}
+
+
+
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(244, 240, 237, 0.9);
+  /* 使用與主題相符的米色背景 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #192A51;
+  /* 使用與主題相符的棕色文字 */
+  display: flex;
+}
+
+.loading-text span {
+  animation: float 1.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.1s);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
