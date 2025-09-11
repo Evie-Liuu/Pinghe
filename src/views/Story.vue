@@ -22,10 +22,10 @@
         <div class="w-1/3"></div>
       </div>
     </header>
-    <main class="p-10 flex flex-col justify-center items-center gap-8 md:px-85">
+    <main class="p-10 flex flex-col justify-center items-center gap-8">
       <HeaderFilter
         @update:filters="handleFilterUpdate"
-        class="flex flex-wrap justify-center items-center gap-4"
+        class="flex flex-wrap justify-center items-center gap-4  md:px-50"
       ></HeaderFilter>
       <ImageCarousel
         :images="allFilteredInfos"

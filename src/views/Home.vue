@@ -33,7 +33,7 @@
         <div class="relative group self-stretch">
           <router-link
             to="/about"
-            class="relative block rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
@@ -49,7 +49,7 @@
         <div class="relative group self-stretch">
           <router-link
             to="/actions"
-            class="relative block rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
@@ -65,7 +65,7 @@
         <div class="relative group self-stretch">
           <router-link
             to="/sdgs"
-            class="relative block lg:-translate-x-1/6 rounded-full font-bold bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block lg:-translate-x-1/6 rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"

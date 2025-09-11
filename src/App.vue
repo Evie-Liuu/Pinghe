@@ -17,7 +17,7 @@
     <p>載入中...</p>
   </div>
   <nav
-    class="fixed top-0 left-0 z-10 w-full p-2 text-rice-500 md:text-4xl font-bold flex flex-row justify-between items-center transition-transform duration-300 ease-in-out"
+    class="fixed top-0 left-0 z-10 w-full p-2 text-rice-500 md:text-4xl flex flex-row justify-between items-center transition-transform duration-300 ease-in-out"
     :class="[
       $route.path !== '/' ? 'bg-header' : '',
       isHeaderVisible || isMenuOpen ? 'translate-y-0' : '-translate-y-full',
