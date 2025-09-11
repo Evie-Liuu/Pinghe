@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
@@ -74,6 +74,19 @@ const swiperOptions = {
 let swiperInstance = null;
 const currentSlidesPerView = ref(1);
 
+console.log(props.initialIndex);
+onMounted(() => {
+  // Swiper 會在 mount 後才準備好
+  // console.log(swiperInstance_.value);
+  // console.log(props.initialIndex);
+
+  // if (swiperInstance_.value && props.initialIndex != null) {
+  //   console.log(props.initialIndex);
+
+  //   swiperInstance_.value.slideToLoop(props.initialIndex, 0, false);
+  // }
+});
+
 const onSwiper = (swiper) => {
   swiperInstance = swiper;
   currentSlidesPerView.value = swiper.params.slidesPerView;
@@ -90,7 +103,7 @@ const handleSlideClick = (isActive, id, index) => {
     goToStory(id);
   } else {
     if (swiperInstance) {
-      swiperInstance.slideToLoop(index);
+      swiperInstance.slideToLoop(swiperInstance.clickedIndex);
     }
   }
 };
@@ -105,8 +118,6 @@ const goPrev = () => {
 
 function getImageUrl(name) {
   if (!name) return "";
-  console.log(`${props.path}${name}`);
-  // return new URL(`${props.path}${name}`, import.meta.url).href;
   return new URL(`../assets/images/${name}`, import.meta.url).href;
 }
 </script>

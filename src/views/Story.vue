@@ -30,13 +30,13 @@
       <ImageCarousel
         :images="allFilteredInfos"
         :path="path"
-        :initial-index="initialSlideIndex"
+        :initialIndex="initialSlideIndex"
       />
     </main>
   </div>
 </template>
 <script setup>
-import { ref, onMounted, computed, inject } from "vue";
+import { ref, onMounted, computed, inject, onBeforeMount } from "vue";
 import carouselImages from "@/data/Story.json";
 import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
@@ -46,8 +46,10 @@ const path = "../assets/images/";
 
 const initialSlideIndex = ref(0);
 
-onMounted(() => {
+// onMounted(() => {
+onBeforeMount(() => {
   const storedIndex = sessionStorage.getItem("lastStoryIndex");
+  console.log("storedIndex");
   console.log(storedIndex);
 
   if (storedIndex) {
