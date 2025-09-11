@@ -18,7 +18,7 @@
       >
         <div @click="handleSlideClick(isActive, img.id, index)" class="h-full">
           <img
-            :src="getImageUrl(props.path + (img.img_url || 'lightBulb.png'))"
+            :src="getImageUrl(img.img_url || 'lightBulb.png')"
             :alt="`slide-${index}`"
             class="rounded-2xl overflow-hidden transition-all duration-300 ease-in-out w-full h-full object-cover"
           />
@@ -106,7 +106,7 @@ const goPrev = () => {
 
 function getImageUrl(name) {
   if (!name) return "";
-  return new URL(`${name}`, import.meta.url).href;
+  return new URL(`${props.path}${name}`, import.meta.url).href;
 }
 </script>
 

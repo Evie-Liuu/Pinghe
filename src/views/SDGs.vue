@@ -19,7 +19,9 @@
         <div class="w-1/3"></div>
       </div>
     </header>
-    <main class="flex flex-col gap-10 md:gap-5 w-full px-4 md:p-15 md:px-80 pt-10 flex-1">
+    <main
+      class="flex flex-col gap-10 md:gap-5 w-full px-4 md:p-15 md:px-80 pt-10 flex-1"
+    >
       <!-- Cards -->
       <router-link
         v-for="info in infos"
@@ -35,7 +37,7 @@
         ></div>
         <div class="relative w-full h-64 md:h-auto md:w-1/2">
           <img
-            :src="getImageUrl(path + info.img_url)"
+            :src="getImageUrl(info.img_url)"
             alt="Card Image"
             class="absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -62,8 +64,6 @@ import CJKSub from "@/components/CJKSub.vue";
 // import { inject } from "vue";
 
 // const handleAppScroll = inject("handleAppScroll");
-
-const path = "../assets/images/";
 
 const infos = ref([
   {
@@ -94,7 +94,7 @@ const infos = ref([
 
 function getImageUrl(name) {
   if (!name) return "";
-  return new URL(`${name}`, import.meta.url).href;
+  return new URL(`../assets/images/${name}`, import.meta.url).href;
 }
 </script>
 <style scoped>

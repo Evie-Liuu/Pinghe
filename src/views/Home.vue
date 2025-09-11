@@ -1,39 +1,43 @@
 <template>
   <main
-    class="w-screen h-screen grid lg:grid-flow-col content-center lg:content-stretch lg:grid-rows-2 text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background.webp')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
+    class="w-screen h-screen flex flex-col gap-12 lg:gap-0 justify-start items-center lg:flex-row text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background.webp')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
   >
     <!-- School Title -->
-    <section class="lg:col-span-1 z-10">
+    <section
+      class="order-1 lg:order-2 z-10 lg:w-1/2 flex justify-center items-center pt-28 lg:pt-0 lg:h-full lg:items-start lg:translate-y-18"
+    >
       <div
         :class="[
           'transition-all duration-3000 ease-out',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
-        class="w-full flex items-right justify-center lg:gap-5 lg:pt-10 lg:translate-x-30"
+        class="w-full flex justify-center lg:justify-start"
       >
         <picture>
           <img
             src="@/assets/images/Title.png"
-            class="pointer-events-none select-none max-w-150"
+            class="pointer-events-none select-none max-w-77 lg:max-w-150"
             alt="Pinghe_Text_H"
           />
         </picture>
       </div>
     </section>
     <!-- Menu Buttons -->
-    <section class="lg:col-span-1 z-10">
+    <section
+      class="order-2 lg:order-1 z-10 lg:w-1/2 flex justify-center items-center lg:h-full lg:items-start lg:translate-65 lg:translate-x-55"
+    >
       <div
         :class="[
           'transition-all duration-3000 ease-out',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
-        class="inline-flex flex-col pt-8 lg:pt-0 lg:gap-5 items-center justify-center text-xl lg:text-2xl"
+        class="inline-flex flex-col gap-4 pe-18 lg:gap-10 items-center justify-center text-xl lg:text-4xl text-black"
       >
         <!-- Button 1 -->
         <div class="relative group self-stretch">
           <router-link
             to="/about"
-            class="relative block rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
@@ -49,7 +53,7 @@
         <div class="relative group self-stretch">
           <router-link
             to="/actions"
-            class="relative block rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block translate-x-6/12 rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
@@ -65,7 +69,7 @@
         <div class="relative group self-stretch">
           <router-link
             to="/sdgs"
-            class="relative block lg:-translate-x-1/6 rounded-full bg-orange-300 p-2 px-5 overflow-hidden"
+            class="relative block translate-x-12/12 rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
           >
             <span
               class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
