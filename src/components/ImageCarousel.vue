@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
@@ -71,53 +71,49 @@ const swiperOptions = {
   },
 };
 
-let swiperInstance = null;
+const swiperInstance = ref(null);
 const currentSlidesPerView = ref(1);
 
-console.log(props.initialIndex);
-onMounted(() => {
-  // Swiper 會在 mount 後才準備好
-  // console.log(swiperInstance_.value);
-  // console.log(props.initialIndex);
-
-  // if (swiperInstance_.value && props.initialIndex != null) {
-  //   console.log(props.initialIndex);
-
-  //   swiperInstance_.value.slideToLoop(props.initialIndex, 0, false);
-  // }
-});
-
 const onSwiper = (swiper) => {
-  swiperInstance = swiper;
+  swiperInstance.value = swiper;
   currentSlidesPerView.value = swiper.params.slidesPerView;
 };
 
+// Watch for the swiper instance and the initialIndex prop to be ready
+watch(() => [swiperInstance.value, props.initialIndex], ([swiper, index]) => {
+  if (swiper && index != null) {
+    swiper.slideToLoop(index, 0);
+  }
+}, { immediate: true });
+
 const goToStory = (id) => {
-  if (swiperInstance) {
-    sessionStorage.setItem("lastStoryIndex", swiperInstance.realIndex);
+  if (swiperInstance.value) {
+    sessionStorage.setItem("lastStoryIndex", swiperInstance.value.realIndex);
   }
   router.push({ name: "story-detail", params: { id } });
 };
+
 const handleSlideClick = (isActive, id, index) => {
   if (isActive) {
     goToStory(id);
   } else {
-    if (swiperInstance) {
-      swiperInstance.slideToLoop(swiperInstance.clickedIndex);
+    if (swiperInstance.value) {
+      swiperInstance.value.slideToLoop(swiperInstance.value.clickedIndex);
     }
   }
 };
 
 const goNext = () => {
-  if (swiperInstance) swiperInstance.slideNext();
+  if (swiperInstance.value) swiperInstance.value.slideNext();
 };
 
 const goPrev = () => {
-  if (swiperInstance) swiperInstance.slidePrev();
+  if (swiperInstance.value) swiperInstance.value.slidePrev();
 };
 
 function getImageUrl(name) {
   if (!name) return "";
+  // This pattern is recognizable by Vite during the build process.
   return new URL(`../assets/images/${name}`, import.meta.url).href;
 }
 </script>
