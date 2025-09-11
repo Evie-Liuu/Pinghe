@@ -1,16 +1,20 @@
 <template>
   <div
     v-if="isLoading && $route.path !== '/' && $route.path !== '/about'"
-    class="loading-overlay"
+    class="loading-overlay text-pblue-500"
   >
-    <div class="loading-text">
-      <span style="--i: 1">載</span>
-      <span style="--i: 2">入</span>
-      <span style="--i: 3">中</span>
-      <span style="--i: 4">.</span>
-      <span style="--i: 5">.</span>
-      <span style="--i: 6">.</span>
+    <div class="train-track">
+      <img
+        src="@/assets/images/LoadingTrain.png"
+        class="loader"
+        alt="Loading..."
+        @error="onImageError"
+        @load="onImageLoad"
+      />
+      <!-- Fallback visual train if image fails to load -->
+      <div class="fallback-train" v-if="imageError">🚂</div>
     </div>
+    <p>載入中...</p>
   </div>
   <nav
     class="fixed top-0 left-0 z-10 w-full p-2 text-rice-500 md:text-4xl font-bold flex flex-row justify-between items-center transition-transform duration-300 ease-in-out"
@@ -129,9 +133,21 @@
 import { ref, onMounted, provide, onBeforeUnmount } from "vue";
 
 const isLoading = ref(true);
+const imageError = ref(false);
+
 const isMenuOpen = ref(false);
 const isHeaderVisible = ref(true);
 const lastScrollY = ref(0);
+
+const onImageError = () => {
+  console.log("Train image failed to load");
+  imageError.value = true;
+};
+
+const onImageLoad = () => {
+  console.log("Train image loaded successfully");
+  imageError.value = false;
+};
 
 const handleScroll = (event) => {
   // Get scroll position from either the event target or the window

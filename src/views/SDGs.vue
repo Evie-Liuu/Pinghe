@@ -19,21 +19,23 @@
         <div class="w-1/3"></div>
       </div>
     </header>
-    <main class="flex flex-col gap-5 w-full px-4 md:p-15 md:px-30 pt-10 flex-1">
+    <main class="flex flex-col gap-10 md:gap-5 w-full px-4 md:p-15 md:px-80 pt-10 flex-1">
       <!-- Cards -->
       <router-link
         v-for="info in infos"
         :to="info.to"
         :key="info.id"
         :class="[
-          'group flex flex-col md:flex-row rounded-lg overflow-hidden flex-1 hover:scale-105',
+          'relative group flex flex-col md:flex-row rounded-lg overflow-hidden flex-1',
           { 'md:flex-row-reverse': info.title === '資源下載' },
         ]"
-        @click="goToStory(info.id)"
       >
+        <div
+          class="absolute inset-0 bg-white/30 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+        ></div>
         <div class="relative w-full h-64 md:h-auto md:w-1/2">
           <img
-            src="../assets/images/lightBulb.png"
+            :src="getImageUrl(path + info.img_url)"
             alt="Card Image"
             class="absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -45,7 +47,7 @@
               <template #en>{{ info.en }}</template>
             </CJKSub>
           </div>
-          <p>
+          <p class="text-lg">
             {{ info.content }}
           </p>
         </div>
@@ -61,13 +63,15 @@ import CJKSub from "@/components/CJKSub.vue";
 
 // const handleAppScroll = inject("handleAppScroll");
 
+const path = "../assets/images/";
+
 const infos = ref([
   {
     id: 1,
     to: "",
     title: "數據呈現",
     en: "Data Presentation",
-    img_url: "",
+    img_url: "lightBulb.png",
     content: "成效視覺化",
   },
   {
@@ -75,7 +79,7 @@ const infos = ref([
     to: "",
     title: "資源下載",
     en: "Resource Download",
-    img_url: "",
+    img_url: "logo.png",
     content: "提供活動簡章",
   },
   {
@@ -83,10 +87,15 @@ const infos = ref([
     to: "/story",
     title: "故事牆",
     en: "Story Wall",
-    img_url: "",
+    img_url: "lightBulb2.png",
     content: "共同實踐的精采回憶",
   },
 ]);
+
+function getImageUrl(name) {
+  if (!name) return "";
+  return new URL(`${name}`, import.meta.url).href;
+}
 </script>
 <style scoped>
 </style>

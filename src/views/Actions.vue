@@ -128,7 +128,7 @@ const allFilteredInfos = computed(() => {
 
   // Filter by keyword
   if (filters.value.keyword) {
-    result = result.filter(info =>
+    result = result.filter((info) =>
       info.title.toLowerCase().includes(filters.value.keyword.toLowerCase())
     );
   }

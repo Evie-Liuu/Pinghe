@@ -1,13 +1,16 @@
 <template>
-  <div class="page-background content-scroller h-screen flex flex-col" @scroll="handleAppScroll">
+  <div
+    class="page-background content-scroller h-screen flex flex-col"
+    @scroll="handleAppScroll"
+  >
     <header class="relative z-5 pt-25 w-full shadow-md bg-header text-rice-500">
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
           <router-link to="/sdgs" class="back-home-btn">
             <span class="text">
               <CJKSub align="center">
-                <template #zh>回首頁</template>
-                <template #en>Home</template>
+                <template #zh>回上頁</template>
+                <template #en>Return</template>
               </CJKSub>
             </span>
             <span class="icon">←</span>
@@ -19,9 +22,7 @@
         <div class="w-1/3"></div>
       </div>
     </header>
-    <main
-      class="p-10 flex flex-col justify-center items-center gap-8 "
-    >
+    <main class="p-10 flex flex-col justify-center items-center gap-8 md:px-85">
       <HeaderFilter
         @update:filters="handleFilterUpdate"
         class="flex flex-wrap justify-center items-center gap-4"
@@ -63,6 +64,7 @@ const filters = ref({
   time: "all",
   startDate: "",
   endDate: "",
+  keyword: "",
 });
 const currentPage = ref(1);
 const itemsPerPage = 6;
@@ -112,6 +114,13 @@ const allFilteredInfos = computed(() => {
       }
       return true; // Should not happen if time is not 'all', but as a fallback
     });
+  }
+
+  // Filter by keyword
+  if (filters.value.keyword) {
+    result = result.filter((info) =>
+      info.title.toLowerCase().includes(filters.value.keyword.toLowerCase())
+    );
   }
 
   return result;

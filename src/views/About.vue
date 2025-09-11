@@ -1,14 +1,18 @@
 <template>
   <div class="page-background">
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="loading-text">
-        <span style="--i: 1">載</span>
-        <span style="--i: 2">入</span>
-        <span style="--i: 3">中</span>
-        <span style="--i: 4">.</span>
-        <span style="--i: 5">.</span>
-        <span style="--i: 6">.</span>
+    <div v-if="isLoading" class="loading-overlay text-pblue-500">
+      <div class="train-track">
+        <img
+          src="@/assets/images/LoadingTrain.png"
+          class="loader"
+          alt="Loading..."
+          @error="onImageError"
+          @load="onImageLoad"
+        />
+        <!-- Fallback visual train if image fails to load -->
+        <div class="fallback-train" v-if="imageError">🚂</div>
       </div>
+      <p>載入中...</p>
     </div>
     <main
       class="absolute bottom-0 w-screen h-screen lg:max-h-280 flex justify-center items-center"
@@ -37,9 +41,20 @@
 import { ref } from "vue";
 
 const isLoading = ref(true);
+const imageError = ref(false);
 
 const onIframeLoad = () => {
   isLoading.value = false;
+};
+
+const onImageError = () => {
+  console.log("Train image failed to load");
+  imageError.value = true;
+};
+
+const onImageLoad = () => {
+  console.log("Train image loaded successfully");
+  imageError.value = false;
 };
 </script>
 <style scoped>

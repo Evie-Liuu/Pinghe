@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full max-w-7xl mx-auto md:mt-15">
+  <div class="relative w-full mx-auto md:mt-15">
     <Swiper
       :initial-slide="props.initialIndex"
       :centered-slides="true"

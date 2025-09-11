@@ -5,7 +5,11 @@
 
   --color-orange-300: #F78F3C;
   --color-orange-600: #DE6028;
+  --color-pblue-200: #495C70;
+  --color-pblue-500: #30455C;
+  --color-pblue-700: #191F38;
 
+  --shadow-focus: 2px 0px 6px -1px rgba(185, 178, 178, 0.9);
 }
 
 body {
@@ -72,37 +76,92 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(244, 240, 237, 0.9);
-  /* 使用與主題相符的米色背景 */
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+  background-color: #eff6ff;
 }
 
-.loading-text {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #192A51;
-  /* 使用與主題相符的棕色文字 */
-  display: flex;
+.train-track {
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  margin-bottom: 1rem;
+  height: 100px;
+  overflow: hidden;
+  /* Hide train when outside boundaries */
+  /* border: 2px dashed rgba(59, 130, 246, 0.3); */
+  /* Visual guide for debugging */
+  border-radius: 8px;
 }
 
-.loading-text span {
-  animation: float 1.5s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.1s);
+.loader {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 120px;
+  /* Make train larger and more visible */
+  height: auto;
+  animation: trainTravel 6s linear infinite;
+  z-index: 10;
 }
 
-@keyframes float {
+@keyframes trainTravel {
+  0% {
+    left: -140px;
+    /* Start completely off-screen from left */
+    opacity: 1;
+  }
+
+  15% {
+    left: 0px;
+    /* Enter the visible area */
+    opacity: 1;
+  }
+
+  85% {
+    left: calc(100% - 120px);
+    /* Travel to near the right edge */
+    opacity: 1;
+  }
+
+  100% {
+    left: calc(100% + 20px);
+    /* Exit completely off-screen to right */
+    opacity: 1;
+  }
+}
+
+/* Loading text styling */
+.loading-overlay p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
 
   0%,
   100% {
-    transform: translateY(0);
+    opacity: 0.6;
   }
 
   50% {
-    transform: translateY(-15px);
+    opacity: 1;
   }
+}
+
+/* Fallback train emoji styling */
+.fallback-train {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  animation: trainTravel 6s linear infinite;
+  z-index: 10;
 }
