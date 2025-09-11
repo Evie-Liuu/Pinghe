@@ -56,7 +56,6 @@ const props = defineProps({
   },
   path: {
     type: String,
-    required: true,
   },
   initialIndex: {
     type: Number,
@@ -106,7 +105,9 @@ const goPrev = () => {
 
 function getImageUrl(name) {
   if (!name) return "";
-  return new URL(`${props.path}${name}`, import.meta.url).href;
+  console.log(`${props.path}${name}`);
+  // return new URL(`${props.path}${name}`, import.meta.url).href;
+  return new URL(`../assets/images/${name}`, import.meta.url).href;
 }
 </script>
 

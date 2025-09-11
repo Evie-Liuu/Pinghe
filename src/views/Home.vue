@@ -1,10 +1,10 @@
 <template>
   <main
-    class="w-screen h-screen flex flex-col gap-12 lg:gap-0 justify-start items-center lg:flex-row text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background.webp')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
+    class="w-screen h-screen flex flex-col gap-12 lg:gap-0 max-[380px]:gap-1 justify-start items-center lg:flex-row text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background.webp')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
   >
     <!-- School Title -->
     <section
-      class="order-1 lg:order-2 z-10 lg:w-1/2 flex justify-center items-center pt-28 lg:pt-0 lg:h-full lg:items-start lg:translate-y-18"
+      class="order-1 lg:order-2 z-10 lg:w-1/2 flex justify-center items-center pt-25 lg:pt-0 lg:h-full lg:items-start lg:translate-y-18"
     >
       <div
         :class="[
@@ -24,7 +24,7 @@
     </section>
     <!-- Menu Buttons -->
     <section
-      class="order-2 lg:order-1 z-10 lg:w-1/2 flex justify-center items-center lg:h-full lg:items-start lg:translate-65 lg:translate-x-55"
+      class="order-2 lg:order-1 z-10 lg:w-1/2 flex justify-center items-center lg:h-full lg:items-start lg:translate-66 lg:translate-x-78"
     >
       <div
         :class="[

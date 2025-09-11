@@ -20,7 +20,7 @@
       </div>
     </header>
     <main
-      class="flex flex-col gap-10 md:gap-5 w-full px-4 md:p-15 md:px-80 pt-10 flex-1"
+      class="flex flex-col gap-10 md:gap-5 w-full px-4 md:p-15 md:py-8 md:px-80 pt-10 flex-1"
     >
       <!-- Cards -->
       <router-link
