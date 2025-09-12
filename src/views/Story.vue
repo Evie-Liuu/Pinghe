@@ -21,8 +21,8 @@
         </div>
         <div class="w-1/3 flex items-center justify-end pr-4">
           <router-link to="/story/new" title="建立新故事">
-            <div class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-orange-400 transition-colors">
-              <i class="fa-solid fa-plus"></i>
+            <div class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
+              <i class="fa-solid fa-plus font-bold text-pblue-500"></i>
             </div>
           </router-link>
         </div>
