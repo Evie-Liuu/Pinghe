@@ -19,8 +19,8 @@
         <div class="w-1/3 text-center">
           <h1 class="text-2xl md:text-3xl font-bold">故事牆</h1>
         </div>
-        <div class="w-1/3 text-center flex items-center justify-center">
-          <div class="bg-orange-300 rounded-full px-1">
+        <div class="w-1/3 flex items-center justify-center">
+          <div class="bg-orange-300 rounded-full px-1 text-center align-top">
             <i class="fa-solid fa-plus"></i>
           </div>
         </div>

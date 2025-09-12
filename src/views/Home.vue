@@ -24,7 +24,7 @@
     </section>
     <!-- Menu Buttons -->
     <section
-      class="order-2 lg:order-1 z-10 lg:w-1/2 flex justify-center items-center lg:h-full lg:items-start lg:translate-66 lg:translate-x-78"
+      class="order-2 lg:order-1 z-20 lg:w-1/2 flex justify-center items-center lg:h-full lg:items-start lg:translate-66 lg:translate-x-78"
     >
       <div
         :class="[
