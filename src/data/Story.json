@@ -8,7 +8,7 @@
         ],
         "intro": "全校讀論語 星期四讀經和鎮長。",
         "img_url": "figure3.png",
-        "description": "全校讀論語 星期四讀經和鎮長。"
+        "content": "全校讀論語 星期四讀經和鎮長。"
     },
     {
         "id": 2,
@@ -19,7 +19,7 @@
         ],
         "intro": "精彩的舞蹈表演，獲得滿堂彩。",
         "img_url": "figure2.png",
-        "description": "精彩的舞蹈表演，獲得滿堂彩。",
+        "content": "精彩的舞蹈表演，獲得滿堂彩。",
         "comment": [
             {
                 "uuid": "10",
@@ -52,7 +52,7 @@
         ],
         "intro": "",
         "img_url": "",
-        "description": ""
+        "content": ""
     },
     {
         "id": 4,
@@ -63,6 +63,6 @@
         ],
         "intro": "",
         "img_url": "figure1.png",
-        "description": ""
+        "content": ""
     }
 ]

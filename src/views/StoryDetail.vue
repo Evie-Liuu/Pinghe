@@ -76,7 +76,7 @@
           <div
             v-if="!isEditing"
             class="prose max-w-none"
-            v-html="selectedInfo.description"
+            v-html="selectedInfo.content"
           ></div>
           <div v-else class="w-full">
             <!-- Toolbar -->
@@ -218,14 +218,14 @@ onUnmounted(() => {
 
 const enterEditMode = () => {
   if (editor.value) {
-    editor.value.commands.setContent(selectedInfo.value.description || "");
+    editor.value.commands.setContent(selectedInfo.value.content || "");
   }
   isEditing.value = true;
 };
 
 const saveContent = () => {
   if (editor.value) {
-    selectedInfo.value.description = editor.value.getHTML();
+    selectedInfo.value.content = editor.value.getHTML();
   }
   isEditing.value = false;
   // In a real app, you'd send this to a server.
