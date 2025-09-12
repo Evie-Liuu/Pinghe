@@ -31,16 +31,16 @@
           'transition-all duration-3000 ease-out',
           isLoaded ? 'opacity-100' : 'opacity-0',
         ]"
-        class="inline-flex flex-col gap-4 pe-18 lg:gap-10 items-center justify-center text-xl lg:text-4xl text-black"
+        class="inline-flex flex-col gap-4 lg:gap-10 items-start justify-center text-xl lg:text-4xl text-black"
       >
         <!-- Button 1 -->
         <div class="relative group self-stretch">
           <router-link
             to="/about"
-            class="relative block rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
+            class="relative block ml-22 mr-50 lg:ml-10 lg:mr-50 rounded-full bg-orange-300 p-2 lg:p-4 overflow-hidden"
           >
             <span
-              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              class="block whitespace-nowrap transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
               >校園探索</span
             >
             <span
@@ -53,10 +53,10 @@
         <div class="relative group self-stretch">
           <router-link
             to="/actions"
-            class="relative block translate-x-6/12 rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
+            class="relative block ml-36 mr-36 lg:ml-30 lg:mr-30 rounded-full bg-orange-300 p-2 lg:p-4 overflow-hidden"
           >
             <span
-              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              class="block whitespace-nowrap transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
               >SDGs行動</span
             >
             <span
@@ -69,10 +69,10 @@
         <div class="relative group self-stretch">
           <router-link
             to="/sdgs"
-            class="relative block translate-x-12/12 rounded-full bg-orange-300 p-2 lg:p-4 lg:mx-2 overflow-hidden"
+            class="relative block ml-50 mr-22 lg:ml-60 lg:mr-0 rounded-full bg-orange-300 p-2 lg:p-4 overflow-hidden"
           >
             <span
-              class="block transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
+              class="block whitespace-nowrap transition-transform duration-300 ease-in-out group-hover:-translate-x-full"
               >SDGs成果</span
             >
             <span
