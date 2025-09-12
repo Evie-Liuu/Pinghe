@@ -19,7 +19,29 @@
         ],
         "intro": "精彩的舞蹈表演，獲得滿堂彩。",
         "img_url": "figure2.png",
-        "description": "精彩的舞蹈表演，獲得滿堂彩。"
+        "description": "精彩的舞蹈表演，獲得滿堂彩。",
+        "comment": [
+            {
+                "uuid": "10",
+                "author_uuid": "400",
+                "author": "小明",
+                "time": "",
+                "delete_time": null,
+                "text": "這篇文章真棒！",
+                "likes": 5,
+                "liked": false
+            },
+            {
+                "uuid": "11",
+                "author_uuid": "0",
+                "author": "我",
+                "time": "",
+                "delete_time": null,
+                "text": "寫得很好，學到很多。",
+                "likes": 2,
+                "liked": true
+            }
+        ]
     },
     {
         "id": 3,

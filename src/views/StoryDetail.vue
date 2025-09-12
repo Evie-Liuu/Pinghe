@@ -110,9 +110,53 @@
         </section>
 
         <!-- Comments Section -->
-        <section>
-          <h2 class="text-2xl font-bold mb-4">留言板</h2>
-          <!-- ... comments logic ... -->
+        <section class="my-20">
+          <h2 class="text-xl mb-4">留言板</h2>
+          <!-- Comments List -->
+          <div class="flex flex-col gap-4 mb-6 text-black">
+            <div
+              v-for="comment in selectedInfo.comment"
+              :key="comment.uuid"
+              :class="[
+                'p-4 rounded-md',
+                comment.author_uuid === currentUser.author_uuid
+                  ? 'bg-green-100'
+                  : 'bg-gray-100',
+              ]"
+            >
+              <p class="font-bold">{{ comment.author }}</p>
+              <p class="text-gray-800">{{ comment.text }}</p>
+              <div class="flex items-center justify-end mt-2">
+                <button
+                  @click="toggleLike(comment.uuid)"
+                  class="text-gray-500 hover:text-red-500"
+                >
+                  <i
+                    :class="[
+                      'fa-heart',
+                      comment.liked ? 'fa-solid text-red-500' : 'fa-regular',
+                    ]"
+                  ></i>
+                  <span class="ml-1">{{ comment.likes }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Post Comment Form -->
+          <div>
+            <textarea
+              v-model="newComment"
+              class="w-full p-2 border rounded-md"
+              rows="3"
+              placeholder="在這裡寫下你的留言..."
+            ></textarea>
+            <button
+              @click="addComment"
+              class="mt-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+            >
+              發布留言
+            </button>
+          </div>
         </section>
       </section>
       <div v-else>
@@ -201,6 +245,35 @@ const share = () => {
   } else {
     navigator.clipboard.writeText(window.location.href);
     alert("連結已複製到剪貼簿！");
+  }
+};
+
+// --- Comment Section Logic ---
+const currentUser = { author_uuid: "0", author: "我" }; // Simulate current user
+const newComment = ref("");
+const addComment = () => {
+  if (newComment.value.trim() === "") return;
+  selectedInfo.value.comment.unshift({
+    uuid: Date.now(),
+    author_uuid: currentUser.author_uuid,
+    author: currentUser.author,
+    time: Date.now(),
+    delete_time: null,
+    text: newComment.value,
+    likes: 0,
+    liked: false,
+  });
+  newComment.value = "";
+};
+const toggleLike = (commentId) => {
+  const comment = selectedInfo.value.comment.find((c) => c.uuid === commentId);
+  if (comment) {
+    if (comment.liked) {
+      comment.likes--;
+    } else {
+      comment.likes++;
+    }
+    comment.liked = !comment.liked;
   }
 };
 </script>
