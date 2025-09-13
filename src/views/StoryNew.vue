@@ -110,21 +110,6 @@
           />
         </div>
 
-        <!-- Image URL Input -->
-        <div>
-          <label for="image" class="block text-lg font-medium">背景圖片</label>
-          <input
-            type="text"
-            v-model="story.img_url"
-            id="image"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="e.g., my-image.png"
-          />
-          <p class="text-sm text-gray-500 mt-1">
-            請提供圖片檔名，並確保圖片已存在於 `src/assets/images/` 資料夾中。
-          </p>
-        </div>
-
         <!-- Tiptap Editor -->
         <div>
           <label class="block text-lg font-medium">內容*</label>
