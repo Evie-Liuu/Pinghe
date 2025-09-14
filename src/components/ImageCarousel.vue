@@ -77,6 +77,13 @@ const currentSlidesPerView = ref(1);
 const onSwiper = (swiper) => {
   swiperInstance.value = swiper;
   currentSlidesPerView.value = swiper.params.slidesPerView;
+
+  // 監聽滑動事件，實時更新位置
+  swiper.on('slideChange', () => {
+    const currentIndex = swiper.realIndex;
+    sessionStorage.setItem("lastStoryIndex", currentIndex);
+    console.log("滑動到索引:", currentIndex);
+  });
 };
 
 // Watch for the swiper instance and the initialIndex prop to be ready
@@ -88,7 +95,9 @@ watch(() => [swiperInstance.value, props.initialIndex], ([swiper, index]) => {
 
 const goToStory = (id) => {
   if (swiperInstance.value) {
-    sessionStorage.setItem("lastStoryIndex", swiperInstance.value.realIndex);
+    const currentIndex = swiperInstance.value.realIndex;
+    sessionStorage.setItem("lastStoryIndex", currentIndex);
+    console.log("保存卡片索引:", currentIndex, "故事ID:", id);
   }
   router.push({ name: "story-detail", params: { id } });
 };

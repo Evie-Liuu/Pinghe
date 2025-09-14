@@ -68,12 +68,13 @@ const initialSlideIndex = ref(0);
 // onMounted(() => {
 onBeforeMount(() => {
   const storedIndex = sessionStorage.getItem("lastStoryIndex");
-  console.log("storedIndex");
-  console.log(storedIndex);
-
-  if (storedIndex) {
-    initialSlideIndex.value = parseInt(storedIndex, 10);
-    // sessionStorage.removeItem('lastStoryIndex'); // Decide if you want to clear it
+  console.log("讀取到的 storedIndex:", storedIndex);
+  if (storedIndex !== null && storedIndex !== '') {
+    const index = parseInt(storedIndex, 10);
+    if (!isNaN(index) && index >= 0) {
+      initialSlideIndex.value = index;
+      console.log("設置初始索引為:", initialSlideIndex.value);
+    }
   }
 });
 
