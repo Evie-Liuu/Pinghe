@@ -95,18 +95,258 @@
       >
       </div>
     </section> -->
+
+    <!-- 身分選擇彈窗 -->
+    <div
+      v-if="showRoleModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">請選擇您的身分</h2>
+
+        <div class="space-y-4">
+          <!-- 老師選項 -->
+          <button
+            @click="showTeacherLogin = true"
+            class="w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600">
+                <i class="fas fa-user-tie text-xl"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-800">老師</h3>
+                <p class="text-sm text-gray-600">具有編輯和管理權限</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- 學生選項 -->
+          <button
+            @click="selectStudentRole"
+            class="w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors group"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white group-hover:bg-green-600">
+                <i class="fas fa-user-graduate text-xl"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-800">學生</h3>
+                <p class="text-sm text-gray-600">瀏覽內容並參與互動</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- 訪客選項 -->
+          <button
+            @click="selectVisitorRole"
+            class="w-full p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors group"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center text-white group-hover:bg-gray-600">
+                <i class="fas fa-user text-xl"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-800">訪客</h3>
+                <p class="text-sm text-gray-600">瀏覽所有公開內容</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 老師登入彈窗 -->
+    <div
+      v-if="showTeacherLogin"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">老師登入</h2>
+          <button
+            @click="backToRoleSelection"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form @submit.prevent="handleTeacherLogin" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">帳號</label>
+            <input
+              v-model="teacherForm.username"
+              type="text"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="請輸入老師帳號"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">密碼</label>
+            <input
+              v-model="teacherForm.password"
+              type="password"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="請輸入密碼"
+            />
+          </div>
+
+          <div v-if="loginError" class="text-red-600 text-sm">
+            {{ loginError }}
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              @click="backToRoleSelection"
+              class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              返回
+            </button>
+            <button
+              type="submit"
+              :disabled="loginLoading"
+              class="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            >
+              {{ loginLoading ? '登入中...' : '登入' }}
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-4 p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
+          <p><strong>預設帳號：</strong>teacher</p>
+          <p><strong>預設密碼：</strong>teacher123</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 學生姓名輸入彈窗 -->
+    <div
+      v-if="showStudentForm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">學生登入</h2>
+          <button
+            @click="backToRoleSelection"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form @submit.prevent="confirmStudentRole" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">請輸入您的姓名</label>
+            <input
+              v-model="studentName"
+              type="text"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="例如：王小明"
+            />
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              @click="backToRoleSelection"
+              class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              返回
+            </button>
+            <button
+              type="submit"
+              class="flex-1 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600"
+            >
+              進入網站
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </main>
 </template>
 <script setup>
 import { ref, onMounted } from "vue";
+import { useAuth } from "@/stores/auth";
+
+const { isAuthenticated, selectRole, teacherLogin, checkAuth } = useAuth();
 
 const isLoaded = ref(false);
+const showRoleModal = ref(false);
+const showTeacherLogin = ref(false);
+const showStudentForm = ref(false);
+const studentName = ref('');
+const loginError = ref('');
+const loginLoading = ref(false);
 
+const teacherForm = ref({
+  username: '',
+  password: ''
+});
+
+// 檢查是否已經登入
 onMounted(() => {
   setTimeout(() => {
     isLoaded.value = true;
   }, 100);
+
+  checkAuth();
+
+  // 如果沒有登入，顯示身分選擇彈窗
+  if (!isAuthenticated.value) {
+    setTimeout(() => {
+      showRoleModal.value = true;
+    }, 1500); // 延遲一點顯示，讓首頁動畫先完成
+  }
 });
+
+const selectStudentRole = () => {
+  showRoleModal.value = false;
+  showStudentForm.value = true;
+};
+
+const selectVisitorRole = () => {
+  selectRole('visitor');
+  showRoleModal.value = false;
+};
+
+const confirmStudentRole = () => {
+  selectRole('student', { name: studentName.value });
+  showStudentForm.value = false;
+};
+
+const handleTeacherLogin = async () => {
+  loginLoading.value = true;
+  loginError.value = '';
+
+  setTimeout(() => {
+    const result = teacherLogin(teacherForm.value.username, teacherForm.value.password);
+
+    if (result.success) {
+      showTeacherLogin.value = false;
+      showRoleModal.value = false;
+    } else {
+      loginError.value = result.message;
+    }
+
+    loginLoading.value = false;
+  }, 500);
+};
+
+const backToRoleSelection = () => {
+  showTeacherLogin.value = false;
+  showStudentForm.value = false;
+  showRoleModal.value = true;
+  loginError.value = '';
+  teacherForm.value = { username: '', password: '' };
+  studentName.value = '';
+};
 </script>
 <style scoped>
 </style>

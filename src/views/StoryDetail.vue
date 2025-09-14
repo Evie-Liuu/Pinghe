@@ -29,6 +29,7 @@
         >
           <div class="absolute inset-0 bg-black/40"></div>
           <button
+            v-if="isTeacher"
             @click="openEditModal"
             class="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 z-20"
           >
@@ -57,18 +58,25 @@
           <!-- Control Buttons -->
           <div class="self-end flex gap-2">
             <button
-              v-if="!isEditing"
+              v-if="!isEditing && isTeacher"
               @click="enterEditMode"
               class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
             >
-              編輯
+              編輯內容
             </button>
             <button
-              v-if="isEditing"
+              v-if="isEditing && isTeacher"
               @click="saveContent"
               class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
             >
               儲存
+            </button>
+            <button
+              v-if="isEditing && isTeacher"
+              @click="cancelEdit"
+              class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+            >
+              取消
             </button>
             <button
               @click="share"
@@ -325,6 +333,7 @@ import typeTags from "@/data/SDGs_goal.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useAuth } from "@/stores/auth";
 
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
@@ -333,6 +342,7 @@ import TaskItem from "@tiptap/extension-task-item";
 
 const props = defineProps({ id: String });
 const handleAppScroll = inject("handleAppScroll");
+const { isTeacher } = useAuth();
 
 const selectedInfo = ref(infos.find((item) => item.id === parseInt(props.id)));
 // jsonData
@@ -382,9 +392,15 @@ const saveContent = () => {
     selectedInfo.value.content = editor.value.getHTML();
   }
   isEditing.value = false;
-  // In a real app, you'd send this to a server.
-  // alert("內容已儲存(僅限於此頁面)!");
-  console.log(editor.value.getJSON());
+  console.log("內容已儲存:", editor.value.getJSON());
+  alert("內容已儲存！");
+};
+
+const cancelEdit = () => {
+  if (editor.value) {
+    editor.value.commands.setContent(selectedInfo.value.content || "");
+  }
+  isEditing.value = false;
 };
 
 const share = () => {

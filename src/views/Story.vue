@@ -19,9 +19,11 @@
         <div class="w-1/3 text-center">
           <h1 class="text-2xl md:text-3xl font-bold">故事牆</h1>
         </div>
-        <div class="w-1/3 flex items-center justify-end pr-4">
-          <router-link to="/story/new" title="建立新故事">
-            <div class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
+        <div class="w-1/3 flex items-center justify-end pr-4 gap-2">
+          <router-link v-if="isTeacher" to="/story/new" title="建立新故事">
+            <div
+              class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
+            >
               <i class="fa-solid fa-plus font-bold text-pblue-500"></i>
             </div>
           </router-link>
@@ -31,7 +33,7 @@
     <main class="p-10 flex flex-col justify-center items-center gap-8">
       <HeaderFilter
         @update:filters="handleFilterUpdate"
-        class="flex flex-wrap justify-center items-center gap-4  md:px-50"
+        class="flex flex-wrap justify-center items-center gap-4 md:px-50"
       ></HeaderFilter>
       <ImageCarousel
         :images="allFilteredInfos"
@@ -47,6 +49,17 @@ import carouselImages from "@/data/Story.json";
 import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import HeaderFilter from "@/components/HeaderFilter.vue";
+import { useAuth } from "@/stores/auth";
+
+const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
+
+// 初始檢查
+onMounted(() => {
+  checkAuth();
+  console.log("Story.vue onMounted - isAuthenticated:", isAuthenticated.value);
+  console.log("Story.vue onMounted - user:", user.value);
+  console.log("Story.vue onMounted - isTeacher:", isTeacher.value);
+});
 
 const path = "../assets/images/";
 

@@ -125,12 +125,50 @@
           <span v-else>SDGs RESULT</span>
         </div>
       </router-link>
+
+      <!-- 身分顯示/登出 -->
+      <div class="px-4 text-rice-500 text-shadow-3d">
+        <div class="p-3" v-if="!isAuthenticated">
+          <router-link
+            to="/"
+            @click="isMenuOpen = false"
+            class="hover:text-orange-300 transition-colors flex items-center gap-2"
+          >
+            <i class="fas fa-user-plus"></i>
+            選擇身分
+          </router-link>
+        </div>
+        <div class="p-3" v-else>
+          <div class="flex flex-col items-center gap-2">
+            <div class="flex items-center gap-2"
+                 :class="{
+                   'text-blue-300': isTeacher,
+                   'text-green-300': isStudent,
+                   'text-gray-300': isVisitor
+                 }">
+              <i :class="user?.icon || 'fas fa-user'"></i>
+              <span class="text-sm">{{ user?.displayName }}: {{ user?.username }}</span>
+            </div>
+            <button
+              @click="handleLogout"
+              class="text-sm px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+            >
+              登出
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
   <router-view />
 </template>
 <script setup>
 import { ref, onMounted, provide, onBeforeUnmount } from "vue";
+import { useAuth } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
+const { isAuthenticated, user, isTeacher, isStudent, isVisitor, logout, checkAuth } = useAuth();
+const router = useRouter();
 
 const isLoading = ref(true);
 const imageError = ref(false);
@@ -169,9 +207,16 @@ const handleScroll = (event) => {
   lastScrollY.value = currentScrollY < 0 ? 0 : currentScrollY;
 };
 
+const handleLogout = () => {
+  logout();
+  isMenuOpen.value = false;
+  router.push('/');
+};
+
 provide("handleAppScroll", handleScroll);
 
 onMounted(() => {
+  checkAuth(); // 初始化時檢查認證狀態
   window.addEventListener("scroll", handleScroll); // Fallback for pages that scroll the window
   setTimeout(() => {
     isLoading.value = false;
