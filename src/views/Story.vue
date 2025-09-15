@@ -56,9 +56,9 @@ const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 // 初始檢查
 onMounted(() => {
   checkAuth();
-  console.log("Story.vue onMounted - isAuthenticated:", isAuthenticated.value);
-  console.log("Story.vue onMounted - user:", user.value);
-  console.log("Story.vue onMounted - isTeacher:", isTeacher.value);
+  // console.log("Story.vue onMounted - isAuthenticated:", isAuthenticated.value);
+  // console.log("Story.vue onMounted - user:", user.value);
+  // console.log("Story.vue onMounted - isTeacher:", isTeacher.value);
 });
 
 const path = "../assets/images/";
@@ -69,7 +69,7 @@ const initialSlideIndex = ref(0);
 onBeforeMount(() => {
   const storedIndex = sessionStorage.getItem("lastStoryIndex");
   console.log("讀取到的 storedIndex:", storedIndex);
-  if (storedIndex !== null && storedIndex !== '') {
+  if (storedIndex !== null && storedIndex !== "") {
     const index = parseInt(storedIndex, 10);
     if (!isNaN(index) && index >= 0) {
       initialSlideIndex.value = index;

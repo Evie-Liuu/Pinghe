@@ -79,7 +79,7 @@ const onSwiper = (swiper) => {
   currentSlidesPerView.value = swiper.params.slidesPerView;
 
   // 監聽滑動事件，實時更新位置
-  swiper.on('slideChange', () => {
+  swiper.on("slideChange", () => {
     const currentIndex = swiper.realIndex;
     sessionStorage.setItem("lastStoryIndex", currentIndex);
     console.log("滑動到索引:", currentIndex);
@@ -87,11 +87,15 @@ const onSwiper = (swiper) => {
 };
 
 // Watch for the swiper instance and the initialIndex prop to be ready
-watch(() => [swiperInstance.value, props.initialIndex], ([swiper, index]) => {
-  if (swiper && index != null) {
-    swiper.slideToLoop(index, 0);
-  }
-}, { immediate: true });
+watch(
+  () => [swiperInstance.value, props.initialIndex],
+  ([swiper, index]) => {
+    if (swiper && index != null) {
+      swiper.slideToLoop(index, 0);
+    }
+  },
+  { immediate: true }
+);
 
 const goToStory = (id) => {
   if (swiperInstance.value) {

@@ -9,8 +9,8 @@ export const useAuth = () => {
 
   // 預設老師帳號（實際應該存在後端）
   const teacherCredentials = {
-    username: 'teacher',
-    password: 'teacher123'
+    username: 'tc',
+    password: 'tc'
   }
 
   // 身分選擇登入（學生和訪客不需要密碼）

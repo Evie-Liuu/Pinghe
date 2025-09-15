@@ -99,10 +99,12 @@
     <!-- 身分選擇彈窗 -->
     <div
       v-if="showRoleModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
     >
       <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">請選擇您的身分</h2>
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          請選擇您的身分
+        </h2>
 
         <div class="space-y-4">
           <!-- 老師選項 -->
@@ -111,7 +113,9 @@
             class="w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group"
           >
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600">
+              <div
+                class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600"
+              >
                 <i class="fas fa-user-tie text-xl"></i>
               </div>
               <div class="text-left">
@@ -127,7 +131,9 @@
             class="w-full p-4 border-2 border-green-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition-colors group"
           >
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white group-hover:bg-green-600">
+              <div
+                class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white group-hover:bg-green-600"
+              >
                 <i class="fas fa-user-graduate text-xl"></i>
               </div>
               <div class="text-left">
@@ -143,7 +149,9 @@
             class="w-full p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors group"
           >
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center text-white group-hover:bg-gray-600">
+              <div
+                class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center text-white group-hover:bg-gray-600"
+              >
                 <i class="fas fa-user text-xl"></i>
               </div>
               <div class="text-left">
@@ -159,7 +167,7 @@
     <!-- 老師登入彈窗 -->
     <div
       v-if="showTeacherLogin"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-gray-700"
     >
       <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
         <div class="flex items-center justify-between mb-6">
@@ -174,7 +182,9 @@
 
         <form @submit.prevent="handleTeacherLogin" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">帳號</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >帳號</label
+            >
             <input
               v-model="teacherForm.username"
               type="text"
@@ -184,7 +194,9 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">密碼</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >密碼</label
+            >
             <input
               v-model="teacherForm.password"
               type="password"
@@ -211,14 +223,14 @@
               :disabled="loginLoading"
               class="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
             >
-              {{ loginLoading ? '登入中...' : '登入' }}
+              {{ loginLoading ? "登入中..." : "登入" }}
             </button>
           </div>
         </form>
 
         <div class="mt-4 p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
-          <p><strong>預設帳號：</strong>teacher</p>
-          <p><strong>預設密碼：</strong>teacher123</p>
+          <p><strong>預設帳號：</strong>tc</p>
+          <p><strong>預設密碼：</strong>tc</p>
         </div>
       </div>
     </div>
@@ -241,7 +253,9 @@
 
         <form @submit.prevent="confirmStudentRole" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">請輸入您的姓名</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >請輸入您的姓名</label
+            >
             <input
               v-model="studentName"
               type="text"
@@ -281,13 +295,13 @@ const isLoaded = ref(false);
 const showRoleModal = ref(false);
 const showTeacherLogin = ref(false);
 const showStudentForm = ref(false);
-const studentName = ref('');
-const loginError = ref('');
+const studentName = ref("");
+const loginError = ref("");
 const loginLoading = ref(false);
 
 const teacherForm = ref({
-  username: '',
-  password: ''
+  username: "",
+  password: "",
 });
 
 // 檢查是否已經登入
@@ -312,21 +326,24 @@ const selectStudentRole = () => {
 };
 
 const selectVisitorRole = () => {
-  selectRole('visitor');
+  selectRole("visitor");
   showRoleModal.value = false;
 };
 
 const confirmStudentRole = () => {
-  selectRole('student', { name: studentName.value });
+  selectRole("student", { name: studentName.value });
   showStudentForm.value = false;
 };
 
 const handleTeacherLogin = async () => {
   loginLoading.value = true;
-  loginError.value = '';
+  loginError.value = "";
 
   setTimeout(() => {
-    const result = teacherLogin(teacherForm.value.username, teacherForm.value.password);
+    const result = teacherLogin(
+      teacherForm.value.username,
+      teacherForm.value.password
+    );
 
     if (result.success) {
       showTeacherLogin.value = false;
@@ -343,9 +360,9 @@ const backToRoleSelection = () => {
   showTeacherLogin.value = false;
   showStudentForm.value = false;
   showRoleModal.value = true;
-  loginError.value = '';
-  teacherForm.value = { username: '', password: '' };
-  studentName.value = '';
+  loginError.value = "";
+  teacherForm.value = { username: "", password: "" };
+  studentName.value = "";
 };
 </script>
 <style scoped>
