@@ -1,6 +1,6 @@
 <template>
   <main
-    class="w-screen h-screen flex flex-col gap-12 lg:gap-0 max-[380px]:gap-1 justify-start items-center lg:flex-row text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background.webp')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
+    class="w-screen h-screen flex flex-col gap-12 lg:gap-0 max-[380px]:gap-1 justify-start items-center lg:flex-row text-center bg-[url('@/assets/images/Mobile/Mobile_MainPage_Background2.png')] bg-cover bg-center overflow-hidden lg:bg-[url('@/assets/images/MainPage_Pic.webp'),_url('@/assets/images/MainPage_Background_T.png')] lg:[background-repeat:no-repeat,no-repeat] lg:[background-position:right,center] lg:[background-size:contain,cover]"
   >
     <!-- School Title -->
     <section
@@ -85,16 +85,14 @@
     </section>
 
     <!-- Cover -->
-    <!-- <section class="lg:row-span-2">
-      <div
-        :class="[
-          'transition-all duration-3000 ease-out',
-          isLoaded ? 'opacity-100' : 'opacity-0',
-        ]"
-        class="lg:h-full flex items-center justify-center"
-      >
-      </div>
-    </section> -->
+    <!-- Train Smoke Animation -->
+    <div class="absolute -bottom-15 left-0 w-1/2 pointer-events-non">
+      <img
+        :src="Train_smoke"
+        class="select-none animate-train-enter"
+        alt="Pinghe_Train_Smoke"
+      />
+    </div>
 
     <!-- 身分選擇彈窗 -->
     <div
@@ -288,6 +286,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useAuth } from "@/stores/auth";
+import Train_smoke from "@/assets/images/Train_Smoke.gif";
 
 const { isAuthenticated, selectRole, teacherLogin, checkAuth } = useAuth();
 
@@ -366,4 +365,17 @@ const backToRoleSelection = () => {
 };
 </script>
 <style scoped>
+@keyframes train-enter {
+  from {
+    transform: translateX(-50%) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+.animate-train-enter {
+  animation: train-enter 1s ease-out forwards; /* Add 1s delay */
+}
 </style>
