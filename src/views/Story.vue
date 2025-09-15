@@ -192,7 +192,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, computed, inject, onBeforeMount } from "vue";
+import { ref, onMounted, computed, inject, onBeforeMount, watch } from "vue";
 import carouselImages from "@/data/Story.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
@@ -234,6 +234,9 @@ const allInfos = ref(carouselImages);
 
 const showEditModal = ref(false);
 const selectedId = ref(null);
+const selectedInfo = computed(() => {
+  return allInfos.value.find((item) => item.id === parseInt(selectedId.value));
+});
 
 const handleEdit = (storyId) => {
   selectedId.value = storyId;
@@ -317,8 +320,9 @@ const allFilteredInfos = computed(() => {
 });
 
 // --- Edit Modal Logic ---
-const editStory = computed(() => {
-  return allInfos.value.find((item) => item.id === parseInt(selectedId.value));
+const editStory = ref(null);
+watch(selectedInfo, () => {
+  editStory.value = { ...selectedInfo.value };
 });
 const editSdgSearch = ref("");
 const showEditDropdown = ref(false);
@@ -327,8 +331,6 @@ const editDropdown = ref(null);
 const sdgOptions = sdgsData.filter((s) => s.value !== 0);
 
 const selectedEditSdgs = computed(() => {
-  console.log();
-
   return sdgOptions.filter((sdg) => editStory.value.types.includes(sdg.value));
 });
 
@@ -353,10 +355,6 @@ const errors = ref({
   tags: false,
 });
 
-const openEditModal = () => {
-  editStory.value = { ...selectedInfo.value };
-  showEditModal.value = true;
-};
 
 const closeEditModal = () => {
   showEditModal.value = false;
