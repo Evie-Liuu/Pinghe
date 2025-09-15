@@ -138,24 +138,39 @@
             選擇身分
           </router-link>
         </div>
-        <div class="p-3" v-else>
-          <div class="flex flex-col items-center gap-2">
-            <div
-              class="flex items-center gap-2"
-              :class="{
-                'text-blue-300': isTeacher,
-                'text-green-300': isStudent,
-                'text-gray-300': isVisitor,
-              }"
-            >
-              <i :class="user?.icon || 'fas fa-user'"></i>
-              <span class="text-sm"
-                >{{ user?.displayName }}: {{ user?.username }}</span
+        <!-- New Profile Dropdown -->
+        <div v-else class="relative" ref="profileMenu">
+          <button
+            @click="isProfileMenuOpen = !isProfileMenuOpen"
+            class="min-w-10"
+          >
+            <img
+              src="@/assets/images/student.png"
+              alt="User Profile"
+              class="w-10 h-10 rounded-full object-cover"
+            />
+          </button>
+          <div
+            v-if="isProfileMenuOpen"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-gray-800"
+          >
+            <div class="px-4 py-2">
+              <p
+                class="text-sm font-medium"
+                :class="{
+                  'text-blue-500': isTeacher,
+                  'text-green-500': isStudent,
+                  'text-gray-500': isVisitor,
+                }"
               >
+                {{ user?.displayName }}
+              </p>
+              <p class="text-sm text-gray-500">{{ user?.username }}</p>
             </div>
+            <div class="border-t border-gray-200"></div>
             <button
               @click="handleLogout"
-              class="text-sm px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
+              class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
             >
               登出
             </button>
@@ -170,6 +185,7 @@
 import { ref, onMounted, provide, onBeforeUnmount } from "vue";
 import { useAuth } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { useClickOutside } from "@/composables/useClickOutside";
 
 const {
   isAuthenticated,
@@ -188,6 +204,12 @@ const imageError = ref(false);
 const isMenuOpen = ref(false);
 const isHeaderVisible = ref(true);
 const lastScrollY = ref(0);
+
+const isProfileMenuOpen = ref(false);
+const profileMenu = ref(null);
+useClickOutside(profileMenu, () => {
+  isProfileMenuOpen.value = false;
+});
 
 const onImageError = () => {
   console.log("Train image failed to load");
@@ -222,6 +244,7 @@ const handleScroll = (event) => {
 const handleLogout = () => {
   logout();
   isMenuOpen.value = false;
+  isProfileMenuOpen.value = false;
   router.push("/");
 };
 
