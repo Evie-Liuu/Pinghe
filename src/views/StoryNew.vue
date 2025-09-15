@@ -52,7 +52,7 @@
                   :key="sdg.value"
                   class="inline-flex items-center px-2 py-1 text-sm bg-blue-500 text-white rounded-full"
                 >
-                  <span v-html="sdg.title"></span>
+                  <span>{{ sdg.title }}</span>
                   <button
                     @click="removeTag(sdg.value)"
                     class="ml-1 text-white hover:text-gray-200"
@@ -83,8 +83,9 @@
                   :key="sdg.value"
                   @click="selectTag(sdg)"
                   class="px-3 py-2 hover:bg-orange-300 cursor-pointer"
-                  v-html="sdg.title"
-                ></div>
+                >
+                  {{ sdg.title }}
+                </div>
                 <div
                   v-if="filteredSdgs.length === 0"
                   class="px-3 py-2 text-gray-500"
@@ -181,15 +182,19 @@ const story = ref({
   types: [],
 });
 
-// Filter out the "All" option from the SDGs data
-const sdgOptions = sdgsData.filter((s) => s.value !== 0);
+// Filter out the "All" option and clean titles
+const sdgOptions = sdgsData
+  .filter((s) => s.value !== 0)
+  .map((tag) => ({
+    ...tag,
+    title: tag.title.replace(/<br\s*\/?>/g, ""),
+  }));
 
 const sdgSearch = ref("");
 const showDropdown = ref(false);
 const dropdown = ref(null);
 
 const filteredSdgs = computed(() => {
-  // if (!sdgSearch.value) return sdgOptions;
   if (!sdgSearch.value)
     return sdgOptions.filter((sdg) => !story.value.types.includes(sdg.value));
   return sdgOptions.filter(
@@ -316,3 +321,4 @@ const saveStory = () => {
   margin-bottom: 0.25em;
 }
 </style>
+
