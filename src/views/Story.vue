@@ -60,7 +60,7 @@
           <div class="relative flex flex-wrap items-center">
             <input
               type="text"
-              v-model="selectedInfo.title"
+              v-model="editStory.title"
               class="w-full p-2 border border-gray-300 rounded-md"
               :class="{ 'border-red-500': errors.title }"
             />
@@ -78,7 +78,7 @@
           <label class="block text-lg font-medium mb-2">介紹</label>
           <input
             type="text"
-            v-model="selectedInfo.intro"
+            v-model="editStory.intro"
             class="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -89,8 +89,8 @@
           <input
             type="date"
             :value="
-              selectedInfo.time
-                ? new Date(selectedInfo.time * 1000).toISOString().split('T')[0]
+              editStory.time
+                ? new Date(editStory.time * 1000).toISOString().split('T')[0]
                 : ''
             "
             @input="updateTime"
@@ -161,15 +161,80 @@
         <!-- Image Upload -->
         <div class="mb-4">
           <label class="block text-lg font-medium mb-2">背景圖片</label>
-          <input
-            type="file"
-            @change="handleImageUpload"
-            accept="image/*"
-            class="w-full p-2 border border-gray-300 rounded-md"
-          />
-          <p class="text-sm text-gray-500 mt-1">
-            選擇新圖片上傳，將替換現有背景圖片。
-          </p>
+
+          <!-- Drag and Drop Upload Area -->
+          <div
+            ref="dropZone"
+            @click="openFileSelector"
+            @dragover.prevent="handleDragOver"
+            @dragleave.prevent="handleDragLeave"
+            @drop.prevent="handleDrop"
+            class="relative border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all duration-200"
+            :class="{
+              'border-blue-500 bg-blue-50': isDragging || isUploadingImage,
+              'border-gray-300 bg-gray-50 hover:bg-gray-100':
+                !isDragging && !isUploadingImage,
+              'cursor-not-allowed opacity-50': isUploadingImage,
+            }"
+          >
+            <!-- Hidden file input -->
+            <input
+              ref="fileInput"
+              type="file"
+              @change="handleImageUpload"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              class="hidden"
+              :disabled="isUploadingImage"
+            />
+
+            <!-- Current image preview (if exists) -->
+            <div
+              v-if="editStory.img_url && !isUploadingImage"
+              class="text-center"
+            >
+              <div
+                class="mx-auto mb-3 w-24 h-24 border border-gray-300 rounded-lg overflow-hidden"
+              >
+                <img
+                  :src="
+                    editStory.img_url.startsWith('blob:')
+                      ? editStory.img_url
+                      : `./src/assets/images/${editStory.img_url}`
+                  "
+                  :alt="editStory.title || '故事圖片'"
+                  class="w-full h-full object-cover"
+                  @error="handleImageError"
+                />
+              </div>
+              <p class="text-sm text-gray-600 mb-2">點擊或拖曳新圖片來替換</p>
+              <p class="text-xs text-gray-500">
+                支援 JPG、PNG、GIF、WebP，最大 5MB
+              </p>
+            </div>
+
+            <!-- Upload area (when no image or uploading) -->
+            <div v-else class="text-center">
+              <div v-if="isUploadingImage" class="text-blue-600">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+                <p class="text-lg">正在上傳圖片...</p>
+                <p class="text-sm">請稍等片刻</p>
+              </div>
+              <div v-else>
+                <div
+                  class="mx-auto mb-3 w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center"
+                >
+                  <i class="fa-solid fa-image text-gray-400 text-xl"></i>
+                </div>
+                <p class="text-lg font-medium text-gray-700 mb-1">
+                  <span v-if="isDragging">放開以上傳圖片</span>
+                  <span v-else>點擊選擇圖片或拖曳到此處</span>
+                </p>
+                <p class="text-sm text-gray-500">
+                  支援 JPG、PNG、GIF、WebP 格式，大小不超過 5MB
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Buttons -->
@@ -200,6 +265,7 @@ import ImageCarousel from "@/components/ImageCarousel.vue";
 import HeaderFilter from "@/components/HeaderFilter.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 
 const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 
@@ -233,19 +299,29 @@ const handleAppScroll = inject("handleAppScroll");
 const allInfos = ref(carouselImages);
 
 const showEditModal = ref(false);
-// const selectedId = ref(null);
-// const selectedInfo = computed(() => {
-//   return allInfos.value.find((item) => item.id === parseInt(selectedId.value));
-// });
 const selectedInfo = ref({});
-const editStory = ref(null);
+const editStory = ref({
+  types: [],
+  title: "",
+  intro: "",
+  time: null,
+  img_url: "",
+});
 
 const handleEdit = (storyId) => {
-  // selectedId.value = storyId;
-  selectedInfo.value = allInfos.value.find(
-    (item) => item.id === parseInt(storyId.value)
-  );
-  editStory.value = { ...selectedInfo.value };
+  const story = allInfos.value.find((item) => item.id === parseInt(storyId));
+
+  if (story) {
+    selectedInfo.value = story;
+    editStory.value = {
+      ...story,
+      types: story.types || [],
+      title: story.title || "",
+      intro: story.intro || "",
+      time: story.time || null,
+      img_url: story.img_url || "",
+    };
+  }
 
   showEditModal.value = true;
 };
@@ -334,10 +410,13 @@ const editDropdown = ref(null);
 const sdgOptions = sdgsData.filter((s) => s.value !== 0);
 
 const selectedEditSdgs = computed(() => {
+  if (!editStory.value || !editStory.value.types) return [];
   return sdgOptions.filter((sdg) => editStory.value.types.includes(sdg.value));
 });
 
 const filteredEditSdgs = computed(() => {
+  if (!editStory.value || !editStory.value.types) return sdgOptions;
+
   if (!editSdgSearch.value)
     return sdgOptions.filter(
       (sdg) => !editStory.value.types.includes(sdg.value)
@@ -359,16 +438,50 @@ const errors = ref({
 });
 
 const closeEditModal = () => {
+  // Clean up any object URLs to prevent memory leaks
+  if (
+    editStory.value &&
+    editStory.value.img_url &&
+    editStory.value.img_url.startsWith("blob:")
+  ) {
+    URL.revokeObjectURL(editStory.value.img_url);
+  }
+
+  // Reset states
   showEditModal.value = false;
+  isDragging.value = false;
+  isUploadingImage.value = false;
+  errors.value.title = false;
+  errors.value.tags = false;
+
+  // Reset editStory to default state
+  editStory.value = {
+    types: [],
+    title: "",
+    intro: "",
+    time: null,
+    img_url: "",
+  };
 };
 
-const saveEdit = () => {
+const saveEdit = async () => {
   let hasError = false;
-  if (!editStory.value.title.trim()) {
+  errors.value.title = false;
+  errors.value.tags = false;
+
+  if (
+    !editStory.value ||
+    !editStory.value.title ||
+    !editStory.value.title.trim()
+  ) {
     errors.value.title = true;
     hasError = true;
   }
-  if (editStory.value.types.length === 0) {
+  if (
+    !editStory.value ||
+    !editStory.value.types ||
+    editStory.value.types.length === 0
+  ) {
     errors.value.tags = true;
     hasError = true;
   }
@@ -376,29 +489,71 @@ const saveEdit = () => {
     return;
   }
 
-  selectedInfo.value.title = editStory.value.title;
-  selectedInfo.value.intro = editStory.value.intro;
-  selectedInfo.value.time = editStory.value.time;
-  selectedInfo.value.types = editStory.value.types;
-  selectedInfo.value.img_url = editStory.value.img_url;
+  // If there's a pending file upload, try to upload it now
+  if (editStory.value._pendingFile) {
+    try {
+      const result = await apiService.uploadImage(
+        editStory.value._pendingFile,
+        "story"
+      );
+      if (result && result.url) {
+        editStory.value.img_url = result.url;
+        delete editStory.value._pendingFile;
+      }
+    } catch (error) {
+      console.warn("Failed to upload pending file during save:", error);
+      // Continue with local URL - user was already warned
+    }
+  }
+
+  if (selectedInfo.value && editStory.value) {
+    selectedInfo.value.title = editStory.value.title;
+    selectedInfo.value.intro = editStory.value.intro;
+    selectedInfo.value.time = editStory.value.time;
+    selectedInfo.value.types = editStory.value.types;
+    selectedInfo.value.img_url = editStory.value.img_url;
+
+    // TODO: Save to server API when available
+    // try {
+    //   await apiService.updateArticle(selectedInfo.value.id, selectedInfo.value);
+    //   console.log('Story updated on server');
+    // } catch (error) {
+    //   console.warn('Failed to update story on server:', error);
+    //   alert('故事已在本地更新，但無法同步到服務器。');
+    // }
+  }
+
   showEditModal.value = false;
 };
 
-const handleImageUpload = (event) => {
+// Add loading state for image upload
+const isUploadingImage = ref(false);
+const isDragging = ref(false);
+const dropZone = ref(null);
+const fileInput = ref(null);
+
+const handleImageUpload = async (event) => {
   const file = event.target.files[0];
   if (file) {
-    editStory.value.img_url = file.name;
-    // In a real app, upload the file to server
+    await processFileUpload(file);
+    // Clear the input to allow selecting the same file again
+    event.target.value = "";
   }
 };
 
 const updateTime = (event) => {
-  const date = new Date(event.target.value);
-  editStory.value.time = Math.floor(date.getTime() / 1000);
+  if (editStory.value) {
+    const date = new Date(event.target.value);
+    editStory.value.time = Math.floor(date.getTime() / 1000);
+  }
 };
 
 const selectEditTag = (sdg) => {
-  if (!editStory.value.types.includes(sdg.value)) {
+  if (
+    editStory.value &&
+    editStory.value.types &&
+    !editStory.value.types.includes(sdg.value)
+  ) {
     editStory.value.types.push(sdg.value);
   }
   editSdgSearch.value = "";
@@ -406,9 +561,106 @@ const selectEditTag = (sdg) => {
 };
 
 const removeEditTag = (tagValue) => {
-  const index = editStory.value.types.indexOf(tagValue);
-  if (index !== -1) {
-    editStory.value.types.splice(index, 1);
+  if (editStory.value && editStory.value.types) {
+    const index = editStory.value.types.indexOf(tagValue);
+    if (index !== -1) {
+      editStory.value.types.splice(index, 1);
+    }
+  }
+};
+
+// Handle image loading errors
+const handleImageError = (event) => {
+  console.warn("Image failed to load:", event.target.src);
+  event.target.style.display = "none";
+};
+
+// Drag and drop handlers
+const handleDragOver = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!isUploadingImage.value) {
+    isDragging.value = true;
+    // Change cursor to show drop is allowed
+    event.dataTransfer.dropEffect = "copy";
+  }
+};
+
+const handleDragLeave = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  // Only set to false if we're leaving the drop zone entirely
+  if (!dropZone.value.contains(event.relatedTarget)) {
+    isDragging.value = false;
+  }
+};
+
+const handleDrop = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  isDragging.value = false;
+
+  if (isUploadingImage.value) {
+    return;
+  }
+
+  const files = event.dataTransfer.files;
+  if (files.length === 0) {
+    alert("沒有檢測到文件，請重試");
+    return;
+  }
+
+  if (files.length > 1) {
+    alert("一次只能上傳一個圖片文件");
+    return;
+  }
+
+  const file = files[0];
+  processFileUpload(file);
+};
+
+const openFileSelector = () => {
+  if (!isUploadingImage.value && fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+// Extract file processing logic for reuse
+const processFileUpload = async (file) => {
+  if (!file || !editStory.value) {
+    return;
+  }
+
+  // Validate file using API service
+  const validationErrors = apiService.validateImageFile(file);
+  if (validationErrors.length > 0) {
+    alert(`文件驗證失敗:\n${validationErrors.join("\n")}`);
+    return;
+  }
+
+  isUploadingImage.value = true;
+
+  try {
+    // Try to upload to server first
+    const result = await apiService.uploadImage(file, "story");
+
+    editStory.value.img_url = result.url;
+    console.log("Image uploaded successfully:", result.url);
+    alert("圖片上傳成功！");
+  } catch (error) {
+    console.warn("Server upload failed, using local file:", error);
+
+    // Fallback: Create a local object URL for preview
+    const localUrl = URL.createObjectURL(file);
+    editStory.value.img_url = localUrl;
+
+    // Store the file for potential later upload
+    editStory.value._pendingFile = file;
+
+    console.log("Using local file preview:", localUrl);
+    alert("暫時無法連接到服務器，將使用本地預覽。保存時可能需要重新上傳圖片。");
+  } finally {
+    isUploadingImage.value = false;
   }
 };
 </script>
