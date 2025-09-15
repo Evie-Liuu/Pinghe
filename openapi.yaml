@@ -1,0 +1,469 @@
+openapi: 3.0.3
+info:
+  title: School CMS API
+  description: API 文件，涵蓋登入、註冊、Profile、文章 CRUD、留言 CRUD，留言支援按讚資訊
+  version: 1.2.0
+servers:
+  - url: http://localhost:3000/api
+
+tags:
+  - name: Auth
+    description: 使用者登入與驗證
+  - name: Users
+    description: 使用者註冊與個人資料
+  - name: Articles
+    description: 文章 CRUD
+  - name: Comments
+    description: 留言 CRUD 與按讚
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: 使用者登入
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: 登入成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: 帳號或密碼錯誤
+
+  /auth/register:
+    post:
+      tags: [Users]
+      summary: 使用者註冊
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: 註冊成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: 註冊失敗（如 Email 已被使用）
+
+  /users/profile:
+    get:
+      tags: [Users]
+      summary: 取得當前使用者 Profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 使用者資料
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 尚未登入
+    put:
+      tags: [Users]
+      summary: 更新個人資料
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 尚未登入
+
+  /articles:
+    get:
+      tags: [Articles]
+      summary: 取得所有文章
+      responses:
+        "200":
+          description: 成功取得文章列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+    post:
+      tags: [Articles]
+      summary: 新增文章
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleInput"
+      responses:
+        "201":
+          description: 文章建立成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+
+  /articles/{id}:
+    get:
+      tags: [Articles]
+      summary: 取得單篇文章
+      parameters:
+        - $ref: "#/components/parameters/ArticleId"
+      responses:
+        "200":
+          description: 單篇文章資料
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "404":
+          description: 找不到文章
+    put:
+      tags: [Articles]
+      summary: 更新文章
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ArticleId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleInput"
+      responses:
+        "200":
+          description: 文章更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+    delete:
+      tags: [Articles]
+      summary: 刪除文章
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ArticleId"
+      responses:
+        "204":
+          description: 刪除成功
+        "404":
+          description: 找不到文章
+
+  /articles/{id}/comments:
+    get:
+      tags: [Comments]
+      summary: 取得文章留言（包含 likeCount 與 likedByUser）
+      parameters:
+        - $ref: "#/components/parameters/ArticleId"
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 留言列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentWithLike"
+    post:
+      tags: [Comments]
+      summary: 新增留言
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ArticleId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "201":
+          description: 留言建立成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentWithLike"
+
+  /comments/{id}:
+    put:
+      tags: [Comments]
+      summary: 更新留言
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CommentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentInput"
+      responses:
+        "200":
+          description: 留言更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentWithLike"
+    delete:
+      tags: [Comments]
+      summary: 刪除留言
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CommentId"
+      responses:
+        "204":
+          description: 刪除成功
+        "404":
+          description: 找不到留言
+
+  /comments/{id}/like:
+    post:
+      tags: [Comments]
+      summary: 對留言按讚
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CommentId"
+      responses:
+        "200":
+          description: 按讚成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentWithLike"
+    delete:
+      tags: [Comments]
+      summary: 取消留言讚
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CommentId"
+      responses:
+        "200":
+          description: 取消讚成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentWithLike"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ArticleId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 文章 ID
+    CommentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 留言 ID
+
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: "123456"
+      required: [email, password]
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT Token
+          example: eyJhbGciOiJIUzI1NiIsInR...
+
+    RegisterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 王小明
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: "123456"
+      required: [name, email, password]
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 王小明
+        bio:
+          type: string
+          example: 我是彰化國小的學生
+        avatarUrl:
+          type: string
+          format: uri
+          example: https://example.com/avatar.png
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 王小明
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        bio:
+          type: string
+          example: 我是彰化國小的學生
+        avatarUrl:
+          type: string
+          format: uri
+          example: https://example.com/avatar.png
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-09-15T10:00:00Z"
+
+    ArticleInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 校園永續活動
+        time:
+          type: string
+          format: date-time
+          example: "2025-07-15T11:00:00Z"
+        types:
+          type: array
+          items:
+            type: integer
+          example: [1, 4]
+        img_url:
+          type: string
+          example: figure2.png。
+        intro:
+          type: string
+          example: 這是一篇關於永續發展的文章內容。
+        content:
+          type: string
+          example: <p>這是一篇關於永續發展的文章內容，透過實際行動如何去影響原本的議題</p>。
+      required: [title, content, types]
+
+    Article:
+      allOf:
+        - $ref: "#/components/schemas/ArticleInput"
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            authorId:
+              type: integer
+              example: 10
+            createdAt:
+              type: string
+              format: date-time
+              example: "2025-09-15T10:00:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2025-09-15T11:00:00Z"
+
+    CommentInput:
+      type: object
+      properties:
+        content:
+          type: string
+          example: 這是一則留言。
+      required: [content]
+
+    Comment:
+      allOf:
+        - $ref: "#/components/schemas/CommentInput"
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 101
+            articleId:
+              type: integer
+              example: 1
+            userId:
+              type: integer
+              example: 10
+            parentId:
+              type: integer
+              nullable: true
+              example: null
+            createdAt:
+              type: string
+              format: date-time
+              example: "2025-09-15T10:30:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2025-09-15T10:40:00Z"
+
+    CommentWithLike:
+      allOf:
+        - $ref: "#/components/schemas/Comment"
+        - type: object
+          properties:
+            likeCount:
+              type: integer
+              example: 3
+            likedByUser:
+              type: boolean
+              example: true
