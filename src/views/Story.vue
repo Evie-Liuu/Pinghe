@@ -60,7 +60,7 @@
           <div class="relative flex flex-wrap items-center">
             <input
               type="text"
-              v-model="editStory.title"
+              v-model="selectedInfo.title"
               class="w-full p-2 border border-gray-300 rounded-md"
               :class="{ 'border-red-500': errors.title }"
             />
@@ -78,7 +78,7 @@
           <label class="block text-lg font-medium mb-2">介紹</label>
           <input
             type="text"
-            v-model="editStory.intro"
+            v-model="selectedInfo.intro"
             class="w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -89,8 +89,8 @@
           <input
             type="date"
             :value="
-              editStory.time
-                ? new Date(editStory.time * 1000).toISOString().split('T')[0]
+              selectedInfo.time
+                ? new Date(selectedInfo.time * 1000).toISOString().split('T')[0]
                 : ''
             "
             @input="updateTime"
@@ -233,13 +233,20 @@ const handleAppScroll = inject("handleAppScroll");
 const allInfos = ref(carouselImages);
 
 const showEditModal = ref(false);
-const selectedId = ref(null);
-const selectedInfo = computed(() => {
-  return allInfos.value.find((item) => item.id === parseInt(selectedId.value));
-});
+// const selectedId = ref(null);
+// const selectedInfo = computed(() => {
+//   return allInfos.value.find((item) => item.id === parseInt(selectedId.value));
+// });
+const selectedInfo = ref({});
+const editStory = ref(null);
 
 const handleEdit = (storyId) => {
-  selectedId.value = storyId;
+  // selectedId.value = storyId;
+  selectedInfo.value = allInfos.value.find(
+    (item) => item.id === parseInt(storyId.value)
+  );
+  editStory.value = { ...selectedInfo.value };
+
   showEditModal.value = true;
 };
 const handleDelete = (storyId) => {
@@ -320,10 +327,6 @@ const allFilteredInfos = computed(() => {
 });
 
 // --- Edit Modal Logic ---
-const editStory = ref(null);
-watch(selectedInfo, () => {
-  editStory.value = { ...selectedInfo.value };
-});
 const editSdgSearch = ref("");
 const showEditDropdown = ref(false);
 const editDropdown = ref(null);
@@ -354,7 +357,6 @@ const errors = ref({
   title: false,
   tags: false,
 });
-
 
 const closeEditModal = () => {
   showEditModal.value = false;
