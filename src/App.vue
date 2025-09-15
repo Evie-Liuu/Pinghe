@@ -17,7 +17,7 @@
     <p>載入中...</p>
   </div>
   <nav
-    class="fixed top-0 left-0 z-10 w-full p-2 text-rice-500 md:text-4xl flex flex-row justify-between items-center transition-transform duration-300 ease-in-out"
+    class="fixed top-0 left-0 z-50 w-full p-2 text-rice-500 md:text-4xl flex flex-row justify-between items-center transition-transform duration-300 ease-in-out"
     :class="[
       $route.path !== '/' ? 'bg-header' : '',
       isHeaderVisible || isMenuOpen ? 'translate-y-0' : '-translate-y-full',
@@ -140,14 +140,18 @@
         </div>
         <div class="p-3" v-else>
           <div class="flex flex-col items-center gap-2">
-            <div class="flex items-center gap-2"
-                 :class="{
-                   'text-blue-300': isTeacher,
-                   'text-green-300': isStudent,
-                   'text-gray-300': isVisitor
-                 }">
+            <div
+              class="flex items-center gap-2"
+              :class="{
+                'text-blue-300': isTeacher,
+                'text-green-300': isStudent,
+                'text-gray-300': isVisitor,
+              }"
+            >
               <i :class="user?.icon || 'fas fa-user'"></i>
-              <span class="text-sm">{{ user?.displayName }}: {{ user?.username }}</span>
+              <span class="text-sm"
+                >{{ user?.displayName }}: {{ user?.username }}</span
+              >
             </div>
             <button
               @click="handleLogout"
@@ -167,7 +171,15 @@ import { ref, onMounted, provide, onBeforeUnmount } from "vue";
 import { useAuth } from "@/stores/auth";
 import { useRouter } from "vue-router";
 
-const { isAuthenticated, user, isTeacher, isStudent, isVisitor, logout, checkAuth } = useAuth();
+const {
+  isAuthenticated,
+  user,
+  isTeacher,
+  isStudent,
+  isVisitor,
+  logout,
+  checkAuth,
+} = useAuth();
 const router = useRouter();
 
 const isLoading = ref(true);
@@ -210,7 +222,7 @@ const handleScroll = (event) => {
 const handleLogout = () => {
   logout();
   isMenuOpen.value = false;
-  router.push('/');
+  router.push("/");
 };
 
 provide("handleAppScroll", handleScroll);

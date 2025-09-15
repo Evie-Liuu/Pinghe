@@ -45,16 +45,40 @@ body {
 .page-background {
   position: relative;
   width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background-image: url("@/assets/images/Background_1.png");
+  min-height: 100vh;
+}
+
+.page-background::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("@/assets/images/Background_1_B.png");
   background-size: cover;
   background-position: center;
+  z-index: -20;
+  pointer-events: none;
+}
+
+.page-background::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("@/assets/images/Background_1_F.png");
+  background-size: cover;
+  background-position: center;
+  z-index: -10;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
   .page-background {
     background-image: url("@/assets/images/Mobile/mobile_Bcakground_1.png");
+    /* background-attachment: fixed; */
+  }
+
+  .page-background::before,
+  .page-background::after {
+    display: none;
   }
 }
 

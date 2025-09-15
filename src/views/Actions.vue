@@ -1,54 +1,67 @@
 <template>
   <div class="page-background content-scroller" @scroll="handleAppScroll">
-    <header class="relative z-5 pt-25 w-full shadow-md bg-header text-rice-500">
-      <div class="container mx-auto flex items-center p-4">
-        <div class="w-1/3">
-          <router-link to="/" class="back-home-btn">
-            <span class="text">
-              <CJKSub align="center">
-                <template #zh>回首頁</template>
-                <template #en>Home</template>
-              </CJKSub>
-            </span>
-            <span class="icon">←</span>
-          </router-link>
-        </div>
-        <div class="w-1/3 text-center">
-          <h1 class="text-2xl md:text-3xl font-bold">行動追蹤</h1>
-        </div>
-        <div class="w-1/3 flex items-center justify-end pr-4">
-          <div
-            class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
-          >
-            <i class="fa-solid fa-plus font-bold text-pblue-500"></i>
+    <!-- <img
+      src="@/assets/images/Background_1_B.png"
+      class="fixed inset-0 -z-20"
+    />
+    <img
+      src="@/assets/images/Background_1_F.png"
+      class="fixed inset-0 -z-10"
+    /> -->
+    <div>
+      <header
+        class="relative z-5 pt-25 w-full shadow-md bg-header text-rice-500"
+      >
+        <div class="container mx-auto flex items-center p-4">
+          <div class="w-1/3">
+            <router-link to="/" class="back-home-btn">
+              <span class="text">
+                <CJKSub align="center">
+                  <template #zh>回首頁</template>
+                  <template #en>Home</template>
+                </CJKSub>
+              </span>
+              <span class="icon">←</span>
+            </router-link>
+          </div>
+          <div class="w-1/3 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold">行動追蹤</h1>
+          </div>
+          <div class="w-1/3 flex items-center justify-end pr-4">
+            <div
+              class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
+            >
+              <i class="fa-solid fa-plus font-bold text-pblue-500"></i>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
-    <main
-      class="p-10 flex flex-col justify-center items-center gap-8 max-w-7xl md:mx-auto"
-    >
-      <HeaderFilter
-        @update:filters="handleFilterUpdate"
-        class="flex flex-wrap justify-center items-center gap-4"
-      ></HeaderFilter>
-      <ActionCard
-        :filteredInfo="paginatedActions"
-        class="flex flex-col gap-10 w-full md:px-0"
-      ></ActionCard>
-      <div
-        v-if="allFilteredInfos.length === 0"
-        class="text-center text-gray-500 mt-8"
+      </header>
+      <main
+        class="p-10 flex flex-col justify-center items-center gap-8 max-w-7xl md:mx-auto"
       >
-        <p>找不到符合條件的行動。</p>
-      </div>
-      <PageLabel
-        class="flex justify-center items-center gap-4 mt-8"
-        :totalItems="allFilteredInfos.length"
-        :itemsPerPage="itemsPerPage"
-        v-model="currentPage"
-      ></PageLabel>
-    </main>
+        <HeaderFilter
+          @update:filters="handleFilterUpdate"
+          class="flex flex-wrap justify-center items-center gap-4"
+        ></HeaderFilter>
+        <ActionCard
+          :filteredInfo="paginatedActions"
+          class="flex flex-col gap-10 w-full md:px-0"
+        ></ActionCard>
+        <div
+          v-if="allFilteredInfos.length === 0"
+          class="text-center text-gray-500 mt-8"
+        >
+          <p>找不到符合條件的行動。</p>
+        </div>
+        <PageLabel
+          class="flex justify-center items-center gap-4 mt-8"
+          :totalItems="allFilteredInfos.length"
+          :itemsPerPage="itemsPerPage"
+          v-model="currentPage"
+        ></PageLabel>
+        <TrainTrack></TrainTrack>
+      </main>
+    </div>
   </div>
 </template>
 <script setup>
@@ -59,6 +72,7 @@ import HeaderFilter from "@/components/HeaderFilter.vue";
 import ActionCard from "@/components/ActionCard.vue";
 import PageLabel from "@/components/PageLabel.vue";
 import CJKSub from "@/components/CJKSub.vue";
+import TrainTrack from "@/components/TrainTrack.vue";
 
 const handleAppScroll = inject("handleAppScroll");
 

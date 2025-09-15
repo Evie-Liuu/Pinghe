@@ -54,12 +54,14 @@
           </p>
         </div>
       </router-link>
+      <TrainTrack></TrainTrack>
     </main>
   </div>
 </template>
 <script setup>
 import { ref } from "vue";
 import CJKSub from "@/components/CJKSub.vue";
+import TrainTrack from "@/components/TrainTrack.vue";
 
 // import { inject } from "vue";
 
