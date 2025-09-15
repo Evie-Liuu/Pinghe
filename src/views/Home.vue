@@ -44,7 +44,7 @@
               >校園探索</span
             >
             <span
-              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              class="absolute inset-0 rounded-full bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
               >Explore →</span
             >
           </router-link>
@@ -60,7 +60,7 @@
               >SDGs行動</span
             >
             <span
-              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              class="absolute inset-0 rounded-full bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
               >Actions →</span
             >
           </router-link>
@@ -76,7 +76,7 @@
               >SDGs成果</span
             >
             <span
-              class="absolute inset-0 bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
+              class="absolute inset-0 rounded-full bg-orange-500 transition-transform duration-300 ease-in-out translate-x-full group-hover:translate-x-0 flex items-center justify-center"
               >Results →</span
             >
           </router-link>
@@ -86,7 +86,9 @@
 
     <!-- Cover -->
     <!-- Train Smoke Animation -->
-    <div class="absolute -bottom-15 left-0 w-1/2 pointer-events-non">
+    <div
+      class="w-full absolute bottom-0 lg:-bottom-15 left-0 lg:w-1/2 pointer-events-non"
+    >
       <img
         :src="Train_smoke"
         class="select-none animate-train-enter"
