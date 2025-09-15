@@ -16,7 +16,49 @@
         class="relative"
         v-slot="{ isActive }"
       >
-        <div @click="handleSlideClick(isActive, img.id, index)" class="h-full">
+        <div
+          @click="handleSlideClick(isActive, img.id, index)"
+          class="h-full cursor-pointer"
+        >
+          <!-- Label -->
+          <div class="absolute top-2 left-2 z-20">
+            <div class="flex flex-wrap gap-2 mt-2">
+              <span
+                v-for="t in img.types"
+                :key="t"
+                class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
+              >
+                {{ sdgsData[t].title }}
+              </span>
+            </div>
+          </div>
+          <!-- Kebab Menu -->
+          <div class="absolute top-2 right-2 z-20">
+            <button
+              @click.stop="toggleMenu(img.id)"
+              class="text-white bg-black/30 rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/50"
+            >
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+            <!-- Dropdown -->
+            <div
+              v-if="isMenuOpen === img.id"
+              ref="menuDropdown"
+              class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg text-black ring-1 ring-black ring-opacity-5"
+            >
+              <a
+                @click.stop="editStory(img.id)"
+                class="block px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                >編輯</a
+              >
+              <a
+                @click.stop="deleteStory(img.id)"
+                class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
+                >刪除</a
+              >
+            </div>
+          </div>
+
           <img
             :src="getImageUrl(img.img_url || 'lightBulb.png')"
             :alt="`slide-${index}`"
@@ -26,6 +68,9 @@
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-orange-300/70 text-center rounded-lg px-2"
           >
             <p>{{ img.title }}</p>
+            <small class="text-xs">{{
+              new Date(img.time * 1000).toLocaleDateString()
+            }}</small>
             <p class="text-sm text-justify leading-relaxed">
               {{ img.intro }}
             </p>
@@ -42,7 +87,10 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import sdgsData from "@/data/SDGs_goal.json";
+
 import { useRouter } from "vue-router";
+import { useClickOutside } from "@/composables/useClickOutside.js";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -62,6 +110,29 @@ const props = defineProps({
     default: 0,
   },
 });
+
+const emit = defineEmits(["edit-story", "delete-story"]);
+
+const isMenuOpen = ref(null); // Holds the ID of the open menu
+const menuDropdown = ref(null);
+
+const toggleMenu = (storyId) => {
+  isMenuOpen.value = isMenuOpen.value === storyId ? null : storyId;
+};
+
+useClickOutside(menuDropdown, () => {
+  isMenuOpen.value = null;
+});
+
+const editStory = (storyId) => {
+  isMenuOpen.value = null; // Close menu
+  emit("edit-story", storyId);
+};
+
+const deleteStory = (storyId) => {
+  isMenuOpen.value = null; // Close menu
+  emit("delete-story", storyId);
+};
 
 const swiperOptions = {
   breakpoints: {
@@ -86,7 +157,6 @@ const onSwiper = (swiper) => {
   });
 };
 
-// Watch for the swiper instance and the initialIndex prop to be ready
 watch(
   () => [swiperInstance.value, props.initialIndex],
   ([swiper, index]) => {
@@ -126,7 +196,6 @@ const goPrev = () => {
 
 function getImageUrl(name) {
   if (!name) return "";
-  // This pattern is recognizable by Vite during the build process.
   return new URL(`../assets/images/${name}`, import.meta.url).href;
 }
 </script>
@@ -150,3 +219,4 @@ function getImageUrl(name) {
   opacity: 0.85;
 }
 </style>
+

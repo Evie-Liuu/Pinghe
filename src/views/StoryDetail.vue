@@ -47,7 +47,7 @@
                 :key="t"
                 class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
               >
-                {{ typeTags[t].title }}
+                {{ sdgsData[t].title }}
               </span>
             </div>
           </div>
@@ -329,7 +329,6 @@
 <script setup>
 import { ref, computed, inject, onUnmounted } from "vue";
 import infos from "@/data/Story.json";
-import typeTags from "@/data/SDGs_goal.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
