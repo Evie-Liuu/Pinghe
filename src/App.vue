@@ -158,6 +158,7 @@
               <p
                 class="text-sm font-medium"
                 :class="{
+                  'text-red-500': isAdmin,
                   'text-blue-500': isTeacher,
                   'text-green-500': isStudent,
                   'text-gray-500': isVisitor,
@@ -190,6 +191,7 @@ import { useClickOutside } from "@/composables/useClickOutside";
 const {
   isAuthenticated,
   user,
+  isAdmin,
   isTeacher,
   isStudent,
   isVisitor,
