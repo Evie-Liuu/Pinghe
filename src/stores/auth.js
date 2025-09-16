@@ -132,45 +132,45 @@ export const useAuth = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
 
-      // const idToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImUzZWU3ZTAyOGUzODg1YTM0NWNlMDcwNTVmODQ2ODYyMjU1YTcwNDYiLCJ0eXAiOiJKV1QifQ.eyJyb2xlIjoiYWRtaW4iLCJpbnN0aXR1dGlvbl9pZCI6bnVsbCwicGVybWlzc2lvbnMiOlsic3lzdGVtX2FkbWluIiwibWFuYWdlX2FsbF9mb3J1bSIsInZpZXdfZm9ydW0iLCJtYW5hZ2VfaW5zdGl0dXRpb25fYWN0aXZpdGllcyIsInZpZXdfYW5hbHl0aWNzIiwibWFuYWdlX293bl9jb250ZW50IiwibWFuYWdlX2luc3RpdHV0aW9uX2NvbnRlbnQiLCJtYW5hZ2VfYWxsX2NvbnRlbnQiLCJtYW5hZ2Vfb3duX2FjdGl2aXRpZXMiLCJwYXJ0aWNpcGF0ZV9hY3Rpdml0aWVzIiwidmlld19hY3Rpdml0aWVzIiwidmlld191c2VycyIsImNyZWF0ZV9mb3J1bV9wb3N0cyIsIm1hbmFnZV9zdHVkZW50X3VzZXJzIiwiY29tbWVudF9mb3J1bV9wb3N0cyIsIm1hbmFnZV9hbGxfYWN0aXZpdGllcyIsIm1hbmFnZV9pbnN0aXR1dGlvbl91c2VycyIsIm1hbmFnZV9pbnN0aXR1dGlvbnMiLCJ2aWV3X2NvbnRlbnQiLCJtYW5hZ2Vfb3duX2luc3RpdHV0aW9uIiwibWFuYWdlX2luc3RpdHV0aW9uX2ZvcnVtIiwibWFuYWdlX3VzZXJzIiwidmlld19pbnN0aXR1dGlvbnMiXSwidXNlcl9pZCI6IlE3bHJETTVSZDVQbUN0M1Awa1N0elV5U0t0cTEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2Rncy1qb3VybmV5IiwiYXVkIjoic2Rncy1qb3VybmV5IiwiYXV0aF90aW1lIjoxNzU4MDA3NDAxLCJzdWIiOiJRN2xyRE01UmQ1UG1DdDNQMGtTdHpVeVNLdHExIiwiaWF0IjoxNzU4MDA3NDAxLCJleHAiOjE3NTgwMTEwMDEsImVtYWlsIjoiYWRtaW5Ac2Rnc2pvdXJuZXkuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbWluQHNkZ3Nqb3VybmV5LmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.OTQLy69LX-FPRMIZemUarUQQ9XYfzT4FdJsKh7bdv668JFcXsREvT-6Ik8OmFnOkG1r3e5Cl7X6boEeNN0V-ivFgATbPcvhZmbVjOlHr61VlcpYoLQ0OEZWs8Pr_n2EjUjaq_Af7LW8c306hDLXfNZwWzzgFBiDQMvi06-4y0zgt19TsU45T6qTDtbUe0H7gg_WUn6LWV84yqV4UCa6PMWgxY0kSUGnWrlLUzXogE8LhHtjj8fVxymZkiqLlMNLxXMdo-xrP399DZEaZXRoil24xPhxzCT0BN8ZI4keKFN_VipbOqNwatwIu45IAXJVzxVDv_lEvZGZxPvNHlyYxxg"
-      console.log(idToken);
+      // console.log(idToken);
 
       // 後端登入
       try {
         const backendResponse = await apiService.login({ id_token: idToken });
         console.log('Backend login successful:', backendResponse);
+        user.value = backendResponse.user;
       } catch (backendError) {
         console.error('Backend login failed:', backendError);
         // 根據後端錯誤決定是否中斷登入
         return { success: false, message: '後端登入失敗，請稍後再試' };
       }
 
-      // 嘗試從 localStorage 獲取之前儲存的使用者資料（包含學校資訊）
-      const storedUserData = localStorage.getItem('user_data');
-      let userData = null;
+      // // 嘗試從 localStorage 獲取之前儲存的使用者資料（包含學校資訊）
+      // const storedUserData = localStorage.getItem('user_data');
 
-      if (storedUserData) {
-        userData = JSON.parse(storedUserData);
-        // 確保是同一個使用者
-        if (userData.uid === userCredential.user.uid) {
-          user.value = userData;
-        } else {
-          // 如果不是同一個使用者，清除舊資料
-          localStorage.removeItem('user_data');
-        }
-      }
+      // let userData = null;
+      // if (storedUserData) {
+      //   userData = JSON.parse(storedUserData);
+      //   // 確保是同一個使用者
+      //   if (userData.uid === userCredential.user.uid) {
+      //     user.value = userData;
+      //   } else {
+      //     // 如果不是同一個使用者，清除舊資料
+      //     localStorage.removeItem('user_data');
+      //   }
+      // }
 
-      // 如果沒有儲存的使用者資料，從後端建立新的
-      if (!user.value || user.value.id !== userCredential.user.uid) {
-        user.value = backendResponse.user;
-        // user.value = {
-        //   email: userCredential.user.email,
-        //   role: 'teacher', // or determine role based on custom claims
-        //   displayName: '老師',
-        //   uid: userCredential.user.uid,
-        //   institution_id: userData ? userData.school : null // 如果有儲存的學校資訊就使用，否則為 null
-        // };
-      }
+      // // 如果沒有儲存的使用者資料，從後端建立新的
+      // if (!user.value || user.value.id !== userCredential.user.uid) {
+      //   // user.value = {
+      //   //   email: userCredential.user.email,
+      //   //   role: 'teacher', // or determine role based on custom claims
+      //   //   displayName: '老師',
+      //   //   uid: userCredential.user.uid,
+      //   //   institution_id: userData ? userData.school : null // 如果有儲存的學校資訊就使用，否則為 null
+      //   // };
+      // }
+      localStorage.removeItem('user_data');
 
       isAuthenticated.value = true;
       localStorage.setItem('auth_token', idToken);

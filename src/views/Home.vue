@@ -183,7 +183,7 @@
     </div>
 
     <!-- 管理員登入彈窗 -->
-    <div
+    <!-- <div
       v-if="showAdminLogin"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-gray-700"
     >
@@ -251,10 +251,10 @@
           <p><strong>預設密碼：</strong>admin</p>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- 老師登入彈窗 -->
-    <div
+    <!-- <div
       v-if="showTeacherLogin"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-gray-700"
     >
@@ -322,10 +322,10 @@
           <p><strong>預設密碼：</strong>tc</p>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- 學生姓名輸入彈窗 -->
-    <div
+    <!-- <div
       v-if="showStudentForm"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
@@ -371,7 +371,7 @@
           </div>
         </form>
       </div>
-    </div>
+    </div> -->
   </main>
 </template>
 <script setup>
@@ -394,8 +394,8 @@ const loginLoading = ref(false);
 const loginError = ref("");
 
 
-const storedUserData = localStorage.getItem('user_data');
-console.log(storedUserData);
+const user = localStorage.getItem('user_data');
+console.log(JSON.parse(user));
 
 // 檢查是否已經登入
 onMounted(() => {
@@ -403,14 +403,14 @@ onMounted(() => {
     isLoaded.value = true;
   }, 100);
 
-  checkAuth();
+  // checkAuth();
 
-  // 如果沒有登入，顯示身分選擇彈窗
-  if (!isAuthenticated.value) {
-    setTimeout(() => {
-      showRoleModal.value = true;
-    }, 1500); // 延遲一點顯示，讓首頁動畫先完成
-  }
+  // // 如果沒有登入，顯示身分選擇彈窗
+  // if (!isAuthenticated.value) {
+  //   setTimeout(() => {
+  //     showRoleModal.value = true;
+  //   }, 1500); // 延遲一點顯示，讓首頁動畫先完成
+  // }
 });
 
 const selectAdminRole = () => {

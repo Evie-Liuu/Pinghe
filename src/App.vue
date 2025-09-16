@@ -130,12 +130,12 @@
       <div class="px-4 text-rice-500 text-shadow-3d">
         <div class="p-3" v-if="!isAuthenticated">
           <router-link
-            to="/"
+            to="/login"
             @click="isMenuOpen = false"
             class="hover:text-orange-300 transition-colors flex items-center gap-2"
           >
             <i class="fas fa-user-plus"></i>
-            選擇身分
+            登入
           </router-link>
         </div>
         <!-- New Profile Dropdown -->
@@ -164,9 +164,9 @@
                   'text-gray-500': isVisitor,
                 }"
               >
-                {{ user?.displayName }}
+                {{ user?.full_name }}
               </p>
-              <p class="text-sm text-gray-500">{{ user?.username }}</p>
+              <!-- <p class="text-sm text-gray-500">{{ user?.email }}</p> -->
             </div>
             <div class="border-t border-gray-200"></div>
             <button
@@ -190,7 +190,7 @@ import { useClickOutside } from "@/composables/useClickOutside";
 
 const {
   isAuthenticated,
-  user,
+  // user,
   isAdmin,
   isTeacher,
   isStudent,
@@ -199,6 +199,9 @@ const {
   checkAuth,
 } = useAuth();
 const router = useRouter();
+
+const user = JSON.parse(localStorage.getItem("user_data"));
+console.log(user);
 
 const isLoading = ref(true);
 const imageError = ref(false);

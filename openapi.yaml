@@ -1,7 +1,17 @@
 openapi: 3.0.3
 info:
   title: School CMS API
-  description: API 文件，涵蓋登入、註冊、Profile、文章 CRUD、留言 CRUD，留言支援按讚資訊
+  description: |
+    API 文件，涵蓋登入、註冊、Profile、文章 CRUD、留言 CRUD，留言支援按讚資訊
+
+    ## Firebase Authentication
+    應用程式也使用 Firebase Authentication 進行身份驗證：
+
+    **Firebase Sign Up Endpoint:**
+    - URL: `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`
+    - Method: POST
+    - Request Body: 參考 `FirebaseSignUpRequest` schema
+    - Response: 參考 `FirebaseSignUpResponse` schema
   version: 1.2.0
 servers:
   - url: http://localhost:3000/api
@@ -124,6 +134,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Article"
+
+  /articles/search:
+    get:
+      tags: [Articles]
+      summary: 搜尋文章 (待確認)
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 搜尋關鍵字
+      responses:
+        "200":
+          description: 搜尋結果
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+
+  /articles/editable:
+    get:
+      tags: [Articles]
+      summary: 取得可編輯的文章列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 可編輯的文章列表
+          content:
+            application/json:
+              schema:
+                type: array
+                properties:
+                  items:
+                    type: integer
+                example: [15, 16, 17]
 
   /articles/{id}:
     get:
@@ -302,39 +357,91 @@ components:
     LoginRequest:
       type: object
       properties:
-        email:
+        id_token:
           type: string
           format: email
-          example: user@example.com
-        password:
-          type: string
-          format: password
-          example: "123456"
-      required: [email, password]
+          example: eyJhbGciOiJIUzI1NiIsInR...
+      required: [id_token]
 
     LoginResponse:
       type: object
       properties:
-        token:
+        success:
+          type: boolean
+          example: true
+        massage:
           type: string
-          description: JWT Token
-          example: eyJhbGciOiJIUzI1NiIsInR...
+          example: 登入成功
+        requires_token_refresh:
+          type: boolean
+          example: false
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            full_name:
+              type: string
+              example: 王小明
+            email:
+              type: string
+              format: email
+              example: user@example.com
+            role:
+              type: string
+              example: admin
+            institution_id:
+              type: integer
+              example: 1
+            permissions:
+              type: array
+              items:
+                type: string
+              example:
+                [
+                  "create_forum_posts",
+                  "view_institutions",
+                  "participate_activities",
+                  "manage_own_activities",
+                  "manage_institution_forum",
+                  "manage_all_forum",
+                  "view_analytics",
+                  "manage_student_users",
+                  "view_activities",
+                  "view_forum",
+                  "manage_all_content",
+                  "view_users",
+                  "system_admin",
+                  "manage_institution_activities",
+                  "manage_institution_content",
+                  "manage_institutions",
+                  "manage_own_content",
+                  "manage_all_activities",
+                  "manage_users",
+                  "manage_own_institution",
+                  "comment_forum_posts",
+                  "manage_institution_users",
+                  "view_content",
+                ]
 
     RegisterRequest:
       type: object
       properties:
-        name:
-          type: string
-          example: 王小明
-        email:
+        id_token:
           type: string
           format: email
-          example: user@example.com
-        password:
+          example: eyJhbGciOiJIUzI1NiIsInR...
+        full_name:
           type: string
-          format: password
-          example: "123456"
-      required: [name, email, password]
+          example: 王小明
+        role:
+          type: string
+          example: admin
+        institution_id:
+          type: integer
+          example: 1
+      required: [id_token, full_name, role, institution_id]
 
     UserUpdate:
       type: object
@@ -445,7 +552,6 @@ components:
               example: 10
             parentId:
               type: integer
-              nullable: true
               example: null
             createdAt:
               type: string
@@ -467,3 +573,85 @@ components:
             likedByUser:
               type: boolean
               example: true
+
+    FirebaseSignUpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@sdgsjourney.com
+        password:
+          type: string
+          format: password
+          example: "123456"
+        returnSecureToken:
+          type: boolean
+          example: true
+      required: [email, password, returnSecureToken]
+
+    FirebaseSignUpResponse:
+      type: object
+      properties:
+        kind:
+          type: string
+          example: "identitytoolkit#SignupNewUserResponse"
+        idToken:
+          type: string
+          description: Firebase ID Token
+          example: "eyJhbGciOiJSUzI1NiIsImtpZCI6..."
+        email:
+          type: string
+          format: email
+          example: test@sdgsjourney.com
+        refreshToken:
+          type: string
+          description: Firebase Refresh Token
+          example: "AEu4IL2..."
+        expiresIn:
+          type: string
+          example: "3600"
+        localId:
+          type: string
+          description: Firebase User ID
+          example: "abc123def456"
+    FirebaseSignInRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@sdgsjourney.com
+        password:
+          type: string
+          format: password
+          example: "123456"
+        returnSecureToken:
+          type: boolean
+          example: true
+      required: [email, password, returnSecureToken]
+    FirebaseSignInResponse:
+      type: object
+      properties:
+        kind:
+          type: string
+          example: "identitytoolkit#SignupNewUserResponse"
+        idToken:
+          type: string
+          description: Firebase ID Token
+          example: "eyJhbGciOiJSUzI1NiIsImtpZCI6..."
+        email:
+          type: string
+          format: email
+          example: test@sdgsjourney.com
+        refreshToken:
+          type: string
+          description: Firebase Refresh Token
+          example: "AEu4IL2..."
+        expiresIn:
+          type: string
+          example: "3600"
+        localId:
+          type: string
+          description: Firebase User ID
+          example: "abc123def456"
