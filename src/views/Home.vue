@@ -107,15 +107,31 @@
         </h2>
 
         <div class="space-y-4">
-          <!-- 老師選項 -->
+          <!-- 管理員選項 -->
           <button
-            @click="showTeacherLogin = true"
-            class="w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group"
+            @click="selectAdminRole"
+            class="w-full p-4 border-2 border-red-200 rounded-lg hover:border-red-400 hover:bg-red-50 transition-colors group"
           >
             <div class="flex items-center gap-4">
               <div
-                class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600"
+                class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white group-hover:bg-red-600"
               >
+                <i class="fas fa-user-shield text-xl"></i>
+              </div>
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-800">管理員</h3>
+                <p class="text-sm text-gray-600">系統管理員權限</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- 老師選項 -->
+          <button
+            @click="selectTeacherRole"
+            class="w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group"
+          >
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600">
                 <i class="fas fa-user-tie text-xl"></i>
               </div>
               <div class="text-left">
@@ -160,6 +176,77 @@
               </div>
             </div>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 管理員登入彈窗 -->
+    <div
+      v-if="showAdminLogin"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 text-gray-700"
+    >
+      <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">管理員登入</h2>
+          <button
+            @click="backToRoleSelection"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form @submit.prevent="handleAdminLogin" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >帳號</label
+            >
+            <input
+              v-model="adminForm.username"
+              type="text"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="請輸入管理員帳號"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >密碼</label
+            >
+            <input
+              v-model="adminForm.password"
+              type="password"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="請輸入密碼"
+            />
+          </div>
+
+          <div v-if="loginError" class="text-red-600 text-sm">
+            {{ loginError }}
+          </div>
+
+          <div class="flex gap-3">
+            <button
+              type="button"
+              @click="backToRoleSelection"
+              class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              返回
+            </button>
+            <button
+              type="submit"
+              :disabled="loginLoading"
+              class="flex-1 py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+            >
+              {{ loginLoading ? "登入中..." : "登入" }}
+            </button>
+          </div>
+        </form>
+
+        <div class="mt-4 p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
+          <p><strong>預設帳號：</strong>admin</p>
+          <p><strong>預設密碼：</strong>admin</p>
         </div>
       </div>
     </div>
@@ -290,20 +377,18 @@ import { ref, onMounted } from "vue";
 import { useAuth } from "@/stores/auth";
 import Train_smoke from "@/assets/images/Train_Smoke.gif";
 
-const { isAuthenticated, selectRole, teacherLogin, checkAuth } = useAuth();
+const { isAuthenticated, selectRole, adminLogin, teacherLogin, checkAuth } = useAuth();
 
 const isLoaded = ref(false);
 const showRoleModal = ref(false);
+const showAdminLogin = ref(false);
 const showTeacherLogin = ref(false);
 const showStudentForm = ref(false);
 const studentName = ref("");
-const loginError = ref("");
+const adminForm = ref({ username: "", password: "" });
+const teacherForm = ref({ username: "", password: "" });
 const loginLoading = ref(false);
-
-const teacherForm = ref({
-  username: "",
-  password: "",
-});
+const loginError = ref("");
 
 // 檢查是否已經登入
 onMounted(() => {
@@ -321,6 +406,16 @@ onMounted(() => {
   }
 });
 
+const selectAdminRole = () => {
+  showRoleModal.value = false;
+  showAdminLogin.value = true;
+};
+
+const selectTeacherRole = () => {
+  showRoleModal.value = false;
+  showTeacherLogin.value = true;
+};
+
 const selectStudentRole = () => {
   showRoleModal.value = false;
   showStudentForm.value = true;
@@ -331,39 +426,51 @@ const selectVisitorRole = () => {
   showRoleModal.value = false;
 };
 
-const confirmStudentRole = () => {
-  selectRole("student", { name: studentName.value });
-  showStudentForm.value = false;
+const handleAdminLogin = async () => {
+  loginLoading.value = true;
+  loginError.value = "";
+
+  const { success, message } = adminLogin(adminForm.value.username, adminForm.value.password);
+
+  loginLoading.value = false;
+  if (success) {
+    showAdminLogin.value = false;
+    adminForm.value = { username: "", password: "" };
+  } else {
+    loginError.value = message;
+  }
 };
 
 const handleTeacherLogin = async () => {
   loginLoading.value = true;
   loginError.value = "";
 
-  setTimeout(() => {
-    const result = teacherLogin(
-      teacherForm.value.username,
-      teacherForm.value.password
-    );
+  const { success, message } = teacherLogin(teacherForm.value.username, teacherForm.value.password);
 
-    if (result.success) {
-      showTeacherLogin.value = false;
-      showRoleModal.value = false;
-    } else {
-      loginError.value = result.message;
-    }
+  loginLoading.value = false;
+  if (success) {
+    showTeacherLogin.value = false;
+    teacherForm.value = { username: "", password: "" };
+  } else {
+    loginError.value = message;
+  }
+};
 
-    loginLoading.value = false;
-  }, 500);
+const confirmStudentRole = () => {
+  selectRole("student", { name: studentName.value });
+  showStudentForm.value = false;
+  studentName.value = "";
 };
 
 const backToRoleSelection = () => {
+  showAdminLogin.value = false;
   showTeacherLogin.value = false;
   showStudentForm.value = false;
   showRoleModal.value = true;
-  loginError.value = "";
+  adminForm.value = { username: "", password: "" };
   teacherForm.value = { username: "", password: "" };
   studentName.value = "";
+  loginError.value = "";
 };
 </script>
 <style scoped>
