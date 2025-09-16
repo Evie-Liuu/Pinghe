@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center min-h-screen bg-gray-100">
     <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
       <h2 class="text-2xl font-bold text-center text-gray-900">註冊新帳號</h2>
-      <form @submit.prevent="handleRegister">
+      <form @submit.prevent="handleRegister" novalidate>
         <div class="space-y-4">
           <div>
             <label
@@ -106,7 +106,7 @@
           </button>
         </div>
       </form>
-      <button @click="handleRegister_test" class="bg-indigo-600">test</button>
+      <!-- <button @click="handleRegister_test" class="bg-indigo-600">test</button> -->
       <div
         v-if="message"
         :class="messageClass"
@@ -167,6 +167,8 @@ const handleRegister = async () => {
     message.value = "請輸入姓名";
     isError.value = true;
     loading.value = false;
+    console.log(message.value);
+
     return;
   }
 

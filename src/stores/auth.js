@@ -160,15 +160,16 @@ export const useAuth = () => {
         }
       }
 
-      // 如果沒有儲存的使用者資料，建立新的
-      if (!user.value || user.value.uid !== userCredential.user.uid) {
-        user.value = {
-          email: userCredential.user.email,
-          role: 'teacher', // or determine role based on custom claims
-          displayName: '老師',
-          uid: userCredential.user.uid,
-          institution_id: userData ? userData.school : null // 如果有儲存的學校資訊就使用，否則為 null
-        };
+      // 如果沒有儲存的使用者資料，從後端建立新的
+      if (!user.value || user.value.id !== userCredential.user.uid) {
+        user.value = backendResponse.user;
+        // user.value = {
+        //   email: userCredential.user.email,
+        //   role: 'teacher', // or determine role based on custom claims
+        //   displayName: '老師',
+        //   uid: userCredential.user.uid,
+        //   institution_id: userData ? userData.school : null // 如果有儲存的學校資訊就使用，否則為 null
+        // };
       }
 
       isAuthenticated.value = true;
@@ -186,6 +187,7 @@ export const useAuth = () => {
   }
 
 
+  // 測試用
   // 身分選擇登入（學生和訪客不需要密碼）
   const selectRole = (roleType, userData = {}) => {
     isAuthenticated.value = true

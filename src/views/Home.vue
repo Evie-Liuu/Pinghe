@@ -393,6 +393,10 @@ const teacherForm = ref({ username: "", password: "" });
 const loginLoading = ref(false);
 const loginError = ref("");
 
+
+const storedUserData = localStorage.getItem('user_data');
+console.log(storedUserData);
+
 // 檢查是否已經登入
 onMounted(() => {
   setTimeout(() => {
