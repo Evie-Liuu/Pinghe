@@ -20,27 +20,26 @@ export const useAuth = () => {
     teacher: { account: 'tc', password: 'tc' }
   }
 
-  const registerWithEmailAndPassword = async (username, email, password, school) => {
+  const registerWithEmailAndPassword = async (username, email, password, school, role) => {
     try {
       // 1. Firebase 註冊
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const idToken = await userCredential.user.getIdToken()
       console.log('Firebase registration successful')
 
-      // 2. 準備後端註冊資料
+      // 2. 設置認證 token
+      localStorage.setItem('auth_token', idToken)
+
+      // 3. 準備後端註冊資料
       const backendUserData = {
         full_name: username,
-        email: email,
-        institution_id: school,
-        // firebase_uid: userCredential.user.uid,
-        role: 'teacher',
+        institution_id: 1,
+        role: role, // 使用傳入的 role
         id_token: idToken
       }
       console.log(backendUserData);
 
-
-
-      // 3. 調用後端 API 註冊
+      // 4. 調用後端 API 註冊
       try {
         const backendResponse = await apiService.register(backendUserData)
         console.log('Backend registration successful:', backendResponse)
@@ -67,7 +66,7 @@ export const useAuth = () => {
       // 4. 設置用戶狀態
       user.value = {
         email: userCredential.user.email,
-        role: 'teacher',
+        role: role,
         username: username,
         displayName: '老師',
         uid: userCredential.user.uid,
@@ -94,18 +93,17 @@ export const useAuth = () => {
       return { success: false, message: error.message || '註冊失敗，請稍後再試' }
     }
   }
-  const test = async () => {
+  const test = async (data) => {
+    // 測試註冊
     const backendUserData = {
-      full_name: "test3",
-      email: "test3@sdgsjourney.com",
-      institution_id: "3",
-      // firebase_uid: userCredential.user.uid,
-      role: 'teacher',
-      id_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6ImUzZWU3ZTAyOGUzODg1YTM0NWNlMDcwNTVmODQ2ODYyMjU1YTcwNDYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2Rncy1qb3VybmV5IiwiYXVkIjoic2Rncy1qb3VybmV5IiwiYXV0aF90aW1lIjoxNzU3OTk2MzkzLCJ1c2VyX2lkIjoid1ZlTEd2TXRoalJ6VWlKenpHY1BobnNBczlsMSIsInN1YiI6IndWZUxHdk10aGpSelVpSnp6R2NQaG5zQXM5bDEiLCJpYXQiOjE3NTc5OTYzOTMsImV4cCI6MTc1Nzk5OTk5MywiZW1haWwiOiJ0ZXN0M0BzZGdzam91cm5leS5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdDNAc2Rnc2pvdXJuZXkuY29tIl19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.X2k3xk1mI1PBJSTF8GYHU2nS6bSEDogF4Vq8fdheMU7YM3lcdkotUMIKtDZToLChFoodH2aNIdOAKPk1e36bhBz4LmsZ8G0Nv-tDG84-0jAxpN4nkHkD04-7-sATpom02-ZGchW4Hq9yhJt1VtfjMF7cXSg6ssusOPwziy3U8-8iQrk6D7eTT51wOoZzKoGbytcNwLpQhpNAJ7SsfHTsSUqgpkIgAlVhODPidmyRAJRb4iPjAPWPedG3XMxg0VGx8m5sG_VGP8EJsh57GM0UImZx7f1fts2t_RCGU3xf7m5IKsHsbh1YTTJ4VQJBCo9Sr4RzuxYAuFiJ0CoY6Vleew"
+      id_token: "eyJhbGciOiJSUzI1NiIsImtpZCI6ImUzZWU3ZTAyOGUzODg1YTM0NWNlMDcwNTVmODQ2ODYyMjU1YTcwNDYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2Rncy1qb3VybmV5IiwiYXVkIjoic2Rncy1qb3VybmV5IiwiYXV0aF90aW1lIjoxNzU4MDA1Njc2LCJ1c2VyX2lkIjoiemRwZ1JqY2NlVWVqNzFGSmZFWnIwZk1UdnhsMiIsInN1YiI6InpkcGdSamNjZVVlajcxRkpmRVpyMGZNVHZ4bDIiLCJpYXQiOjE3NTgwMDU2NzYsImV4cCI6MTc1ODAwOTI3NiwiZW1haWwiOiJ0ZXN0OThAc2Rnc2pvdXJuZXkuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInRlc3Q5OEBzZGdzam91cm5leS5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Z6-8m6VlNV1IZ6fnMCifgP1flT3zZRVxhfovKUyvdZ0nwodxkgfcjlsSavH6tnEaijdOKQYCm5WL016EPpNK5k2nT7OuO269rfAsNOs9JC6VAgHbFVWVyV4WLF6ssVbpEQCEd6z3RTGRX2NJf0BS3dXyozAOMuUbz_wMeNFNe4I_8Os19FAJZFGLjATBkkm1ccqEtKpyYoZBE0loQ6g4VxH-z8xuF7GPimpMnVrB-UYAmyK6NPXJt4AKEMbXkIkTM8kBf3f3dwP5GxoG_WlWpIdVWuVANQwjkbpYi6nLvCFlWFd0eNg_GjhJ9Xl7xc_ecyo0COXIo97587V3RiBoDw",
+      full_name: "Test Teacher User",
+      role: "teacher",
+      institution_id: 1
     }
-    console.log(backendUserData);
-    console.log('123');
 
+    // 設置認證 token
+    localStorage.setItem('auth_token', backendUserData.id_token)
 
     // 3. 調用後端 API 註冊
     try {
@@ -116,6 +114,16 @@ export const useAuth = () => {
       // 如果後端註冊失敗，仍然允許 Firebase 註冊成功，但記錄錯誤
       console.warn('User registered in Firebase but backend registration failed')
     }
+    // try {
+    //   console.log(data);
+
+    //   const backendResponse = await apiService.login(data)
+    //   console.log('Backend registration successful:', backendResponse)
+    // } catch (backendError) {
+    //   console.error('Backend registration failed:', backendError)
+    //   // 如果後端註冊失敗，仍然允許 Firebase 註冊成功，但記錄錯誤
+    //   console.warn('User registered in Firebase but backend registration failed')
+    // }
 
   }
 
@@ -123,6 +131,19 @@ export const useAuth = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
+
+      // const idToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImUzZWU3ZTAyOGUzODg1YTM0NWNlMDcwNTVmODQ2ODYyMjU1YTcwNDYiLCJ0eXAiOiJKV1QifQ.eyJyb2xlIjoiYWRtaW4iLCJpbnN0aXR1dGlvbl9pZCI6bnVsbCwicGVybWlzc2lvbnMiOlsic3lzdGVtX2FkbWluIiwibWFuYWdlX2FsbF9mb3J1bSIsInZpZXdfZm9ydW0iLCJtYW5hZ2VfaW5zdGl0dXRpb25fYWN0aXZpdGllcyIsInZpZXdfYW5hbHl0aWNzIiwibWFuYWdlX293bl9jb250ZW50IiwibWFuYWdlX2luc3RpdHV0aW9uX2NvbnRlbnQiLCJtYW5hZ2VfYWxsX2NvbnRlbnQiLCJtYW5hZ2Vfb3duX2FjdGl2aXRpZXMiLCJwYXJ0aWNpcGF0ZV9hY3Rpdml0aWVzIiwidmlld19hY3Rpdml0aWVzIiwidmlld191c2VycyIsImNyZWF0ZV9mb3J1bV9wb3N0cyIsIm1hbmFnZV9zdHVkZW50X3VzZXJzIiwiY29tbWVudF9mb3J1bV9wb3N0cyIsIm1hbmFnZV9hbGxfYWN0aXZpdGllcyIsIm1hbmFnZV9pbnN0aXR1dGlvbl91c2VycyIsIm1hbmFnZV9pbnN0aXR1dGlvbnMiLCJ2aWV3X2NvbnRlbnQiLCJtYW5hZ2Vfb3duX2luc3RpdHV0aW9uIiwibWFuYWdlX2luc3RpdHV0aW9uX2ZvcnVtIiwibWFuYWdlX3VzZXJzIiwidmlld19pbnN0aXR1dGlvbnMiXSwidXNlcl9pZCI6IlE3bHJETTVSZDVQbUN0M1Awa1N0elV5U0t0cTEiLCJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc2Rncy1qb3VybmV5IiwiYXVkIjoic2Rncy1qb3VybmV5IiwiYXV0aF90aW1lIjoxNzU4MDA3NDAxLCJzdWIiOiJRN2xyRE01UmQ1UG1DdDNQMGtTdHpVeVNLdHExIiwiaWF0IjoxNzU4MDA3NDAxLCJleHAiOjE3NTgwMTEwMDEsImVtYWlsIjoiYWRtaW5Ac2Rnc2pvdXJuZXkuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImFkbWluQHNkZ3Nqb3VybmV5LmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.OTQLy69LX-FPRMIZemUarUQQ9XYfzT4FdJsKh7bdv668JFcXsREvT-6Ik8OmFnOkG1r3e5Cl7X6boEeNN0V-ivFgATbPcvhZmbVjOlHr61VlcpYoLQ0OEZWs8Pr_n2EjUjaq_Af7LW8c306hDLXfNZwWzzgFBiDQMvi06-4y0zgt19TsU45T6qTDtbUe0H7gg_WUn6LWV84yqV4UCa6PMWgxY0kSUGnWrlLUzXogE8LhHtjj8fVxymZkiqLlMNLxXMdo-xrP399DZEaZXRoil24xPhxzCT0BN8ZI4keKFN_VipbOqNwatwIu45IAXJVzxVDv_lEvZGZxPvNHlyYxxg"
+      console.log(idToken);
+
+      // 後端登入
+      try {
+        const backendResponse = await apiService.login({ id_token: idToken });
+        console.log('Backend login successful:', backendResponse);
+      } catch (backendError) {
+        console.error('Backend login failed:', backendError);
+        // 根據後端錯誤決定是否中斷登入
+        return { success: false, message: '後端登入失敗，請稍後再試' };
+      }
 
       // 嘗試從 localStorage 獲取之前儲存的使用者資料（包含學校資訊）
       const storedUserData = localStorage.getItem('user_data');

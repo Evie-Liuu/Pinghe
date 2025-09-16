@@ -19,6 +19,21 @@
             />
           </div>
           <div>
+            <label for="role" class="block text-sm font-medium text-gray-700"
+              >身分</label
+            >
+            <select
+              v-model="role"
+              id="role"
+              required
+              class="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="student">學生</option>
+              <option value="teacher">老師</option>
+              <option value="admin">管理員</option>
+            </select>
+          </div>
+          <div>
             <label for="email" class="block text-sm font-medium text-gray-700"
               >電子郵件</label
             >
@@ -121,6 +136,7 @@ const email = ref("");
 const password = ref("");
 const selectedRegion = ref("");
 const selectedSchool = ref("");
+const role = ref("student");
 const loading = ref(false);
 const message = ref("");
 const isError = ref(false);
@@ -187,7 +203,8 @@ const handleRegister = async () => {
       username.value,
       email.value,
       password.value,
-      selectedSchool.value
+      selectedSchool.value,
+      role.value // 傳遞 role
     );
 
   loading.value = false;

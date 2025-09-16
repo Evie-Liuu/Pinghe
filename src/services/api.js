@@ -1,5 +1,7 @@
 // API service for handling server requests
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+console.log(import.meta.env.DEV);
+
+const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
 const UPLOAD_MAX_SIZE = parseInt(import.meta.env.VITE_UPLOAD_MAX_SIZE) || 5242880; // 5MB
 const UPLOAD_ALLOWED_TYPES = (import.meta.env.VITE_UPLOAD_ALLOWED_TYPES || 'image/jpeg,image/jpg,image/png,image/gif,image/webp').split(',');
 
@@ -153,6 +155,8 @@ class ApiService {
   }
 
   async register(userData) {
+    // console.log(userData);
+    console.log(JSON.stringify(userData));
     return this.request('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
