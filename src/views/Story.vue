@@ -89,9 +89,7 @@
           <input
             type="date"
             :value="
-              editStory.time
-                ? new Date(editStory.time * 1000).toISOString().split('T')[0]
-                : ''
+              editStory.time ? formatDate(editStory.time * 1000, '-') : ''
             "
             @input="updateTime"
             class="w-full p-2 border border-gray-300 rounded-md"
@@ -123,7 +121,6 @@
                 type="text"
                 v-model="editSdgSearch"
                 @focus="showEditDropdown = true"
-                @input="filterEditSdgs"
                 class="flex-1 min-w-0 outline-none bg-transparent"
                 :placeholder="
                   selectedEditSdgs.length === 0 ? '搜尋SDGs標籤...' : ''
@@ -264,10 +261,12 @@ import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import HeaderFilter from "@/components/HeaderFilter.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
 import { apiService } from "@/services/api.js";
 
 const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
+const { formatDate } = useDateFormat();
 
 // 初始檢查
 onMounted(() => {
@@ -299,7 +298,7 @@ const handleAppScroll = inject("handleAppScroll");
 const allInfos = ref(carouselImages);
 
 const showEditModal = ref(false);
-const selectedInfo = ref({});
+const selectedInfo = ref(null);
 const editStory = ref({
   types: [],
   title: "",
@@ -315,7 +314,7 @@ const handleEdit = (storyId) => {
     selectedInfo.value = story;
     editStory.value = {
       ...story,
-      types: story.types || [],
+      types: [...(story.types || [])],
       title: story.title || "",
       intro: story.intro || "",
       time: story.time || null,

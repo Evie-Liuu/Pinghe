@@ -38,16 +38,14 @@
           <div class="relative z-10 text-white">
             <h1 class="text-4xl font-bold mb-4">{{ selectedInfo.title }}</h1>
             <p class="mb-2 text-lg">{{ selectedInfo.intro }}</p>
-            <small>{{
-              new Date(selectedInfo.time * 1000).toLocaleDateString()
-            }}</small>
+            <small>{{ formatDate(selectedInfo.time * 1000) }}</small>
             <div class="flex flex-wrap gap-2 mt-2">
               <span
                 v-for="t in selectedInfo.types"
                 :key="t"
                 class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
               >
-                {{ sdgsData[t].title }}
+                {{ sdgsData[t].title.replace(/<br\s*\/?>/gi, "") }}
               </span>
             </div>
           </div>
@@ -332,6 +330,7 @@ import infos from "@/data/Story.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
 
 import { EditorContent, useEditor } from "@tiptap/vue-3";
@@ -341,6 +340,7 @@ import TaskItem from "@tiptap/extension-task-item";
 
 const props = defineProps({ id: String });
 const handleAppScroll = inject("handleAppScroll");
+const { formatDate } = useDateFormat();
 const { isTeacher } = useAuth();
 
 const selectedInfo = ref(infos.find((item) => item.id === parseInt(props.id)));
