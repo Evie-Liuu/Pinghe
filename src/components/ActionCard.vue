@@ -119,8 +119,7 @@ const progressColor = (progress) => {
   return "bg-green-500";
 };
 const goToActions = (id) => {
-  return;
-  router.push({ name: "story-detail", params: { id } });
+  router.push({ name: "action-detail", params: { id } });
 };
 </script>
 <style scoped>

@@ -8,6 +8,12 @@ const routes = [
   { path: "/register", name: "Register", component: () => import("@/views/Register.vue") },
   { path: "/about", name: "About", component: () => import("@/views/About.vue") },
   { path: "/actions", name: "Actions", component: () => import("@/views/Actions.vue") },
+  {
+    path: "/actions/:id",
+    name: "action-detail",
+    component: () => import("@/views/ActionDetail.vue"),
+    props: true
+  },
   { path: "/sdgs", name: "SDGs", component: () => import("@/views/SDGs.vue") },
   { path: "/story", name: "Story", component: () => import("@/views/Story.vue") },
   {
