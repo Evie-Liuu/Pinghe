@@ -9,6 +9,12 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
+    // 如果 API_BASE_URL 是空的，跳過 API 調用（用於開發環境）
+    if (!this.baseURL || this.baseURL.trim() === '') {
+      console.warn('API_BASE_URL is empty, skipping API call for:', endpoint);
+      throw new Error('API_BASE_URL_NOT_CONFIGURED');
+    }
+
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: {

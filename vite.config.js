@@ -23,4 +23,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'), // @ 指向 src 目錄
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api.sdgs-journey.com/api/v1',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

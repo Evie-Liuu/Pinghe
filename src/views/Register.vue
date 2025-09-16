@@ -91,6 +91,7 @@
           </button>
         </div>
       </form>
+      <button @click="handleRegister_test" class="bg-indigo-600">test</button>
       <div
         v-if="message"
         :class="messageClass"
@@ -135,6 +136,11 @@ const availableSchools = computed(() => {
   return selectedRegion.value ? getSchoolsByRegion(selectedRegion.value) : [];
 });
 
+const handleRegister_test = async () => {
+  const { success, message: resultMessage } = await auth.test();
+  console.log(success);
+  console.log(resultMessage);
+};
 const handleRegister = async () => {
   loading.value = true;
   message.value = "";
@@ -186,9 +192,9 @@ const handleRegister = async () => {
 
   loading.value = false;
   if (success) {
-    message.value = "註冊成功！將為您跳轉到首頁...";
+    message.value = "註冊成功！將為您跳轉到登入頁面...";
     setTimeout(() => {
-      router.push("/");
+      router.push("/login");
     }, 2000);
   } else {
     message.value = `註冊失敗: ${resultMessage}`;

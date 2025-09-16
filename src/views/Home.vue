@@ -131,7 +131,9 @@
             class="w-full p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors group"
           >
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600">
+              <div
+                class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white group-hover:bg-blue-600"
+              >
                 <i class="fas fa-user-tie text-xl"></i>
               </div>
               <div class="text-left">
@@ -377,7 +379,8 @@ import { ref, onMounted } from "vue";
 import { useAuth } from "@/stores/auth";
 import Train_smoke from "@/assets/images/Train_Smoke.gif";
 
-const { isAuthenticated, selectRole, adminLogin, teacherLogin, checkAuth } = useAuth();
+const { isAuthenticated, selectRole, adminLogin, teacherLogin, checkAuth } =
+  useAuth();
 
 const isLoaded = ref(false);
 const showRoleModal = ref(false);
@@ -430,7 +433,10 @@ const handleAdminLogin = async () => {
   loginLoading.value = true;
   loginError.value = "";
 
-  const { success, message } = adminLogin(adminForm.value.username, adminForm.value.password);
+  const { success, message } = adminLogin(
+    adminForm.value.username,
+    adminForm.value.password
+  );
 
   loginLoading.value = false;
   if (success) {
@@ -445,7 +451,10 @@ const handleTeacherLogin = async () => {
   loginLoading.value = true;
   loginError.value = "";
 
-  const { success, message } = teacherLogin(teacherForm.value.username, teacherForm.value.password);
+  const { success, message } = teacherLogin(
+    teacherForm.value.username,
+    teacherForm.value.password
+  );
 
   loginLoading.value = false;
   if (success) {
