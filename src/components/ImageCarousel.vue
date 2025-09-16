@@ -28,7 +28,7 @@
                 :key="t"
                 class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
               >
-                {{ sdgsData[t].title }}
+                {{ sdgsData[t].title.replace(/<br\s*\/?>/gi, "") }}
               </span>
             </div>
           </div>
@@ -68,9 +68,7 @@
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-orange-300/70 text-center rounded-lg px-2"
           >
             <p>{{ img.title }}</p>
-            <small class="text-xs">{{
-              new Date(img.time * 1000).toLocaleDateString()
-            }}</small>
+            <small class="text-xs">{{ formatDate(img.time * 1000) }}</small>
             <p class="text-sm text-justify leading-relaxed">
               {{ img.intro }}
             </p>
@@ -91,11 +89,13 @@ import sdgsData from "@/data/SDGs_goal.json";
 
 import { useRouter } from "vue-router";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useDateFormat } from "@/composables/useDateFormat.js";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import "swiper/css/navigation";
 
 const router = useRouter();
+const { formatDate } = useDateFormat();
 
 const props = defineProps({
   images: {
