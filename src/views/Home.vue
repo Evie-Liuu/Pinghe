@@ -86,12 +86,15 @@
 
     <!-- Cover -->
     <!-- Train Smoke Animation -->
-    <div
-      class="w-full absolute bottom-0 lg:-bottom-15 left-0 lg:w-1/2 pointer-events-non"
-    >
+    <div class="w-full h-full absolute top-0 left-0 pointer-events-none tain-smoke-gif">
       <img
         :src="Train_smoke"
-        class="select-none animate-train-enter"
+        class="hidden lg:block select-none animate-train-enter"
+        alt="Pinghe_Train_Smoke"
+      />
+      <img
+        :src="Train_smoke_M"
+        class="block lg:hidden select-none animate-train-enter"
         alt="Pinghe_Train_Smoke"
       />
     </div>
@@ -377,7 +380,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useAuth } from "@/stores/auth";
-import Train_smoke from "@/assets/images/Train_Smoke.gif";
+import Train_smoke from "@/assets/images/Train_Smoke_W.gif";
+import Train_smoke_M from "@/assets/images/Mobile/Train_Smoke_M.gif";
 
 const { isAuthenticated, selectRole, adminLogin, teacherLogin, checkAuth } =
   useAuth();
@@ -393,8 +397,7 @@ const teacherForm = ref({ username: "", password: "" });
 const loginLoading = ref(false);
 const loginError = ref("");
 
-
-const user = localStorage.getItem('user_data');
+const user = localStorage.getItem("user_data");
 console.log(JSON.parse(user));
 
 // 檢查是否已經登入
