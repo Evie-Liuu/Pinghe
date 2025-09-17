@@ -27,7 +27,15 @@
           <div class="w-1/3 text-center">
             <h1 class="text-2xl md:text-3xl font-bold">行動追蹤</h1>
           </div>
-          <div class="w-1/3"></div>
+          <div class="w-1/3 flex items-center justify-end pr-4 gap-2">
+            <router-link v-if="isTeacher" to="/actions/new" title="建立新故事">
+              <div
+                class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
+              >
+                <i class="fa-solid fa-plus font-bold text-pblue-500"></i>
+              </div>
+            </router-link>
+          </div>
         </div>
       </header>
       <main
@@ -67,6 +75,9 @@ import ActionCard from "@/components/ActionCard.vue";
 import PageLabel from "@/components/PageLabel.vue";
 import CJKSub from "@/components/CJKSub.vue";
 import TrainTrack from "@/components/TrainTrack.vue";
+import { useAuth } from "@/stores/auth";
+
+const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 
 const handleAppScroll = inject("handleAppScroll");
 

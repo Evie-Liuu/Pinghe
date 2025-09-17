@@ -9,6 +9,12 @@ const routes = [
   { path: "/about", name: "About", component: () => import("@/views/About.vue") },
   { path: "/actions", name: "Actions", component: () => import("@/views/Actions.vue") },
   {
+    path: "/actions/new",
+    name: "actions-new",
+    component: () => import("@/views/ActionNew.vue"),
+    meta: { requiresTeacher: true }
+  },
+  {
     path: "/actions/:id",
     name: "action-detail",
     component: () => import("@/views/ActionDetail.vue"),

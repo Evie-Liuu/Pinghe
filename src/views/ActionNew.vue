@@ -3,7 +3,7 @@
     <header class="pt-25 w-full z-10 shadow-md bg-header text-rice-500">
       <div class="container mx-auto flex items-center p-4">
         <div class="w-1/3">
-          <router-link to="/story" class="back-home-btn">
+          <router-link to="/actions" class="back-home-btn">
             <span class="text">
               <CJKSub align="left">
                 <template #zh>取消</template>
@@ -14,7 +14,7 @@
           </router-link>
         </div>
         <div class="w-1/3 text-center">
-          <h1 class="text-2xl md:text-3xl font-bold">建立故事</h1>
+          <h1 class="text-2xl md:text-3xl font-bold">建立行動</h1>
         </div>
         <div class="w-1/3"></div>
       </div>
