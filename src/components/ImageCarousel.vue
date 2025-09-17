@@ -33,7 +33,7 @@
             </div>
           </div>
           <!-- Kebab Menu -->
-          <div class="absolute top-2 right-2 z-20">
+          <div v-if="isTeacher" class="absolute top-2 right-2 z-20">
             <button
               @click.stop="toggleMenu(img.id)"
               class="text-white bg-black/30 rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/50"
@@ -90,12 +90,14 @@ import sdgsData from "@/data/SDGs_goal.json";
 import { useRouter } from "vue-router";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateFormat } from "@/composables/useDateFormat.js";
+import { useAuth } from "@/stores/auth";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import "swiper/css/navigation";
 
 const router = useRouter();
 const { formatDate } = useDateFormat();
+const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 
 const props = defineProps({
   images: {
