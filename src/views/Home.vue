@@ -86,15 +86,17 @@
 
     <!-- Cover -->
     <!-- Train Smoke Animation -->
-    <div class="w-full h-full absolute top-0 left-0 pointer-events-none tain-smoke-gif">
+    <div
+      class="w-full h-full absolute top-0 left-0 pointer-events-none overflow-hidden"
+    >
       <img
         :src="Train_smoke"
-        class="hidden lg:block select-none animate-train-enter"
+        class="hidden lg:block absolute top-0 left-0 w-full h-full object-cover object-center select-none animate-train-enter"
         alt="Pinghe_Train_Smoke"
       />
       <img
         :src="Train_smoke_M"
-        class="block lg:hidden select-none animate-train-enter"
+        class="block lg:hidden absolute top-0 left-0 w-full h-full object-cover object-center select-none animate-train-enter"
         alt="Pinghe_Train_Smoke"
       />
     </div>
