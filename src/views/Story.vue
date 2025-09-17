@@ -42,6 +42,7 @@
         @edit-story="handleEdit"
         @delete-story="handleDelete"
       />
+      <TrainTrack></TrainTrack>
     </main>
 
     <!-- Edit Modal -->
@@ -260,6 +261,7 @@ import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
 import ImageCarousel from "@/components/ImageCarousel.vue";
 import HeaderFilter from "@/components/HeaderFilter.vue";
+import TrainTrack from "@/components/TrainTrack.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";

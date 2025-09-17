@@ -34,11 +34,13 @@
           class="absolute inset-0 2xl:border-10 border-pblue-100 pointer-events-none"
         ></div>
       </div>
+      <TrainTrack></TrainTrack>
     </main>
   </div>
 </template>
 <script setup>
 import { ref } from "vue";
+import TrainTrack from "@/components/TrainTrack.vue";
 
 const isLoading = ref(true);
 const imageError = ref(false);

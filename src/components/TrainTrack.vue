@@ -1,8 +1,9 @@
 <template>
   <div class="page-train-track hidden lg:block">
     <img
-      src="@/assets/images/Train_Long.png"
+      src="@/assets/images/Train_Long_Full.png"
       :class="['page-loader', { 'animate-train': isAnimating }]"
+      class="absolute top-0 left-0 w-full h-full object-cover object-center select-none"
       alt="Train"
       @error="onImageError"
       @load="onImageLoad"
@@ -56,25 +57,22 @@ onUnmounted(() => {
 </script>
 <style scoped>
 .page-train-track {
-  width: 90%;
-  /* max-width: 500px; */
   position: fixed;
   top: 0;
   left: 0;
   overflow: hidden;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   z-index: -15;
 }
 
 .page-loader {
   position: absolute;
-  left: -140px;
-  bottom: 20vh;
-  transform: translateY(50%);
-  width: 180px;
+  left: -700px;
+  /* bottom: 20vh; */
+  /* transform: translateY(50%); */
+  /* width: 180px; */
   /* Make train larger and more visible */
-  height: auto;
   z-index: 10;
 }
 
@@ -82,7 +80,7 @@ onUnmounted(() => {
   animation: trainTravel 15s linear;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .page-loader {
     bottom: 18vh;
   }
@@ -98,22 +96,22 @@ onUnmounted(() => {
   .page-loader {
     bottom: 15.2vh;
   }
-}
+} */
 
 @keyframes trainTravel {
   0% {
-    left: -140px;
+    left: -700px;
     /* Start completely off-screen from left */
     opacity: 1;
   }
 
-  15% {
+  20% {
     left: 0px;
     /* Enter the visible area */
     opacity: 1;
   }
 
-  85% {
+  80% {
     left: calc(100% - 120px);
     /* Travel to near the right edge */
     opacity: 1;
