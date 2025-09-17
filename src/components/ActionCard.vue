@@ -36,7 +36,7 @@
               <template #en>Time</template>
             </CJKSub>
             ：{{
-              info.startTime.length
+              info.startTime && info.endTime
                 ? new Date(info.startTime * 1000).toLocaleDateString() +
                   " ~ " +
                   new Date(info.endTime * 1000).toLocaleDateString()
