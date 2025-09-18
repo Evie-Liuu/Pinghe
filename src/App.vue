@@ -152,7 +152,7 @@
           </button>
           <div
             v-if="isProfileMenuOpen"
-            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-gray-800"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-gray-800 overflow-hidden"
           >
             <div class="px-4 py-2">
               <p
@@ -190,7 +190,7 @@ import { useClickOutside } from "@/composables/useClickOutside";
 
 const {
   isAuthenticated,
-  // user,
+  user,
   isAdmin,
   isTeacher,
   isStudent,
@@ -199,9 +199,6 @@ const {
   checkAuth,
 } = useAuth();
 const router = useRouter();
-
-const user = JSON.parse(localStorage.getItem("user_data"));
-console.log(user);
 
 const isLoading = ref(true);
 const imageError = ref(false);
@@ -256,7 +253,7 @@ const handleLogout = () => {
 provide("handleAppScroll", handleScroll);
 
 onMounted(() => {
-  checkAuth(); // 初始化時檢查認證狀態
+  // checkAuth(); // 初始化時檢查認證狀態
   window.addEventListener("scroll", handleScroll); // Fallback for pages that scroll the window
   setTimeout(() => {
     isLoading.value = false;

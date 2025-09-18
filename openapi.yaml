@@ -201,7 +201,7 @@ paths:
   /articles/own:
     get:
       tags: [Articles]
-      summary: 取得自己的文章列表(可編輯)
+      summary: 取得自己的文章清單(可編輯)
       parameters:
         - name: user_id
           in: query
@@ -210,7 +210,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: 自己的文章列表
+          description: 自己的文章清單
           content:
             application/json:
               schema:
@@ -222,7 +222,8 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Article"
+                      type: integer
+                    example: [1, 2, 13]
 
   /articles/{id}:
     get:
@@ -307,9 +308,6 @@ paths:
                   success:
                     type: boolean
                     example: true
-                  content:
-                    type: object
-                    example: {}
         "404":
           description: 找不到文章
           content:
@@ -371,56 +369,61 @@ paths:
                   content:
                     $ref: "#/components/schemas/CommentWithLike"
 
-  /comments/{id}:
-    put:
-      tags: [Comments]
-      summary: 更新留言
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/CommentId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CommentInput"
-      responses:
-        "200":
-          description: 留言更新成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  content:
-                    $ref: "#/components/schemas/CommentWithLike"
-    delete:
-      tags: [Comments]
-      summary: 刪除留言
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/CommentId"
-      responses:
-        "200":
-          description: 刪除成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  content:
-                    type: object
-                    example: {}
-        "404":
-          description: 找不到留言
+  # /comments/{id}:
+  #   put:
+  #     tags: [Comments]
+  #     summary: 更新留言
+  #     security:
+  #       - bearerAuth: []
+  #     parameters:
+  #       - $ref: "#/components/parameters/CommentId"
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/CommentInput"
+  #     responses:
+  #       "200":
+  #         description: 留言更新成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 success:
+  #                   type: boolean
+  #                   example: true
+  #                 content:
+  #                   $ref: "#/components/schemas/CommentWithLike"
+  #   delete:
+  #     tags: [Comments]
+  #     summary: 刪除留言
+  #     security:
+  #       - bearerAuth: []
+  #     parameters:
+  #       - $ref: "#/components/parameters/CommentId"
+  #     responses:
+  #       "200":
+  #         description: 刪除成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 success:
+  #                   type: boolean
+  #                   example: true
+  #       "404":
+  #         description: 找不到留言
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 success:
+  #                   type: boolean
+  #                   example: false
 
   /comments/{id}/like:
     post:

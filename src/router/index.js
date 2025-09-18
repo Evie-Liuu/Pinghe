@@ -43,10 +43,7 @@ const router = createRouter({
 
 // 路由守衛
 router.beforeEach((to, from, next) => {
-  const { isAuthenticated, isTeacher, isAdmin, checkAuth } = useAuth();
-
-  // 檢查現有認證狀態
-  checkAuth();
+  const { isAuthenticated, isTeacher, isAdmin } = useAuth();
 
   // 需要管理員權限的路由
   if (to.meta.requiresAdmin && !isAdmin.value) {

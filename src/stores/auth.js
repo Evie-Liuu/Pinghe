@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { reactive, toRefs, computed } from 'vue'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -8,9 +8,54 @@ import {
 import { auth } from '@/firebase'
 import { apiService } from '@/services/api'
 
-// 全域狀態
-const isAuthenticated = ref(false)
-const user = ref(null)
+const state = reactive({
+  isAuthenticated: false,
+  user: null,
+});
+
+// 建立一個 Promise，它將在首次確定身份驗證狀態時解析。
+let authReadyResolver;
+export const authReady = new Promise(resolve => {
+  authReadyResolver = resolve;
+});
+
+// 只設定一次 onAuthStateChanged 監聽器。
+// 這會在應用程式載入時自動執行。
+onAuthStateChanged(auth, (firebaseUser) => {
+  if (firebaseUser) {
+    state.isAuthenticated = true;
+    const userData = localStorage.getItem('user_data');
+    if (userData) {
+      const parsedUserData = JSON.parse(userData);
+      // 檢查用戶 UID 是否匹配，如果不匹配則清除舊資料
+      if (parsedUserData.uid === firebaseUser.uid) {
+        state.user = parsedUserData;
+      } else {
+        // UID 不匹配，清除舊資料並等待新的登入資料
+        localStorage.removeItem('user_data');
+        state.user = null;
+      }
+    } else {
+      // 如果沒有本地資料，設置為 null 等待登入過程完成
+      state.user = null;
+    }
+
+    // 確保有 auth_token
+    firebaseUser.getIdToken().then(token => {
+      localStorage.setItem('auth_token', token);
+    });
+  } else {
+    state.isAuthenticated = false;
+    state.user = null;
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+  }
+  // 首次 onAuthStateChanged 觸發時，解析 Promise，通知應用程式驗證已就緒。
+  if (authReadyResolver) {
+    authReadyResolver();
+    authReadyResolver = null; // 避免未來再次解析
+  }
+});
 
 // 多身分認證系統
 export const useAuth = () => {
@@ -64,7 +109,7 @@ export const useAuth = () => {
       }
 
       // 4. 設置用戶狀態
-      user.value = {
+      state.user = {
         email: userCredential.user.email,
         role: role,
         username: username,
@@ -73,11 +118,11 @@ export const useAuth = () => {
         institution_id: school,
         id_token: idToken
       }
-      isAuthenticated.value = true
+      state.isAuthenticated = true
       localStorage.setItem('auth_token', idToken)
-      localStorage.setItem('user_data', JSON.stringify(user.value))
+      localStorage.setItem('user_data', JSON.stringify(state.user))
 
-      return { success: true, user: user.value }
+      return { success: true, user: state.user }
     } catch (error) {
       console.error('Registration Error:', error)
 
@@ -129,55 +174,40 @@ export const useAuth = () => {
 
   const loginWithCredentials = async (email, password) => {
     try {
+      // 在開始登入前清除舊的用戶資料，防止競態條件
+      localStorage.removeItem('user_data');
+      state.user = null;
+
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
 
-      // console.log(idToken);
+      // 設置認證 token
+      localStorage.setItem('auth_token', idToken);
 
       // 後端登入
       try {
         const backendResponse = await apiService.login({ id_token: idToken });
         console.log('Backend login successful:', backendResponse);
-        user.value = backendResponse.user;
+        state.user = backendResponse.user;
       } catch (backendError) {
         console.error('Backend login failed:', backendError);
+        // 清除認證資料
+        localStorage.removeItem('auth_token');
         // 根據後端錯誤決定是否中斷登入
         return { success: false, message: '後端登入失敗，請稍後再試' };
       }
 
-      // // 嘗試從 localStorage 獲取之前儲存的使用者資料（包含學校資訊）
-      // const storedUserData = localStorage.getItem('user_data');
-
-      // let userData = null;
-      // if (storedUserData) {
-      //   userData = JSON.parse(storedUserData);
-      //   // 確保是同一個使用者
-      //   if (userData.uid === userCredential.user.uid) {
-      //     user.value = userData;
-      //   } else {
-      //     // 如果不是同一個使用者，清除舊資料
-      //     localStorage.removeItem('user_data');
-      //   }
-      // }
-
-      // // 如果沒有儲存的使用者資料，從後端建立新的
-      // if (!user.value || user.value.id !== userCredential.user.uid) {
-      //   // user.value = {
-      //   //   email: userCredential.user.email,
-      //   //   role: 'teacher', // or determine role based on custom claims
-      //   //   displayName: '老師',
-      //   //   uid: userCredential.user.uid,
-      //   //   institution_id: userData ? userData.school : null // 如果有儲存的學校資訊就使用，否則為 null
-      //   // };
-      // }
-      localStorage.removeItem('user_data');
-
-      isAuthenticated.value = true;
-      localStorage.setItem('auth_token', idToken);
-      localStorage.setItem('user_data', JSON.stringify(user.value));
+      // 設置用戶狀態和本地儲存
+      state.isAuthenticated = true;
+      localStorage.setItem('user_data', JSON.stringify(state.user));
       return { success: true };
     } catch (error) {
       console.error('Login Error:', error);
+      // 登入失敗時清除所有相關資料
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      state.user = null;
+      state.isAuthenticated = false;
       return { success: false, message: error.message };
     }
   }
@@ -190,51 +220,51 @@ export const useAuth = () => {
   // 測試用
   // 身分選擇登入（學生和訪客不需要密碼）
   const selectRole = (roleType, userData = {}) => {
-    isAuthenticated.value = true
+    state.isAuthenticated = true
 
     switch (roleType) {
       case 'admin':
-        user.value = {
+        state.user = {
           account: userData.account || 'admin',
           role: 'admin',
           displayName: '管理員',
           icon: 'fa-user-shield'
         }
         localStorage.setItem('auth_token', 'admin_token')
-        localStorage.setItem('user_data', JSON.stringify(user.value))
+        localStorage.setItem('user_data', JSON.stringify(state.user))
         break
 
       case 'teacher':
-        user.value = {
+        state.user = {
           account: userData.account || 'teacher',
           role: 'teacher',
           displayName: '老師',
           icon: 'fa-user-tie'
         }
         localStorage.setItem('auth_token', 'teacher_token')
-        localStorage.setItem('user_data', JSON.stringify(user.value))
+        localStorage.setItem('user_data', JSON.stringify(state.user))
         break
 
       case 'student':
-        user.value = {
+        state.user = {
           account: userData.name || '學生',
           role: 'student',
           displayName: '學生',
           icon: 'fa-user-graduate'
         }
         localStorage.setItem('auth_token', 'student_token')
-        localStorage.setItem('user_data', JSON.stringify(user.value))
+        localStorage.setItem('user_data', JSON.stringify(state.user))
         break
 
       case 'visitor':
-        user.value = {
+        state.user = {
           account: '訪客',
           role: 'visitor',
           displayName: '訪客',
           icon: 'fa-user'
         }
         localStorage.setItem('auth_token', 'visitor_token')
-        localStorage.setItem('user_data', JSON.stringify(user.value))
+        localStorage.setItem('user_data', JSON.stringify(state.user))
         break
     }
 
@@ -263,62 +293,31 @@ export const useAuth = () => {
     } catch (error) {
       console.error('Sign out error', error)
     }
-    isAuthenticated.value = false
-    user.value = null
+    state.isAuthenticated = false
+    state.user = null
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_data')
   }
 
-  const checkAuth = () => {
-    onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        isAuthenticated.value = true;
-        // You might want to get the token again or just use the stored user data
-        const userData = localStorage.getItem('user_data');
-        if (userData) {
-          user.value = JSON.parse(userData);
-        } else {
-          // If no local data, create a user object from firebaseUser
-          user.value = {
-            email: firebaseUser.email,
-            uid: firebaseUser.uid,
-            role: 'teacher', // or fetch role
-            displayName: '老師'
-          };
-          localStorage.setItem('user_data', JSON.stringify(user.value));
-          firebaseUser.getIdToken().then(token => {
-            localStorage.setItem('auth_token', token);
-          });
-        }
-      } else {
-        isAuthenticated.value = false;
-        user.value = null;
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_data');
-      }
-    });
-  }
-
   // Permission
   const isAdmin = computed(() => {
-    return user.value && user.value.role === 'admin'
+    return state.user && state.user.role === 'admin'
   })
 
   const isTeacher = computed(() => {
-    return user.value && user.value.role === 'teacher'
+    return state.user && state.user.role === 'teacher'
   })
 
   const isStudent = computed(() => {
-    return user.value && user.value.role === 'student'
+    return state.user && state.user.role === 'student'
   })
 
   const isVisitor = computed(() => {
-    return user.value && user.value.role === 'visitor'
+    return state.user && state.user.role === 'visitor'
   })
 
   return {
-    isAuthenticated,
-    user,
+    ...toRefs(state),
     isAdmin,
     isTeacher,
     isStudent,
@@ -327,7 +326,6 @@ export const useAuth = () => {
     adminLogin,
     teacherLogin,
     logout,
-    checkAuth,
     registerWithEmailAndPassword,
     loginWithEmailAndPassword,
     loginWithCredentials,
