@@ -76,7 +76,7 @@
               :end-time="parseInt(actionData.endTime)"
               :phases="ganttPhases"
               :posts="actionData.post || []"
-              :avatar="'/thumb2.jpg'"
+              :avatar="'student.png'"
             />
             <div v-else class="text-center py-12 text-gray-500">
               <i class="fas fa-chart-bar text-4xl text-gray-300 mb-4"></i>

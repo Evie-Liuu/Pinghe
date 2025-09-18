@@ -44,7 +44,7 @@
           :key="phase.id"
           class="flex-1 p-3 font-semibold text-center bg-gradient-to-b from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-all duration-200 text-gray-800"
           :class="{
-            'border-r border-gray-200': index < phases.length - 1
+            'border-r border-gray-200': index < phases.length - 1,
           }"
         >
           {{ phase.name }}
@@ -167,12 +167,12 @@
           class="phase-column flex-1 relative"
           :class="{
             'border-r border-gray-200': index < phases.length - 1,
-            'flex-shrink-0': index === phases.length - 1
+            'flex-shrink-0': index === phases.length - 1,
           }"
         >
           <!-- Day cells in phase column -->
           <div
-            v-for="(day, index) in days"
+            v-for="day in days"
             :key="day.toISOString()"
             class="phase-day-cell relative hover:bg-blue-50 transition-colors duration-200 border-b border-gray-200"
             :style="{
@@ -192,7 +192,7 @@
             >
               <img
                 v-if="avatar"
-                :src="avatar"
+                :src="getImageUrl(avatar)"
                 class="w-6 h-6 rounded-full object-cover border-2 border-white shadow-md"
                 alt="使用者頭像"
               />
@@ -268,6 +268,11 @@ const emit = defineEmits(["update:scrollTime", "phase-click", "day-click"]);
 const selectedUnit = ref("week");
 const scrollContainer = shallowRef(null);
 const currentScrollTime = ref(props.startTime);
+
+function getImageUrl(name) {
+  if (!name) return "";
+  return new URL(`../assets/images/${name}`, import.meta.url).href;
+}
 
 const isValidTimeRange = computed(() => {
   return (
