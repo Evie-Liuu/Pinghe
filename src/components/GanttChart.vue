@@ -169,15 +169,12 @@
           v-for="(phase, index) in phases"
           :key="phase.id"
           class="phase-column flex-1 relative"
-          :class="{
-            'border-r border-gray-200': index < phases.length - 1,
-          }"
         >
           <!-- Day cells in phase column -->
           <div
             v-for="day in days"
             :key="day.toISOString()"
-            class="phase-day-cell relative hover:bg-blue-50 transition-colors duration-200 border-b border-gray-200"
+            class="phase-day-cell relative hover:bg-blue-50 transition-colors duration-200 border-r border-gray-200"
             :style="{
               height: timePointHeight + 'px',
               minHeight: timePointHeight + 'px',
@@ -758,7 +755,6 @@ watch(
 .flex-shrink-0 {
   flex-shrink: 0 !important;
 }
-
 
 .phase-day-cell.has-posts::before {
   content: "";
