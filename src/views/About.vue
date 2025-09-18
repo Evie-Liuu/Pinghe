@@ -17,17 +17,20 @@
     <main
       class="absolute bottom-0 w-screen h-screen lg:max-h-280 flex justify-center items-center"
     >
-      <div class="w-full h-full flex justify-center">
+      <div
+        class="relative w-full h-2/3 2xl:w-285 2xl:h-165 mx-auto translate-y-0 2xl:translate-y-7"
+      >
         <iframe
           @load="onIframeLoad"
           src="https://www.thinglink.com/view/scene/2024716940248875685"
           type="text/html"
-          class="w-full h-full pt-20 blended-iframe"
+          class="w-full h-full"
           webkitallowfullscreen
           mozallowfullscreen
           allowfullscreen
           scrolling="no"
         ></iframe>
+        <div class="absolute inset-0 2xl:border-10 pointer-events-none"></div>
       </div>
       <TrainTrack></TrainTrack>
     </main>
