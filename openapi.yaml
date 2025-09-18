@@ -43,7 +43,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LoginResponse"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/LoginContent"
         "401":
           description: 帳號或密碼錯誤
 
@@ -63,7 +69,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/User"
         "400":
           description: 註冊失敗（如 Email 已被使用）
 
@@ -79,7 +91,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/User"
         "401":
           description: 尚未登入
     put:
@@ -99,7 +117,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/User"
         "401":
           description: 尚未登入
 
@@ -113,9 +137,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Article"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Article"
     post:
       tags: [Articles]
       summary: 新增文章
@@ -133,7 +163,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Article"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  # content:
+                  #   $ref: "#/components/schemas/Article"
 
   /articles/search:
     get:
@@ -152,33 +188,41 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Article"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Article"
 
-  /articles/editable:
+  /articles/own:
     get:
       tags: [Articles]
-      summary: 取得可編輯的文章列表
-      security:
-        - bearerAuth: []
+      summary: 取得自己的文章列表(可編輯)
       parameters:
-        - name: author_id
+        - name: user_id
           in: query
-          required: false
+          required: true
           schema:
             type: integer
       responses:
         "200":
-          description: 可編輯的文章列表
+          description: 自己的文章列表
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 properties:
-                  items:
-                    type: integer
-                example: [15, 16, 17]
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Article"
 
   /articles/{id}:
     get:
@@ -192,9 +236,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Article"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/Article"
         "404":
           description: 找不到文章
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
     put:
       tags: [Articles]
       summary: 更新文章
@@ -214,7 +272,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Article"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/Article"
+        "404":
+          description: 找不到文章
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
     delete:
       tags: [Articles]
       summary: 刪除文章
@@ -223,15 +297,34 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ArticleId"
       responses:
-        "204":
+        "200":
           description: 刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    example: {}
         "404":
           description: 找不到文章
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
 
   /articles/{id}/comments:
     get:
       tags: [Comments]
-      summary: 取得文章留言（包含 likeCount 與 likedByUser）
+      summary: 取得文章留言（包含 like_count 與 liked_by_user）
       parameters:
         - $ref: "#/components/parameters/ArticleId"
       security:
@@ -242,9 +335,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CommentWithLike"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CommentWithLike"
     post:
       tags: [Comments]
       summary: 新增留言
@@ -264,7 +363,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommentWithLike"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/CommentWithLike"
 
   /comments/{id}:
     put:
@@ -286,7 +391,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommentWithLike"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/CommentWithLike"
     delete:
       tags: [Comments]
       summary: 刪除留言
@@ -295,8 +406,19 @@ paths:
       parameters:
         - $ref: "#/components/parameters/CommentId"
       responses:
-        "204":
+        "200":
           description: 刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    example: {}
         "404":
           description: 找不到留言
 
@@ -314,7 +436,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommentWithLike"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/CommentWithLike"
     delete:
       tags: [Comments]
       summary: 取消留言讚
@@ -328,7 +456,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommentWithLike"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/CommentWithoutLike"
 
 components:
   securitySchemes:
@@ -363,13 +497,10 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR...
       required: [id_token]
 
-    LoginResponse:
+    LoginContent:
       type: object
       properties:
-        success:
-          type: boolean
-          example: true
-        massage:
+        message:
           type: string
           example: 登入成功
         requires_token_refresh:
@@ -452,7 +583,7 @@ components:
         bio:
           type: string
           example: 我是彰化國小的學生
-        avatarUrl:
+        avatar_url:
           type: string
           format: uri
           example: https://example.com/avatar.png
@@ -470,17 +601,21 @@ components:
           type: string
           format: email
           example: user@example.com
-        bio:
-          type: string
-          example: 我是彰化國小的學生
-        avatarUrl:
-          type: string
-          format: uri
-          example: https://example.com/avatar.png
-        createdAt:
-          type: string
-          format: date-time
-          example: "2025-09-15T10:00:00Z"
+        institution_id:
+          type: integer
+          example: 1
+        # bio:
+        #   type: string
+        #   example: 我是彰化國小的學生
+        # avatar_url:
+        #   type: string
+        #   format: uri
+        #   example: https://example.com/avatar.png
+        created_at:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1757997600
 
     ArticleInput:
       type: object
@@ -489,9 +624,10 @@ components:
           type: string
           example: 校園永續活動
         time:
-          type: string
-          format: date-time
-          example: "2025-07-15T11:00:00Z"
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1752644400
         types:
           type: array
           items:
@@ -499,7 +635,7 @@ components:
           example: [1, 4]
         img_url:
           type: string
-          example: figure2.png。
+          example: figure2.png
         intro:
           type: string
           example: 這是一篇關於永續發展的文章內容。
@@ -516,17 +652,19 @@ components:
             id:
               type: integer
               example: 1
-            author_id:
+            user_id:
               type: integer
               example: 10
-            createdAt:
-              type: string
-              format: date-time
-              example: "2025-09-15T10:00:00Z"
-            updatedAt:
-              type: string
-              format: date-time
-              example: "2025-09-15T11:00:00Z"
+            created_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1757997600
+            updated_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1758001200
 
     CommentInput:
       type: object
@@ -544,35 +682,45 @@ components:
             id:
               type: integer
               example: 101
-            articleId:
-              type: integer
-              example: 1
-            userId:
+            user_id:
               type: integer
               example: 10
-            parentId:
+            parent_id:
               type: integer
-              example: null
-            createdAt:
-              type: string
-              format: date-time
-              example: "2025-09-15T10:30:00Z"
-            updatedAt:
-              type: string
-              format: date-time
-              example: "2025-09-15T10:40:00Z"
+              example: 1
+            created_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1757999400
+            updated_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1758000000
 
     CommentWithLike:
       allOf:
         - $ref: "#/components/schemas/Comment"
         - type: object
           properties:
-            likeCount:
+            like_count:
               type: integer
               example: 3
-            likedByUser:
+            liked_by_user:
               type: boolean
               example: true
+    CommentWithoutLike:
+      allOf:
+        - $ref: "#/components/schemas/Comment"
+        - type: object
+          properties:
+            like_count:
+              type: integer
+              example: 2
+            liked_by_user:
+              type: boolean
+              example: false
 
     FirebaseSignUpRequest:
       type: object
