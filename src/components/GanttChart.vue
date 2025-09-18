@@ -164,7 +164,7 @@
       </div>
 
       <!-- Phase columns -->
-      <div class="flex flex-1">
+      <div class="flex flex-1 border-r border-gray-200">
         <div
           v-for="(phase, index) in phases"
           :key="phase.id"
@@ -477,8 +477,6 @@ const isWeekend = (date) => {
 };
 
 const isHoliday = (date) => {
-  if (isWeekend(date)) return true;
-
   const month = date.getMonth() + 1;
   const day = date.getDate();
   const key = `${month}-${day}`;
@@ -590,10 +588,38 @@ watch(
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Weekend styling */
+.phase-day-cell.bg-gray-50 {
+  background: #f9fafb !important;
+}
+
+/* Holiday styling */
+.phase-day-cell.bg-gray-100 {
+  background: #f3f4f6 !important;
+}
+
+/* Posts indicator styling */
+.phase-day-cell.has-posts {
+  background: linear-gradient(135deg, #fef3c7, #fde68a) !important;
+}
+
 .phase-day-cell:hover {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe) !important;
   transform: scale(1.01);
   box-shadow: inset 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Specific hover states for different day types */
+.phase-day-cell.bg-gray-50:hover {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1) !important;
+}
+
+.phase-day-cell.bg-gray-100:hover {
+  background: linear-gradient(135deg, #d1d5db, #9ca3af) !important;
+}
+
+.phase-day-cell.has-posts:hover {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b) !important;
 }
 
 /* 確保格線完全對齊 - 統一 box-sizing */
@@ -733,13 +759,6 @@ watch(
   flex-shrink: 0 !important;
 }
 
-.phase-day-cell.weekend {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-}
-
-.phase-day-cell.weekend:hover {
-  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
-}
 
 .phase-day-cell.has-posts::before {
   content: "";
