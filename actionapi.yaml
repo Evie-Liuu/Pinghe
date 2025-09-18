@@ -1,0 +1,1082 @@
+openapi: 3.0.3
+info:
+  title: 行動任務卡片 API
+  version: 2.0.0
+  description: 提供活動管理與留言互動的統一回應格式 API
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.example.com/v1
+    description: 生產環境
+  - url: https://api-staging.example.com/v1
+    description: 測試環境
+
+security:
+  - bearerAuth: []
+
+paths:
+  /activities:
+    post:
+      summary: 新增活動
+      description: 建立一個新的任務活動
+      tags:
+        - Activities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityCreate"
+      responses:
+        "201":
+          description: 活動建立成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      id: "act_123"
+                      title: "團隊會議"
+                      description: "討論專案進度"
+                      startTime: "2024-01-15T10:00:00Z"
+                      endTime: "2024-01-15T12:00:00Z"
+                      members: ["user1", "user2"]
+                      stages: []
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      summary: 取得活動清單
+      description: 支援分頁、排序和篩選的活動清單查詢
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+        - name: title
+          in: query
+          description: 依標題篩選
+          schema:
+            type: string
+        - name: member
+          in: query
+          description: 依成員篩選
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: 開始日期範圍（格式：YYYY-MM-DD）
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: 結束日期範圍（格式：YYYY-MM-DD）
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: 活動清單
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      data: []
+                      pagination:
+                        page: 1
+                        limit: 20
+                        total: 50
+                        totalPages: 3
+                        hasNext: true
+                        hasPrev: false
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /activities/{activityId}:
+    get:
+      summary: 取得單一活動
+      description: 根據活動 ID 取得活動詳細資料
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+      responses:
+        "200":
+          description: 活動資料
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      id: "act_123"
+                      title: "團隊會議"
+                      description: "討論專案進度"
+                      startTime: "2024-01-15T10:00:00Z"
+                      endTime: "2024-01-15T12:00:00Z"
+                      members: ["user1", "user2"]
+                      stages: []
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      summary: 編輯活動
+      description: 更新指定活動的資料
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityUpdate"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: 刪除活動
+      description: 永久刪除指定的活動
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+      responses:
+        "200":
+          description: 刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "活動已成功刪除"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /activities/{activityId}/comments:
+    post:
+      summary: 發表留言
+      description: 在指定活動下新增留言
+      tags:
+        - Comments
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentCreate"
+      responses:
+        "201":
+          description: 留言發表成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      id: "cmt_001"
+                      content: "這個計畫進度如何？"
+                      author: "user1"
+                      createdAt: "2024-01-15T10:30:00Z"
+                      reactions: []
+                      replyCount: 0
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      summary: 取得留言清單
+      description: 支援分頁的留言清單查詢
+      tags:
+        - Comments
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Order"
+      responses:
+        "200":
+          description: 留言清單
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      data: []
+                      pagination:
+                        page: 1
+                        limit: 20
+                        total: 5
+                        totalPages: 1
+                        hasNext: false
+                        hasPrev: false
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /activities/{activityId}/comments/{commentId}:
+    put:
+      summary: 編輯留言
+      description: 更新指定留言的內容
+      tags:
+        - Comments
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentUpdate"
+      responses:
+        "200":
+          description: 留言更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: 刪除留言
+      description: 永久刪除指定的留言
+      tags:
+        - Comments
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+      responses:
+        "200":
+          description: 刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "留言已成功刪除"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /activities/{activityId}/comments/{commentId}/replies:
+    post:
+      summary: 回覆留言
+      description: 對指定留言進行回覆
+      tags:
+        - Replies
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplyCreate"
+      responses:
+        "201":
+          description: 回覆成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      id: "reply_001"
+                      content: "我同意這個想法！"
+                      author: "user2"
+                      createdAt: "2024-01-15T10:45:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    get:
+      summary: 取得回覆清單
+      description: 支援分頁的回覆清單查詢
+      tags:
+        - Replies
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: 回覆清單
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /activities/{activityId}/comments/{commentId}/reactions:
+    post:
+      summary: 新增表情反應
+      description: 對指定留言新增表情反應
+      tags:
+        - Reactions
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReactionCreate"
+      responses:
+        "201":
+          description: 表情新增成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      emoji: "👍"
+                      user: "user1"
+                      createdAt: "2024-01-15T10:50:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      summary: 取消表情反應
+      description: 移除指定留言的表情反應
+      tags:
+        - Reactions
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/CommentId"
+        - name: emoji
+          in: query
+          required: true
+          description: 要移除的表情符號
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 表情移除成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "表情反應已移除"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ActivityId:
+      name: activityId
+      in: path
+      required: true
+      description: 活動的唯一識別碼
+      schema:
+        type: string
+        pattern: "^act_[a-zA-Z0-9]+$"
+        example: act_123
+
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      description: 留言的唯一識別碼
+      schema:
+        type: string
+        pattern: "^cmt_[a-zA-Z0-9]+$"
+        example: cmt_001
+
+    Page:
+      name: page
+      in: query
+      description: 頁數（從 1 開始）
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+        example: 1
+
+    Limit:
+      name: limit
+      in: query
+      description: 每頁項目數量
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+        example: 20
+
+    Sort:
+      name: sort
+      in: query
+      description: 排序欄位
+      schema:
+        type: string
+        enum: [createdAt, updatedAt, title, author]
+        default: createdAt
+
+    Order:
+      name: order
+      in: query
+      description: 排序方向
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+
+  responses:
+    BadRequest:
+      description: 請求參數錯誤
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            badRequest:
+              value:
+                success: false
+                error:
+                  code: "BAD_REQUEST"
+                  message: "請求參數格式錯誤"
+                  details: "無效的日期格式"
+
+    Unauthorized:
+      description: 未授權訪問
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            unauthorized:
+              value:
+                success: false
+                error:
+                  code: "UNAUTHORIZED"
+                  message: "請先登入以訪問此資源"
+
+    Forbidden:
+      description: 禁止訪問
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            forbidden:
+              value:
+                success: false
+                error:
+                  code: "FORBIDDEN"
+                  message: "您沒有權限執行此操作"
+
+    NotFound:
+      description: 資源不存在
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            notFound:
+              value:
+                success: false
+                error:
+                  code: "NOT_FOUND"
+                  message: "找不到指定的資源"
+
+    Conflict:
+      description: 資源衝突
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            conflict:
+              value:
+                success: false
+                error:
+                  code: "CONFLICT"
+                  message: "資源已存在或操作衝突"
+
+    ValidationError:
+      description: 資料驗證錯誤
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+          examples:
+            validation:
+              value:
+                success: false
+                error:
+                  code: "VALIDATION_ERROR"
+                  message: "資料驗證失敗"
+                  fields:
+                    title: ["標題不能為空"]
+                    startTime: ["開始時間必須晚於當前時間"]
+
+    InternalServerError:
+      description: 伺服器內部錯誤
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            serverError:
+              value:
+                success: false
+                error:
+                  code: "INTERNAL_SERVER_ERROR"
+                  message: "伺服器內部錯誤，請稍後再試"
+
+  schemas:
+    # 統一回應格式
+    BaseResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          description: 操作是否成功
+        timestamp:
+          type: string
+          format: date-time
+          description: 回應時間戳
+          example: "2024-01-15T10:00:00Z"
+
+    SuccessResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            success:
+              type: boolean
+              enum: [true]
+            content:
+              description: 成功回應的資料內容
+              type: object
+
+    ErrorResponse:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            success:
+              type: boolean
+              enum: [false]
+            error:
+              type: object
+              required: [code, message]
+              properties:
+                code:
+                  type: string
+                  description: 錯誤代碼
+                  example: "VALIDATION_ERROR"
+                message:
+                  type: string
+                  description: 錯誤訊息
+                  example: "資料驗證失敗"
+                details:
+                  type: string
+                  description: 詳細錯誤說明
+                  example: "標題欄位不能為空"
+
+    ValidationErrorResponse:
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+        - type: object
+          properties:
+            error:
+              type: object
+              required: [code, message, fields]
+              properties:
+                code:
+                  type: string
+                  enum: ["VALIDATION_ERROR"]
+                message:
+                  type: string
+                  example: "資料驗證失敗"
+                fields:
+                  type: object
+                  description: 欄位驗證錯誤詳情
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: string
+                  example:
+                    title: ["標題不能為空", "標題長度必須介於 1-100 字元"]
+                    email: ["請輸入有效的電子郵件地址"]
+
+    PaginatedResponse:
+      allOf:
+        - $ref: "#/components/schemas/SuccessResponse"
+        - type: object
+          properties:
+            content:
+              type: object
+              required: [data, pagination]
+              properties:
+                data:
+                  type: array
+                  description: 資料陣列
+                  items:
+                    type: object
+                pagination:
+                  $ref: "#/components/schemas/Pagination"
+
+    Pagination:
+      type: object
+      required: [page, limit, total, totalPages, hasNext, hasPrev]
+      properties:
+        page:
+          type: integer
+          description: 當前頁數
+          minimum: 1
+          example: 1
+        limit:
+          type: integer
+          description: 每頁項目數量
+          minimum: 1
+          example: 20
+        total:
+          type: integer
+          description: 總項目數
+          minimum: 0
+          example: 100
+        totalPages:
+          type: integer
+          description: 總頁數
+          minimum: 0
+          example: 5
+        hasNext:
+          type: boolean
+          description: 是否有下一頁
+          example: true
+        hasPrev:
+          type: boolean
+          description: 是否有上一頁
+          example: false
+
+    # 活動相關 Schema
+    ActivityBase:
+      type: object
+      required: [title, startTime, endTime, members]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: 活動標題
+          example: "團隊會議"
+        description:
+          type: string
+          maxLength: 1000
+          description: 活動描述
+          example: "討論專案進度和未來規劃"
+        startTime:
+          type: string
+          format: date-time
+          description: 活動開始時間
+          example: "2024-01-15T10:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: 活動結束時間
+          example: "2024-01-15T12:00:00Z"
+        members:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 50
+          description: 參與成員列表
+          example: ["user1", "user2", "user3"]
+
+    ActivityCreate:
+      allOf:
+        - $ref: "#/components/schemas/ActivityBase"
+        - type: object
+          properties:
+            stages:
+              type: array
+              description: 活動階段列表
+              items:
+                $ref: "#/components/schemas/StageCreate"
+              example: []
+
+    ActivityUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: 活動標題
+        description:
+          type: string
+          maxLength: 1000
+          description: 活動描述
+        startTime:
+          type: string
+          format: date-time
+          description: 活動開始時間
+        endTime:
+          type: string
+          format: date-time
+          description: 活動結束時間
+        members:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 50
+          description: 參與成員列表
+        stages:
+          type: array
+          description: 活動階段列表
+          items:
+            $ref: "#/components/schemas/StageUpdate"
+
+    Activity:
+      allOf:
+        - $ref: "#/components/schemas/ActivityBase"
+        - type: object
+          required: [id, createdAt, updatedAt]
+          properties:
+            id:
+              type: string
+              pattern: "^act_[a-zA-Z0-9]+$"
+              description: 活動唯一識別碼
+              example: "act_123"
+            createdAt:
+              type: string
+              format: date-time
+              description: 建立時間
+              example: "2024-01-15T09:00:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              description: 最後更新時間
+              example: "2024-01-15T09:30:00Z"
+            stages:
+              type: array
+              description: 活動階段列表
+              items:
+                $ref: "#/components/schemas/Stage"
+
+    # 階段相關 Schema
+    StageBase:
+      type: object
+      required: [order, name, startTime, endTime]
+      properties:
+        order:
+          type: integer
+          minimum: 1
+          description: 階段順序
+          example: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 階段名稱
+          example: "設計階段"
+        description:
+          type: string
+          maxLength: 500
+          description: 階段描述
+          example: "進行UI/UX設計和原型製作"
+        startTime:
+          type: string
+          format: date-time
+          description: 階段開始時間
+          example: "2024-01-15T10:00:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: 階段結束時間
+          example: "2024-01-15T11:00:00Z"
+
+    StageCreate:
+      $ref: "#/components/schemas/StageBase"
+
+    StageUpdate:
+      type: object
+      properties:
+        order:
+          type: integer
+          minimum: 1
+          description: 階段順序
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: 階段名稱
+        description:
+          type: string
+          maxLength: 500
+          description: 階段描述
+        startTime:
+          type: string
+          format: date-time
+          description: 階段開始時間
+        endTime:
+          type: string
+          format: date-time
+          description: 階段結束時間
+
+    Stage:
+      allOf:
+        - $ref: "#/components/schemas/StageBase"
+        - type: object
+          required: [id, createdAt, updatedAt]
+          properties:
+            id:
+              type: string
+              pattern: "^stage_[a-zA-Z0-9]+$"
+              description: 階段唯一識別碼
+              example: "stage_001"
+            createdAt:
+              type: string
+              format: date-time
+              description: 建立時間
+              example: "2024-01-15T09:00:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              description: 最後更新時間
+              example: "2024-01-15T09:30:00Z"
+
+    # 留言相關 Schema
+    CommentBase:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: 留言內容
+          example: "這個計畫進度如何？有什麼需要協助的地方嗎？"
+
+    CommentCreate:
+      $ref: "#/components/schemas/CommentBase"
+
+    CommentUpdate:
+      $ref: "#/components/schemas/CommentBase"
+
+    Comment:
+      allOf:
+        - $ref: "#/components/schemas/CommentBase"
+        - type: object
+          required: [id, author, createdAt, updatedAt, reactions, replyCount]
+          properties:
+            id:
+              type: string
+              pattern: "^cmt_[a-zA-Z0-9]+$"
+              description: 留言唯一識別碼
+              example: "cmt_001"
+            author:
+              type: string
+              description: 作者識別碼
+              example: "user1"
+            createdAt:
+              type: string
+              format: date-time
+              description: 建立時間
+              example: "2024-01-15T10:30:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              description: 最後更新時間
+              example: "2024-01-15T10:35:00Z"
+            reactions:
+              type: array
+              description: 表情反應統計
+              items:
+                $ref: "#/components/schemas/ReactionSummary"
+            replyCount:
+              type: integer
+              minimum: 0
+              description: 回覆數量
+              example: 3
+
+    # 回覆相關 Schema
+    ReplyBase:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: 回覆內容
+          example: "我同意這個想法，讓我們開始執行吧！"
+
+    ReplyCreate:
+      $ref: "#/components/schemas/ReplyBase"
+
+    ReplyUpdate:
+      $ref: "#/components/schemas/ReplyBase"
+
+    Reply:
+      allOf:
+        - $ref: "#/components/schemas/ReplyBase"
+        - type: object
+          required: [id, author, createdAt, updatedAt]
+          properties:
+            id:
+              type: string
+              pattern: "^reply_[a-zA-Z0-9]+$"
+              description: 回覆唯一識別碼
+              example: "reply_001"
+            author:
+              type: string
+              description: 作者識別碼
+              example: "user2"
+            createdAt:
+              type: string
+              format: date-time
+              description: 建立時間
+              example: "2024-01-15T10:45:00Z"
+            updatedAt:
+              type: string
+              format: date-time
+              description: 最後更新時間
+              example: "2024-01-15T10:45:00Z"
+
+    # 表情反應相關 Schema
+    ReactionCreate:
+      type: object
+      required: [emoji]
+      properties:
+        emoji:
+          type: string
+          pattern: '^[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]$'
+          description: 表情符號（僅支援 Unicode emoji）
+          example: "👍"
+
+    ReactionSummary:
+      type: object
+      required: [emoji, count]
+      properties:
+        emoji:
+          type: string
+          description: 表情符號
+          example: "👍"
+        count:
+          type: integer
+          minimum: 1
+          description: 該表情的數量
+          example: 5
+        users:
+          type: array
+          description: 使用該表情的用戶列表（可選）
+          items:
+            type: string
+          example: ["user1", "user2", "user3"]

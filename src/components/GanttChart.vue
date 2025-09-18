@@ -93,9 +93,10 @@
           >
             <div class="flex w-full">
               <div
-                class="w-1/2 p-2 font-semibold bg-gray-100 border-b text-center text-xs border-r border-gray-200 flex items-center justify-center"
+                class="w-1/2 font-semibold bg-gray-100 border-b text-center text-xs border-r border-gray-200 flex items-center justify-center"
                 :style="{
                   height: week.days.length * timePointHeight + 'px',
+                  minHeight: week.days.length * timePointHeight + 'px',
                 }"
               >
                 <span
@@ -131,9 +132,10 @@
           >
             <div class="flex w-full">
               <div
-                class="w-1/2 p-2 font-semibold bg-gray-100 border-b border-gray-200 text-center text-xs border-r border-gray-200 flex items-center justify-center"
+                class="w-1/2 font-semibold bg-gray-100 border-b border-gray-200 text-center text-xs border-r border-gray-200 flex items-center justify-center"
                 :style="{
                   height: month.days.length * timePointHeight + 'px',
+                  minHeight: month.days.length * timePointHeight + 'px',
                 }"
               >
                 <span
@@ -554,7 +556,7 @@ watch(
 
 .week-group,
 .month-group {
-  border-bottom: 1px solid #e2e8f0;
+  /* Remove border-bottom to prevent extra spacing */
 }
 
 .day-cell {
@@ -655,9 +657,9 @@ watch(
   padding: 12px 8px;
 }
 
-.time-column .week-group > div > div,
-.time-column .month-group > div > div {
-  padding: 8px 4px;
+.time-column .week-group > div > div:last-child,
+.time-column .month-group > div > div:last-child {
+  padding: 0px 4px;
 }
 
 /* 確保週和月分組的底邊框與日期格線一致 */
