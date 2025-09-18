@@ -8,13 +8,15 @@
     >
       <!-- Time indicator -->
       <div
-        class="absolute top-2 left-2 text-xs text-gray-700 bg-white bg-opacity-90 px-2 py-1 rounded-md shadow-sm z-10 font-medium"
+        class="absolute top-2 left-10 text-xs text-gray-700 bg-white bg-opacity-90 px-2 py-1 rounded-md shadow-sm z-10 font-medium"
       >
         {{ yearMonthHint }}
       </div>
 
       <!-- Time axis controls - improved layout -->
-      <div :class="`${leftColumnWidth} border-r border-gray-200 flex`">
+      <div
+        :class="`${leftColumnWidth} border-r border-gray-200 flex text-gray-700`"
+      >
         <!-- Time unit selector -->
         <div
           class="w-1/2 p-2 font-medium text-center text-xs bg-gray-50 border-r border-gray-200 flex flex-col items-center justify-center gap-1"
@@ -91,7 +93,7 @@
           >
             <div class="flex w-full">
               <div
-                class="w-1/2 p-2 font-semibold bg-gray-100 border-b border-gray-200 text-center text-xs border-r border-gray-200 flex items-center justify-center"
+                class="w-1/2 p-2 font-semibold bg-gray-100 border-b text-center text-xs border-r border-gray-200 flex items-center justify-center"
                 :style="{
                   height: week.days.length * timePointHeight + 'px',
                 }"
@@ -167,7 +169,6 @@
           class="phase-column flex-1 relative"
           :class="{
             'border-r border-gray-200': index < phases.length - 1,
-            'flex-shrink-0': index === phases.length - 1,
           }"
         >
           <!-- Day cells in phase column -->
@@ -572,9 +573,7 @@ watch(
 .phase-column {
   position: relative;
   min-width: 120px;
-  flex-shrink: 0;
-  flex-grow: 1;
-  flex-basis: 0;
+  flex: 1 1 0%;
 }
 
 .phase-day-cell {
@@ -681,7 +680,6 @@ watch(
 
 .phase-column {
   min-width: 130px;
-  flex-shrink: 0;
   background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
 }
 
@@ -722,12 +720,6 @@ watch(
 .gantt-header > div:last-child > div,
 .gantt-content > div:last-child > div {
   flex-shrink: 0;
-}
-
-/* 最後一欄特殊處理 */
-.phase-column:last-child {
-  flex-shrink: 0;
-  min-width: max-content;
 }
 
 /* 避免過度伸縮 */
@@ -791,7 +783,6 @@ watch(
 
   .phase-column {
     min-width: 110px;
-    flex-shrink: 0;
   }
 }
 
@@ -806,7 +797,6 @@ watch(
 
   .phase-column {
     min-width: 90px;
-    flex-shrink: 0;
   }
 
   .day-cell,
@@ -832,7 +822,6 @@ watch(
 
   .phase-column {
     min-width: 70px;
-    flex-shrink: 0;
   }
 
   .gantt-header {
@@ -864,7 +853,6 @@ watch(
 
   .phase-column {
     min-width: 60px;
-    flex-shrink: 0;
   }
 
   .time-column .transform.-rotate-90 {

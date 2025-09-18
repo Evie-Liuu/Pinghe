@@ -25,7 +25,7 @@
       </header>
 
       <!-- Main Content -->
-      <main class="max-w-7xl mx-auto p-6">
+      <main class="max-w-7xl mx-auto p-6 text-sm">
         <div v-if="actionData" class="space-y-6">
           <!-- Action Info -->
           <div class="bg-white rounded-xl shadow-lg p-6">
@@ -69,7 +69,20 @@
 
           <!-- Gantt Chart -->
           <div class="bg-white rounded-xl shadow-lg p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-6">專案甘特圖</h3>
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold text-gray-800">專案甘特圖</h3>
+              <!-- <button
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <i class="fas fa-plus"></i>
+                建立貼文
+              </button> -->
+              <!-- <router-link v-if="isTeacher" to="/actions/new" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <i class="fas fa-plus"></i>
+                建立貼文
+              </router-link> -->
+            </div>
             <GanttChart
               v-if="actionData.startTime && actionData.endTime"
               :start-time="parseInt(actionData.startTime)"
