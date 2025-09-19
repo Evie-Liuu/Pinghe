@@ -12,7 +12,7 @@ info:
     - Method: POST
     - Request Body: 參考 `FirebaseSignUpRequest` schema
     - Response: 參考 `FirebaseSignUpResponse` schema
-  version: 1.2.0
+  version: 1.3.0
 servers:
   - url: http://localhost:3000/api
 
@@ -21,7 +21,7 @@ tags:
     description: 使用者登入與驗證
   - name: Users
     description: 使用者註冊與個人資料
-  - name: Articles
+  - name: Posts
     description: 文章 CRUD
   - name: Comments
     description: 留言 CRUD 與按讚
@@ -79,7 +79,7 @@ paths:
         "400":
           description: 註冊失敗（如 Email 已被使用）
 
-  /users/profile:
+  /auth/user:
     get:
       tags: [Users]
       summary: 取得當前使用者 Profile
@@ -127,10 +127,18 @@ paths:
         "401":
           description: 尚未登入
 
-  /articles:
+  /posts:
     get:
-      tags: [Articles]
-      summary: 取得所有文章
+      tags: [Posts]
+      summary: 取得所有文章 (可依機構篩選，含有最新幾篇留言)
+      parameters:
+        # GET /posts?institution_id=1
+        - name: institution_id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 機構 ID (optional)
       responses:
         "200":
           description: 成功取得文章列表
@@ -145,9 +153,9 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Article"
+                      $ref: "#/components/schemas/Post"
     post:
-      tags: [Articles]
+      tags: [Posts]
       summary: 新增文章
       security:
         - bearerAuth: []
@@ -169,11 +177,11 @@ paths:
                     type: boolean
                     example: true
                   # content:
-                  #   $ref: "#/components/schemas/Article"
+                  #   $ref: "#/components/schemas/Post"
 
-  /articles/search:
+  /posts/search:
     get:
-      tags: [Articles]
+      tags: [Posts]
       summary: 搜尋文章 (待確認)
       parameters:
         - name: keyword
@@ -196,18 +204,18 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Article"
+                      $ref: "#/components/schemas/Post"
 
-  /articles/own:
+  /posts/own:
     get:
-      tags: [Articles]
+      tags: [Posts]
       summary: 取得自己的文章清單(可編輯)
       parameters:
         - name: user_id
           in: query
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         "200":
           description: 自己的文章清單
@@ -223,14 +231,14 @@ paths:
                     type: array
                     items:
                       type: integer
-                    example: [1, 2, 13]
+                    example: ["1", "2", "13"]
 
-  /articles/{id}:
+  /posts/{id}:
     get:
-      tags: [Articles]
+      tags: [Posts]
       summary: 取得單篇文章
       parameters:
-        - $ref: "#/components/parameters/ArticleId"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: 單篇文章資料
@@ -243,7 +251,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/Article"
+                    $ref: "#/components/schemas/Post"
         "404":
           description: 找不到文章
           content:
@@ -255,12 +263,12 @@ paths:
                     type: boolean
                     example: false
     put:
-      tags: [Articles]
+      tags: [Posts]
       summary: 更新文章
       security:
         - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/ArticleId"
+        - $ref: "#/components/parameters/PostId"
       requestBody:
         required: true
         content:
@@ -279,7 +287,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/Article"
+                    $ref: "#/components/schemas/Post"
         "404":
           description: 找不到文章
           content:
@@ -291,12 +299,12 @@ paths:
                     type: boolean
                     example: false
     delete:
-      tags: [Articles]
+      tags: [Posts]
       summary: 刪除文章
       security:
         - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/ArticleId"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: 刪除成功
@@ -319,12 +327,12 @@ paths:
                     type: boolean
                     example: false
 
-  /articles/{id}/comments:
+  /posts/{id}/comments:
     get:
       tags: [Comments]
-      summary: 取得文章留言（包含 like_count 與 liked_by_user）
+      summary: 取得文章留言（包含 reactions 與 liked_by_user）
       parameters:
-        - $ref: "#/components/parameters/ArticleId"
+        - $ref: "#/components/parameters/PostId"
       security:
         - bearerAuth: []
       responses:
@@ -348,7 +356,8 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/ArticleId"
+        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/UserId"
       requestBody:
         required: true
         content:
@@ -369,63 +378,63 @@ paths:
                   content:
                     $ref: "#/components/schemas/CommentWithLike"
 
-  # /comments/{id}:
-  #   put:
-  #     tags: [Comments]
-  #     summary: 更新留言
-  #     security:
-  #       - bearerAuth: []
-  #     parameters:
-  #       - $ref: "#/components/parameters/CommentId"
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: "#/components/schemas/CommentInput"
-  #     responses:
-  #       "200":
-  #         description: 留言更新成功
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 success:
-  #                   type: boolean
-  #                   example: true
-  #                 content:
-  #                   $ref: "#/components/schemas/CommentWithLike"
-  #   delete:
-  #     tags: [Comments]
-  #     summary: 刪除留言
-  #     security:
-  #       - bearerAuth: []
-  #     parameters:
-  #       - $ref: "#/components/parameters/CommentId"
-  #     responses:
-  #       "200":
-  #         description: 刪除成功
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 success:
-  #                   type: boolean
-  #                   example: true
-  #       "404":
-  #         description: 找不到留言
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 success:
-  #                   type: boolean
-  #                   example: false
+    # /comments/{CommentId}:
+    #   put:
+    #     tags: [Comments]
+    #     summary: 更新留言
+    #     security:
+    #       - bearerAuth: []
+    #     parameters:
+    #       - $ref: "#/components/parameters/CommentId"
+    #     requestBody:
+    #       required: true
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/CommentInput"
+    #     responses:
+    #       "200":
+    #         description: 留言更新成功
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               properties:
+    #                 success:
+    #                   type: boolean
+    #                   example: true
+    #                 content:
+    #                   $ref: "#/components/schemas/CommentWithLike"
+    #   delete:
+    #     tags: [Comments]
+    #     summary: 刪除留言
+    #     security:
+    #       - bearerAuth: []
+    #     parameters:
+    #       - $ref: "#/components/parameters/CommentId"
+    #     responses:
+    #       "200":
+    #         description: 刪除成功
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               properties:
+    #                 success:
+    #                   type: boolean
+    #                   example: true
+    #       "404":
+    #         description: 找不到留言
+    #         content:
+    #           application/json:
+    #             schema:
+    #               type: object
+    #               properties:
+    #                 success:
+    #                   type: boolean
+    #                   example: false
 
-  /comments/{id}/like:
+  /comments/{CommentId}/like:
     post:
       tags: [Comments]
       summary: 對留言按讚
@@ -433,6 +442,7 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/CommentId"
+        - $ref: "#/components/parameters/UserId"
       responses:
         "200":
           description: 按讚成功
@@ -453,6 +463,7 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/CommentId"
+        - $ref: "#/components/parameters/UserId"
       responses:
         "200":
           description: 取消讚成功
@@ -475,20 +486,34 @@ components:
       bearerFormat: JWT
 
   parameters:
-    ArticleId:
-      name: id
+    UserId:
+      name: user_id
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+      description: 使用者 ID
+    PostId:
+      name: article_id
+      in: path
+      required: true
+      schema:
+        type: string
       description: 文章 ID
     CommentId:
-      name: id
+      name: comment_id
       in: path
       required: true
       schema:
-        type: integer
+        type: string
       description: 留言 ID
+    InstitutionId:
+      name: institution_id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: 機構 ID
 
   schemas:
     LoginRequest:
@@ -513,7 +538,7 @@ components:
           type: object
           properties:
             id:
-              type: integer
+              type: string
               example: 1
             full_name:
               type: string
@@ -526,7 +551,7 @@ components:
               type: string
               example: admin
             institution_id:
-              type: integer
+              type: string
               example: 1
             permissions:
               type: array
@@ -573,7 +598,7 @@ components:
           type: string
           example: admin
         institution_id:
-          type: integer
+          type: string
           example: 1
       required: [id_token, full_name, role, institution_id]
 
@@ -595,7 +620,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
           example: 1
         name:
           type: string
@@ -605,7 +630,7 @@ components:
           format: email
           example: user@example.com
         institution_id:
-          type: integer
+          type: string
           example: 1
         # bio:
         #   type: string
@@ -647,17 +672,22 @@ components:
           example: <p>這是一篇關於永續發展的文章內容，透過實際行動如何去影響原本的議題</p>。
       required: [title, content, types]
 
-    Article:
+    Post:
       allOf:
         - $ref: "#/components/schemas/ArticleInput"
         - type: object
           properties:
             id:
-              type: integer
+              type: string
               example: 1
             user_id:
-              type: integer
+              type: string
               example: 10
+            comment:
+              type: array
+              items:
+                type: string
+              example: ["您是如何去發想的", "寫得很好，值得省思"]
             created_at:
               type: integer
               format: int64
@@ -672,58 +702,97 @@ components:
     CommentInput:
       type: object
       properties:
-        content:
+        parent_id:
+          type: string
+          example: 1
+        user_id:
+          type: string
+          example: 10
+        comment:
           type: string
           example: 這是一則留言。
-      required: [content]
+      required: [user_id, parent_id, comment]
 
     Comment:
-      allOf:
-        - $ref: "#/components/schemas/CommentInput"
-        - type: object
-          properties:
-            id:
-              type: integer
-              example: 101
-            user_id:
-              type: integer
-              example: 10
-            parent_id:
-              type: integer
-              example: 1
-            created_at:
-              type: integer
-              format: int64
-              description: Unix timestamp
-              example: 1757999400
-            updated_at:
-              type: integer
-              format: int64
-              description: Unix timestamp
-              example: 1758000000
+      type: object
+      properties:
+        id:
+          type: string
+          example: cmt_101
+        created_at:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1757999400
+        updated_at:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1758000000
+        user_id:
+          type: string
+          example: 10
+        parent_id:
+          type: string
+          example: 1
+        comment:
+          type: array
+          items:
+            type: string
+          example: [這是一則留言。, 留言二]
+      required: [comment]
+      # allOf:
+      # - $ref: "#/components/schemas/CommentInput"
+      # - type: object
+      #   properties:
+      #     id:
+      #       type: string
+      #       example: cmt_101
+      #     created_at:
+      #       type: integer
+      #       format: int64
+      #       description: Unix timestamp
+      #       example: 1757999400
+      #     updated_at:
+      #       type: integer
+      #       format: int64
+      #       description: Unix timestamp
+      #       example: 1758000000
 
     CommentWithLike:
       allOf:
         - $ref: "#/components/schemas/Comment"
         - type: object
           properties:
-            like_count:
-              type: integer
-              example: 3
+            reactions:
+              type: object
+              properties:
+                like:
+                  type: integer
+                  example: 3
+                laugh:
+                  type: integer
+                  example: 2
             liked_by_user:
-              type: boolean
-              example: true
+              type: string
+              example: laugh
     CommentWithoutLike:
       allOf:
         - $ref: "#/components/schemas/Comment"
         - type: object
           properties:
-            like_count:
-              type: integer
-              example: 2
+            reactions:
+              type: object
+              properties:
+                like:
+                  type: integer
+                  example: 3
+                laugh:
+                  type: integer
+                  example: 1
             liked_by_user:
-              type: boolean
-              example: false
+              type: string
+              example: null
 
     FirebaseSignUpRequest:
       type: object
