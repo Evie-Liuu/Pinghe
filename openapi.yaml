@@ -150,12 +150,31 @@ paths:
           schema:
             type: integer
           description: 每頁顯示數量
-        - name: keyword
+        - name: order
+          in: query
+          description: 排序方向
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: title
           in: query
           required: false
           schema:
             type: string
-          description: 搜尋關鍵字
+          description: 依標題篩選
+        - name: startDate
+          in: query
+          description: 開始日期範圍（格式：YYYY-MM-DD）
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: 結束日期範圍（格式：YYYY-MM-DD）
+          schema:
+            type: string
+            format: date
       responses:
         "200":
           description: 成功取得文章列表

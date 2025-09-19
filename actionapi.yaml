@@ -20,7 +20,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /activities:
+  /institutions/{institutionId}/activities:
     post:
       summary: 新增活動
       description: 建立一個新的任務活動
@@ -43,14 +43,7 @@ paths:
                 success:
                   value:
                     success: true
-                    content:
-                      id: "act_123"
-                      title: "團隊會議"
-                      description: "討論專案進度"
-                      startTime: "1746028800"
-                      endTime: "1753977600"
-                      members: ["user1", "user2"]
-                      stages: []
+
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -58,25 +51,25 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
     get:
-      summary: 取得活動清單
+      summary: 取得全部活動清單
       description: 支援分頁、排序和篩選的活動清單查詢
       tags:
         - Activities
       parameters:
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/Sort"
+        # - $ref: "#/components/parameters/Sort"
         - $ref: "#/components/parameters/Order"
         - name: title
           in: query
           description: 依標題篩選
           schema:
             type: string
-        - name: member
-          in: query
-          description: 依成員篩選
-          schema:
-            type: string
+        # - name: member
+        #   in: query
+        #   description: 依成員篩選
+        #   schema:
+        #     type: string
         - name: startDate
           in: query
           description: 開始日期範圍（格式：YYYY-MM-DD）
@@ -95,32 +88,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      data: []
-                      pagination:
-                        page: 1
-                        limit: 20
-                        total: 50
-                        totalPages: 3
-                        hasNext: true
-                        hasPrev: false
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Activity"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /activities/{activityId}:
+  /institutions/{institutionId}/activities/{activityId}:
     get:
       summary: 取得單一活動
       description: 根據活動 ID 取得活動詳細資料
       tags:
         - Activities
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
       responses:
         "200":
@@ -128,19 +117,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      id: "act_123"
-                      title: "團隊會議"
-                      description: "討論專案進度"
-                      startTime: "1746028800"
-                      endTime: "1753977600"
-                      members: ["user1", "user2"]
-                      stages: []
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/Activity"
         "404":
           $ref: "#/components/responses/NotFound"
         "401":
@@ -151,6 +134,7 @@ paths:
       tags:
         - Activities
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
       requestBody:
         required: true
@@ -179,6 +163,7 @@ paths:
       tags:
         - Activities
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
       responses:
         "200":
@@ -198,7 +183,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /activities/{activityId}/comments:
+  /institutions/{institutionId}/activities/{activityId}/comments:
     post:
       summary: 發表留言
       description: 在指定活動下新增留言
@@ -227,7 +212,7 @@ paths:
                       id: "cmt_001"
                       content: "這個計畫進度如何？"
                       author: "user1"
-                      createdAt: "2024-01-15T10:30:00Z"
+                      created_at: "2024-01-15T10:30:00Z"
                       reactions: []
                       replyCount: 0
         "400":
@@ -274,7 +259,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /activities/{activityId}/comments/{commentId}:
+  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}:
     put:
       summary: 編輯留言
       description: 更新指定留言的內容
@@ -334,7 +319,7 @@ paths:
         "403":
           $ref: "#/components/responses/Forbidden"
 
-  /activities/{activityId}/comments/{commentId}/replies:
+  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/replies:
     post:
       summary: 回覆留言
       description: 對指定留言進行回覆
@@ -364,7 +349,7 @@ paths:
                       id: "reply_001"
                       content: "我同意這個想法！"
                       author: "user2"
-                      createdAt: "2024-01-15T10:45:00Z"
+                      created_at: "2024-01-15T10:45:00Z"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -395,7 +380,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /activities/{activityId}/comments/{commentId}/reactions:
+  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/reactions:
     post:
       summary: 新增表情反應
       description: 對指定留言新增表情反應
@@ -424,7 +409,7 @@ paths:
                     content:
                       emoji: "👍"
                       user: "user1"
-                      createdAt: "2024-01-15T10:50:00Z"
+                      created_at: "2024-01-15T10:50:00Z"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -473,6 +458,16 @@ components:
       bearerFormat: JWT
 
   parameters:
+    InstitutionId:
+      name: institutionId
+      in: path
+      required: true
+      description: 機構的唯一識別碼
+      schema:
+        type: string
+        pattern: "^act_[a-zA-Z0-9]+$"
+        example: act_123
+
     ActivityId:
       name: activityId
       in: path
@@ -510,9 +505,9 @@ components:
       schema:
         type: integer
         minimum: 1
-        maximum: 100
-        default: 20
-        example: 20
+        maximum: 3
+        default: 3
+        example: 3
 
     Sort:
       name: sort
@@ -520,8 +515,8 @@ components:
       description: 排序欄位
       schema:
         type: string
-        enum: [createdAt, updatedAt, title, author]
-        default: createdAt
+        enum: [created_at, updated_at, title, author]
+        default: created_at
 
     Order:
       name: order
@@ -619,7 +614,7 @@ components:
                   message: "資料驗證失敗"
                   fields:
                     title: ["標題不能為空"]
-                    startTime: ["開始時間必須晚於當前時間"]
+                    start_time: ["開始時間必須晚於當前時間"]
 
     InternalServerError:
       description: 伺服器內部錯誤
@@ -766,100 +761,85 @@ components:
     # 活動相關 Schema
     ActivityBase:
       type: object
-      required: [title, startTime, endTime, members]
+      required: [title, start_time, end_time]
       properties:
         title:
           type: string
           minLength: 1
           maxLength: 100
           description: 活動標題
-          example: "團隊會議"
+          example: "剩食問題"
         description:
           type: string
           maxLength: 1000
           description: 活動描述
-          example: "討論專案進度和未來規劃"
-        startTime:
+          example: "解決剩食問題的策略"
+        start_time:
           type: string
-          format: date-time
           description: 活動開始時間
           example: "1746028800"
-        endTime:
+        end_time:
           type: string
-          format: date-time
           description: 活動結束時間
           example: "1753977600"
-        members:
+        types:
           type: array
-          items:
-            type: string
-          minItems: 1
-          maxItems: 50
-          description: 參與成員列表
-          example: ["user1", "user2", "user3"]
+          description: 活動SGDs類型
+          example: [2, 4, 13]
+        # members:
+        #   type: array
+        #   items:
+        #     type: string
+        #   minItems: 1
+        #   maxItems: 50
+        #   description: 參與成員列表
+        #   example: ["user1", "user2", "user3"]
 
     ActivityCreate:
       allOf:
         - $ref: "#/components/schemas/ActivityBase"
-        - type: object
-          properties:
-            stages:
-              type: array
-              description: 活動階段列表
-              items:
-                $ref: "#/components/schemas/StageCreate"
-              example: []
+        - $ref: "#/components/schemas/StageCreate"
 
     ActivityUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: 活動標題
-        description:
-          type: string
-          maxLength: 1000
-          description: 活動描述
-        startTime:
-          type: string
-          format: date-time
-          description: 活動開始時間
-        endTime:
-          type: string
-          format: date-time
-          description: 活動結束時間
-        members:
-          type: array
-          items:
-            type: string
-          minItems: 1
-          maxItems: 50
-          description: 參與成員列表
-        stages:
-          type: array
-          description: 活動階段列表
-          items:
-            $ref: "#/components/schemas/StageUpdate"
+      allOf:
+        - $ref: "#/components/schemas/ActivityBase"
+        - $ref: "#/components/schemas/StageCreate"
+        - type: object
+          # required: [members]
+          properties:
+            members:
+              type: array
+              items:
+                type: string
+              example: ["user1", "user2", "user3"]
 
     Activity:
       allOf:
         - $ref: "#/components/schemas/ActivityBase"
         - type: object
-          required: [id, createdAt, updatedAt]
+          required: [id, created_at, updated_at]
           properties:
             id:
               type: string
-              pattern: "^act_[a-zA-Z0-9]+$"
+              # pattern: "^act_[a-zA-Z0-9]+$"
               description: 活動唯一識別碼
               example: "act_123"
-            createdAt:
+            user_id:
+              type: string
+              description: 活動唯一識別碼
+              example: "1"
+            progresss_percentage:
+              type: number
+              minimum: 0
+              maximum: 100
+              description: 進度百分比
+              example: 100
+            created_at:
               type: string
               format: date-time
               description: 建立時間
               example: "2024-01-15T09:00:00Z"
-            updatedAt:
+            updated_at:
               type: string
               format: date-time
               description: 最後更新時間
@@ -873,37 +853,36 @@ components:
     # 階段相關 Schema
     StageBase:
       type: object
-      required: [order, name, startTime, endTime]
+      required: [order, name, start_time, end_time]
       properties:
         order:
           type: integer
-          minimum: 1
           description: 階段順序
           example: 1
         name:
           type: string
-          minLength: 1
-          maxLength: 50
           description: 階段名稱
-          example: "設計階段"
-        description:
+          example: 行動規劃
+        completed:
+          type: boolean
+          description: 階段完成度
+          example: true
+        start_time:
           type: string
-          maxLength: 500
-          description: 階段描述
-          example: "進行UI/UX設計和原型製作"
-        startTime:
-          type: string
-          format: date-time
-          description: 階段開始時間
           example: "1746028800"
-        endTime:
+        end_time:
           type: string
-          format: date-time
-          description: 階段結束時間
-          example: "2024-01-15T11:00:00Z"
+          example: "1753977600"
 
     StageCreate:
-      $ref: "#/components/schemas/StageBase"
+      type: object
+      required: [stages]
+      properties:
+        stages:
+          type: array
+          description: 活動階段列表
+          items:
+            $ref: "#/components/schemas/StageBase"
 
     StageUpdate:
       type: object
@@ -921,11 +900,11 @@ components:
           type: string
           maxLength: 500
           description: 階段描述
-        startTime:
+        start_time:
           type: string
           format: date-time
           description: 階段開始時間
-        endTime:
+        end_time:
           type: string
           format: date-time
           description: 階段結束時間
@@ -934,19 +913,19 @@ components:
       allOf:
         - $ref: "#/components/schemas/StageBase"
         - type: object
-          required: [id, createdAt, updatedAt]
+          required: [id, created_at, updated_at]
           properties:
-            id:
-              type: string
-              pattern: "^stage_[a-zA-Z0-9]+$"
-              description: 階段唯一識別碼
-              example: "stage_001"
-            createdAt:
+            # id:
+            #   type: string
+            #   pattern: "^stage_[a-zA-Z0-9]+$"
+            #   description: 階段唯一識別碼
+            #   example: "stage_001"
+            created_at:
               type: string
               format: date-time
               description: 建立時間
               example: "2024-01-15T09:00:00Z"
-            updatedAt:
+            updated_at:
               type: string
               format: date-time
               description: 最後更新時間
@@ -974,7 +953,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommentBase"
         - type: object
-          required: [id, author, createdAt, updatedAt, reactions, replyCount]
+          required: [id, author, created_at, updated_at, reactions, replyCount]
           properties:
             id:
               type: string
@@ -985,12 +964,12 @@ components:
               type: string
               description: 作者識別碼
               example: "user1"
-            createdAt:
+            created_at:
               type: string
               format: date-time
               description: 建立時間
               example: "2024-01-15T10:30:00Z"
-            updatedAt:
+            updated_at:
               type: string
               format: date-time
               description: 最後更新時間
@@ -1028,7 +1007,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/ReplyBase"
         - type: object
-          required: [id, author, createdAt, updatedAt]
+          required: [id, author, created_at, updated_at]
           properties:
             id:
               type: string
@@ -1039,12 +1018,12 @@ components:
               type: string
               description: 作者識別碼
               example: "user2"
-            createdAt:
+            created_at:
               type: string
               format: date-time
               description: 建立時間
               example: "2024-01-15T10:45:00Z"
-            updatedAt:
+            updated_at:
               type: string
               format: date-time
               description: 最後更新時間
@@ -1057,7 +1036,8 @@ components:
       properties:
         emoji:
           type: string
-          pattern: '^[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]$'
+          minLength: 1
+          maxLength: 10
           description: 表情符號（僅支援 Unicode emoji）
           example: "👍"
 
