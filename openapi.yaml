@@ -341,6 +341,7 @@ paths:
       tags: [Comments]
       summary: 取得文章所有留言（包含 reactions 與 liked_by_user）
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/PostId"
       security:
         - bearerAuth: []
@@ -356,15 +357,14 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Comment"
+                    $ref: "#/components/schemas/Comment"
     post:
       tags: [Comments]
       summary: 新增留言
       security:
         - bearerAuth: []
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/UserId"
       requestBody:
@@ -387,62 +387,6 @@ paths:
                   content:
                     $ref: "#/components/schemas/CommentWithLike"
 
-    # /comments/{CommentId}:
-    #   put:
-    #     tags: [Comments]
-    #     summary: 更新留言
-    #     security:
-    #       - bearerAuth: []
-    #     parameters:
-    #       - $ref: "#/components/parameters/CommentId"
-    #     requestBody:
-    #       required: true
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/CommentInput"
-    #     responses:
-    #       "200":
-    #         description: 留言更新成功
-    #         content:
-    #           application/json:
-    #             schema:
-    #               type: object
-    #               properties:
-    #                 success:
-    #                   type: boolean
-    #                   example: true
-    #                 content:
-    #                   $ref: "#/components/schemas/CommentWithLike"
-    #   delete:
-    #     tags: [Comments]
-    #     summary: 刪除留言
-    #     security:
-    #       - bearerAuth: []
-    #     parameters:
-    #       - $ref: "#/components/parameters/CommentId"
-    #     responses:
-    #       "200":
-    #         description: 刪除成功
-    #         content:
-    #           application/json:
-    #             schema:
-    #               type: object
-    #               properties:
-    #                 success:
-    #                   type: boolean
-    #                   example: true
-    #       "404":
-    #         description: 找不到留言
-    #         content:
-    #           application/json:
-    #             schema:
-    #               type: object
-    #               properties:
-    #                 success:
-    #                   type: boolean
-    #                   example: false
-
   /institutions/{InstitutionId}/posts/{PostId}/comments/{CommentId}/like:
     post:
       tags: [Comments]
@@ -450,6 +394,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
@@ -472,6 +417,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
@@ -866,10 +812,7 @@ components:
               type: string
               example: 10
             comment:
-              type: array
-              items:
-                type: string
-              example: ["您是如何去發想的", "寫得很好，值得省思"]
+              $ref: "#/components/schemas/CommentBase"
             created_at:
               type: integer
               format: int64
@@ -880,6 +823,44 @@ components:
               format: int64
               description: Unix timestamp
               example: 1758001200
+
+    CommentBase:
+      type: object
+      required: [content]
+      properties:
+        id:
+          type: string
+          example: "cmt_01"
+        user_id:
+          type: string
+          example: "01"
+        content:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: 留言內容
+          example: "<p>挑食狀況蠻明顯的</p>"
+        created_at:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1757999400
+        updated_at:
+          type: integer
+          format: int64
+          description: Unix timestamp
+          example: 1758000000
+      example:
+        - id: cmt_01
+          user_id: 01
+          content: "<p>您是如何去發想的</p>"
+          created_at: 1757999400
+          # updated_at: 1758000000
+        - id: cmt_02
+          user_id: 02
+          content: "<p>寫得很好，值得省思</p>"
+          created_at: 1757999400
+          # updated_at: 1758000000
 
     CommentInput:
       type: object
@@ -923,23 +904,7 @@ components:
       #       type: string
       #     example: [這是一則留言。, 留言二]
       # required: [comment]
-      allOf:
-        - $ref: "#/components/schemas/CommentInput"
-        - type: object
-          properties:
-            id:
-              type: string
-              example: cmt_101
-            created_at:
-              type: integer
-              format: int64
-              description: Unix timestamp
-              example: 1757999400
-            updated_at:
-              type: integer
-              format: int64
-              description: Unix timestamp
-              example: 1758000000
+      $ref: "#/components/schemas/CommentBase"
 
     CommentWithLike:
       allOf:

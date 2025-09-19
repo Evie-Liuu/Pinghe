@@ -25,9 +25,9 @@ tags:
   - name: Activities verify
     description: 活動 CRUD 加入行動操作
   - name: Tasks
-    description: 貼文 CRUD 操作
+    description: 貼文 CRUD 操作 與按讚功能
   - name: Comments
-    description: 留言 CRUD 與按讚功能
+    description: 留言 CRUD
 
 paths:
   /institutions/{institutionId}/activities:
@@ -401,6 +401,53 @@ paths:
           $ref: "#/components/responses/NotFound"
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+  /institutions/{InstitutionId}/activities/{activityId}/tasks/{taskId}/like:
+    post:
+      tags: 
+        - Tasks
+      summary: 對留言新增表情反應
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: 新增表情反應成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/Task"
+    delete:
+      tags: [Tasks]
+      summary: 取消對留言表情反應
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: 取消表情反應成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/Task"
 
   /institutions/{institutionId}/activities/{activityId}/tasks/{taskId}/comments:
     post:
@@ -1246,7 +1293,7 @@ components:
                 format: date-time
                 description: 最後更新時間
                 example: "1753977600"
-              reply_count:
+              replies_count:
                 type: integer
                 example: 0
               reactions_count:
