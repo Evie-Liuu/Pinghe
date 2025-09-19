@@ -233,7 +233,7 @@ paths:
                       type: integer
                     example: ["1", "2", "13"]
 
-  /posts/{id}:
+  /posts/{PostId}:
     get:
       tags: [Posts]
       summary: 取得單篇文章
@@ -327,7 +327,7 @@ paths:
                     type: boolean
                     example: false
 
-  /posts/{id}/comments:
+  /posts/{PostId}/comments:
     get:
       tags: [Comments]
       summary: 取得文章所有留言（包含 reactions 與 liked_by_user）
@@ -434,18 +434,19 @@ paths:
     #                   type: boolean
     #                   example: false
 
-  /comments/{CommentId}/like:
+  /posts/{PostId}/comments/{CommentId}/like:
     post:
       tags: [Comments]
-      summary: 對留言按讚
+      summary: 對留言新增表情反應
       security:
         - bearerAuth: []
       parameters:
+        - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
       responses:
         "200":
-          description: 按讚成功
+          description: 新增表情反應成功
           content:
             application/json:
               schema:
@@ -458,15 +459,16 @@ paths:
                     $ref: "#/components/schemas/CommentWithLike"
     delete:
       tags: [Comments]
-      summary: 取消留言讚
+      summary: 取消對留言表情反應
       security:
         - bearerAuth: []
       parameters:
+        - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
       responses:
         "200":
-          description: 取消讚成功
+          description: 取消表情反應成功
           content:
             application/json:
               schema:
@@ -494,7 +496,7 @@ components:
         type: string
       description: 使用者 ID
     PostId:
-      name: article_id
+      name: post_id
       in: path
       required: true
       schema:
