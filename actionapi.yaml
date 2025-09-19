@@ -183,6 +183,112 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /institutions/{institutionId}/activities/{activityId}/join-requests:
+    post:
+      summary: 提交加入請求
+      description: 使用者對活動發送加入請求
+      tags:
+        - Activities verify
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/ActivityId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinRequestInput"
+      responses:
+        "201":
+          description: 加入請求已建立
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/JoinRequest"
+        "400":
+          description: 請求格式錯誤
+        "409":
+          description: 已經申請過或已參加活動
+
+    get:
+      summary: 主辦方查詢加入請求
+      description: 主辦方查詢某活動所有加入請求
+      tags:
+        - Activities verify
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/ActivityId"
+      responses:
+        "200":
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JoinRequest"
+        "403":
+          description: 無權限操作
+        "404":
+          description: 活動不存在
+
+  /institutions/{institutionId}/activities/{activityId}/join-requests/{requestId}/accept:
+    post:
+      summary: 舉辦方接受加入請求
+      description: 舉辦方同意特定使用者加入活動
+      tags:
+        - Activities verify
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: 加入請求已接受
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/JoinRequest"
+        "403":
+          description: 無權限操作
+        "404":
+          description: 請求不存在
+
+  /institutions/{institutionId}/activities/{activityId}/join-requests/{requestId}/reject:
+    post:
+      summary: 舉辦方拒絕加入請求
+      description: 舉辦方拒絕特定使用者加入活動
+      tags:
+        - Activities verify
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      responses:
+        "200":
+          description: 加入請求已拒絕
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/JoinRequest"
+
+        "403":
+          description: 無權限操作
+        "404":
+          description: 請求不存在
+
   /institutions/{institutionId}/activities/{activityId}/comments:
     post:
       summary: 發表留言
@@ -465,8 +571,7 @@ components:
       description: 機構的唯一識別碼
       schema:
         type: string
-        pattern: "^act_[a-zA-Z0-9]+$"
-        example: act_123
+        example: 123
 
     ActivityId:
       name: activityId
@@ -487,6 +592,15 @@ components:
         type: string
         pattern: "^cmt_[a-zA-Z0-9]+$"
         example: cmt_001
+
+    RequestId:
+      name: requestId
+      in: path
+      required: true
+      description: 加入行動請求的唯一識別碼
+      schema:
+        type: string
+        example: req_001
 
     Page:
       name: page
@@ -849,6 +963,36 @@ components:
               description: 活動階段列表
               items:
                 $ref: "#/components/schemas/Stage"
+            join_state:
+              type: boolean
+              description: 是否已加入活動 #學生身分(-1: 未加入; 0:申請加入; 1:已加入;)
+              example: -1
+
+    # 加入請求相關 Schema
+    JoinRequestInput:
+      type: object
+      required: [user_id]
+      properties:
+        user_id:
+          type: string
+          example: "23"
+
+    JoinRequest:
+      type: array
+      description: 加入請求列表
+      items:
+        type: object
+        required: [id, user_id, time]
+        properties:
+          id:
+            type: string
+            example: "req_456"
+          user_id:
+            type: string
+            example: "user_123"
+          time:
+            type: string
+            example: "1783977600"
 
     # 階段相關 Schema
     StageBase:
