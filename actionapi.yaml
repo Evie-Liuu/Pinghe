@@ -149,6 +149,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SuccessResponse"
+                examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "活動已儲存編輯"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -289,14 +295,106 @@ paths:
         "404":
           description: 請求不存在
 
-  /institutions/{institutionId}/activities/{activityId}/comments:
+  /institutions/{institutionId}/activities/{activityId}/tasks/{taskId}:
+    get:
+      summary: 取得單一貼文
+      description: 根據活動 ID 取得活動詳細資料
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: 活動資料
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/TaskBase"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    put:
+      summary: 編輯貼文
+      description: 更新指定貼文的資料
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskBase"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "貼文已儲存編輯"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      summary: 刪除貼文
+      description: 永久刪除指定的貼文
+      tags:
+        - Activities
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
+      responses:
+        "200":
+          description: 刪除成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+              examples:
+                success:
+                  value:
+                    success: true
+                    content:
+                      message: "活動已成功刪除"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /institutions/{institutionId}/activities/{activityId}/tasks/{taskId}/comments:
     post:
       summary: 發表留言
-      description: 在指定活動下新增留言
+      description: 在指定貼文下新增留言
       tags:
         - Comments
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/TaskId"
       requestBody:
         required: true
         content:
@@ -315,12 +413,7 @@ paths:
                   value:
                     success: true
                     content:
-                      id: "cmt_001"
-                      content: "這個計畫進度如何？"
-                      author: "user1"
-                      created_at: "2024-01-15T10:30:00Z"
-                      reactions: []
-                      replyCount: 0
+                      message: "留言已成功發表"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
@@ -330,231 +423,228 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
     get:
-      summary: 取得留言清單
+      summary: 取得貼文留言清單
       description: 支援分頁的留言清單查詢
       tags:
         - Comments
       parameters:
+        - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Limit"
-        - $ref: "#/components/parameters/Sort"
-        - $ref: "#/components/parameters/Order"
+        - $ref: "#/components/parameters/TaskId"
+        # - $ref: "#/components/parameters/Page"
+        # - $ref: "#/components/parameters/Limit"
+        # - $ref: "#/components/parameters/Sort"
+        # - $ref: "#/components/parameters/Order"
       responses:
         "200":
           description: 留言清單
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      data: []
-                      pagination:
-                        page: 1
-                        limit: 20
-                        total: 5
-                        totalPages: 1
-                        hasNext: false
-                        hasPrev: false
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Comment"
         "404":
           $ref: "#/components/responses/NotFound"
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}:
-    put:
-      summary: 編輯留言
-      description: 更新指定留言的內容
-      tags:
-        - Comments
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CommentUpdate"
-      responses:
-        "200":
-          description: 留言更新成功
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-    delete:
-      summary: 刪除留言
-      description: 永久刪除指定的留言
-      tags:
-        - Comments
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-      responses:
-        "200":
-          description: 刪除成功
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      message: "留言已成功刪除"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}:
+  #   put:
+  #     summary: 編輯留言
+  #     description: 更新指定留言的內容
+  #     tags:
+  #       - Comments
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/CommentUpdate"
+  #     responses:
+  #       "200":
+  #         description: 留言更新成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SuccessResponse"
+  #       "400":
+  #         $ref: "#/components/responses/BadRequest"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
+  #       "422":
+  #         $ref: "#/components/responses/ValidationError"
+  #   delete:
+  #     summary: 刪除留言
+  #     description: 永久刪除指定的留言
+  #     tags:
+  #       - Comments
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #     responses:
+  #       "200":
+  #         description: 刪除成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SuccessResponse"
+  #             examples:
+  #               success:
+  #                 value:
+  #                   success: true
+  #                   content:
+  #                     message: "留言已成功刪除"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
+  #       "403":
+  #         $ref: "#/components/responses/Forbidden"
 
-  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/replies:
-    post:
-      summary: 回覆留言
-      description: 對指定留言進行回覆
-      tags:
-        - Replies
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ReplyCreate"
-      responses:
-        "201":
-          description: 回覆成功
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      id: "reply_001"
-                      content: "我同意這個想法！"
-                      author: "user2"
-                      created_at: "2024-01-15T10:45:00Z"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/ValidationError"
-    get:
-      summary: 取得回覆清單
-      description: 支援分頁的回覆清單查詢
-      tags:
-        - Replies
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-        - $ref: "#/components/parameters/Page"
-        - $ref: "#/components/parameters/Limit"
-      responses:
-        "200":
-          description: 回覆清單
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PaginatedResponse"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/replies:
+  #   post:
+  #     summary: 回覆留言
+  #     description: 對指定留言進行回覆
+  #     tags:
+  #       - Replies
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/ReplyCreate"
+  #     responses:
+  #       "201":
+  #         description: 回覆成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SuccessResponse"
+  #             examples:
+  #               success:
+  #                 value:
+  #                   success: true
+  #                   content:
+  #                     id: "reply_001"
+  #                     content: "我同意這個想法！"
+  #                     author: "user2"
+  #                     created_at: "2024-01-15T10:45:00Z"
+  #       "400":
+  #         $ref: "#/components/responses/BadRequest"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
+  #       "422":
+  #         $ref: "#/components/responses/ValidationError"
+  #   get:
+  #     summary: 取得回覆清單
+  #     description: 支援分頁的回覆清單查詢
+  #     tags:
+  #       - Replies
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #       - $ref: "#/components/parameters/Page"
+  #       - $ref: "#/components/parameters/Limit"
+  #     responses:
+  #       "200":
+  #         description: 回覆清單
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/PaginatedResponse"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
 
-  /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/reactions:
-    post:
-      summary: 新增表情反應
-      description: 對指定留言新增表情反應
-      tags:
-        - Reactions
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ReactionCreate"
-      responses:
-        "201":
-          description: 表情新增成功
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      emoji: "👍"
-                      user: "user1"
-                      created_at: "2024-01-15T10:50:00Z"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "409":
-          $ref: "#/components/responses/Conflict"
-    delete:
-      summary: 取消表情反應
-      description: 移除指定留言的表情反應
-      tags:
-        - Reactions
-      parameters:
-        - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/CommentId"
-        - name: emoji
-          in: query
-          required: true
-          description: 要移除的表情符號
-          schema:
-            type: string
-      responses:
-        "200":
-          description: 表情移除成功
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessResponse"
-              examples:
-                success:
-                  value:
-                    success: true
-                    content:
-                      message: "表情反應已移除"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/reactions:
+  #   post:
+  #     summary: 新增表情反應
+  #     description: 對指定留言新增表情反應
+  #     tags:
+  #       - Reactions
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/ReactionCreate"
+  #     responses:
+  #       "201":
+  #         description: 表情新增成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SuccessResponse"
+  #             examples:
+  #               success:
+  #                 value:
+  #                   success: true
+  #                   content:
+  #                     emoji: "👍"
+  #                     user: "user1"
+  #                     created_at: "2024-01-15T10:50:00Z"
+  #       "400":
+  #         $ref: "#/components/responses/BadRequest"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
+  #       "409":
+  #         $ref: "#/components/responses/Conflict"
+  #   delete:
+  #     summary: 取消表情反應
+  #     description: 移除指定留言的表情反應
+  #     tags:
+  #       - Reactions
+  #     parameters:
+  #       - $ref: "#/components/parameters/ActivityId"
+  #       - $ref: "#/components/parameters/CommentId"
+  #       - name: emoji
+  #         in: query
+  #         required: true
+  #         description: 要移除的表情符號
+  #         schema:
+  #           type: string
+  #     responses:
+  #       "200":
+  #         description: 表情移除成功
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SuccessResponse"
+  #             examples:
+  #               success:
+  #                 value:
+  #                   success: true
+  #                   content:
+  #                     message: "表情反應已移除"
+  #       "404":
+  #         $ref: "#/components/responses/NotFound"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
 
 components:
   securitySchemes:
@@ -582,6 +672,16 @@ components:
         type: string
         pattern: "^act_[a-zA-Z0-9]+$"
         example: act_123
+
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      description: 任務的唯一識別碼
+      schema:
+        type: string
+        # pattern: "^act_[a-zA-Z0-9]+$"
+        example: task_123
 
     CommentId:
       name: commentId
@@ -753,11 +853,11 @@ components:
         success:
           type: boolean
           description: 操作是否成功
-        timestamp:
-          type: string
-          format: date-time
-          description: 回應時間戳
-          example: "1746028800"
+        # timestamp:
+        #   type: string
+        #   format: date-time
+        #   description: 回應時間戳
+        #   example: "1746028800"
 
     SuccessResponse:
       allOf:
@@ -967,6 +1067,28 @@ components:
               type: boolean
               description: 是否已加入活動 #學生身分(-1: 未加入; 0:申請加入; 1:已加入;)
               example: -1
+            tasks:
+              $ref: "#/components/schemas/Task"
+            comments:
+              type: array
+              description: 留言列表
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "cmt_123"
+                  user_id:
+                    type: string
+                    example: "user1"
+                  parent_id:
+                    type: string
+                    example: "task_123"
+                  content:
+                    type: string
+                    example: "今天剩食有減少"
+
+                # $ref: "#/components/schemas/Comment"
 
     # 加入請求相關 Schema
     JoinRequestInput:
@@ -1028,31 +1150,6 @@ components:
           items:
             $ref: "#/components/schemas/StageBase"
 
-    StageUpdate:
-      type: object
-      properties:
-        order:
-          type: integer
-          minimum: 1
-          description: 階段順序
-        name:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: 階段名稱
-        description:
-          type: string
-          maxLength: 500
-          description: 階段描述
-        start_time:
-          type: string
-          format: date-time
-          description: 階段開始時間
-        end_time:
-          type: string
-          format: date-time
-          description: 階段結束時間
-
     Stage:
       allOf:
         - $ref: "#/components/schemas/StageBase"
@@ -1075,17 +1172,81 @@ components:
               description: 最後更新時間
               example: "2024-01-15T09:30:00Z"
 
+    # 任務相關 Schema
+    TaskBase:
+      type: object
+      required: [content, stage]
+      properties:
+        id:
+          type: string
+          description: 任務唯一識別碼
+          example: "task_123"
+        user_id:
+          type: string
+          description: 作者識別碼
+          example: "user1"
+        content:
+          type: string
+          example: <p>剩食問題調查</p>
+        stage:
+          type: integer
+          example: 1
+
+    Task:
+      type: array
+      description: 任務列表
+      items:
+        allOf:
+          - $ref: "#/components/schemas/TaskBase"
+          - type: object
+            required:
+              [id, author, created_at, updated_at, reactions, replyCount]
+            properties:
+              created_at:
+                type: string
+                description: 建立時間
+                example: "1746028800"
+              updated_at:
+                type: string
+                format: date-time
+                description: 最後更新時間
+                example: "1753977600"
+              reply_count:
+                type: integer
+                example: 0
+              reactions_count:
+                type: integer
+                example: 5
+              reactions:
+                type: object
+                properties:
+                  like:
+                    type: integer
+                    example: 3
+                  laugh:
+                    type: integer
+                    example: 2
+              liked_by_user:
+                type: string
+                example: laugh
+
     # 留言相關 Schema
     CommentBase:
       type: object
       required: [content]
       properties:
+        id:
+          type: string
+          example: "cmt_01"
+        user_id:
+          type: string
+          example: "01"
         content:
           type: string
           minLength: 1
           maxLength: 2000
           description: 留言內容
-          example: "這個計畫進度如何？有什麼需要協助的地方嗎？"
+          example: "挑食狀況蠻明顯的"
 
     CommentCreate:
       $ref: "#/components/schemas/CommentBase"
@@ -1099,35 +1260,29 @@ components:
         - type: object
           required: [id, author, created_at, updated_at, reactions, replyCount]
           properties:
-            id:
+            parent_id:
               type: string
-              pattern: "^cmt_[a-zA-Z0-9]+$"
-              description: 留言唯一識別碼
-              example: "cmt_001"
-            author:
-              type: string
-              description: 作者識別碼
-              example: "user1"
+              example: "task_123"
             created_at:
               type: string
               format: date-time
               description: 建立時間
-              example: "2024-01-15T10:30:00Z"
+              example: "1746028800"
             updated_at:
               type: string
               format: date-time
               description: 最後更新時間
-              example: "2024-01-15T10:35:00Z"
-            reactions:
-              type: array
-              description: 表情反應統計
-              items:
-                $ref: "#/components/schemas/ReactionSummary"
-            replyCount:
-              type: integer
-              minimum: 0
-              description: 回覆數量
-              example: 3
+              example: "1748877600"
+            # reactions:
+            #   type: array
+            #   description: 表情反應統計
+            #   items:
+            #     $ref: "#/components/schemas/ReactionSummary"
+            # replyCount:
+            #   type: integer
+            #   minimum: 0
+            #   description: 回覆數量
+            #   example: 3
 
     # 回覆相關 Schema
     ReplyBase:

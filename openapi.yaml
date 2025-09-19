@@ -358,7 +358,7 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: "#/components/schemas/CommentWithLike"
+                      $ref: "#/components/schemas/Comment"
     post:
       tags: [Comments]
       summary: 新增留言
@@ -896,50 +896,50 @@ components:
       required: [user_id, parent_id, comment]
 
     Comment:
-      type: object
-      properties:
-        id:
-          type: string
-          example: cmt_101
-        created_at:
-          type: integer
-          format: int64
-          description: Unix timestamp
-          example: 1757999400
-        updated_at:
-          type: integer
-          format: int64
-          description: Unix timestamp
-          example: 1758000000
-        user_id:
-          type: string
-          example: 10
-        parent_id:
-          type: string
-          example: 1
-        comment:
-          type: array
-          items:
-            type: string
-          example: [這是一則留言。, 留言二]
-      required: [comment]
-      # allOf:
-      # - $ref: "#/components/schemas/CommentInput"
-      # - type: object
-      #   properties:
-      #     id:
+      # type: object
+      # properties:
+      #   id:
+      #     type: string
+      #     example: cmt_101
+      #   created_at:
+      #     type: integer
+      #     format: int64
+      #     description: Unix timestamp
+      #     example: 1757999400
+      #   updated_at:
+      #     type: integer
+      #     format: int64
+      #     description: Unix timestamp
+      #     example: 1758000000
+      #   user_id:
+      #     type: string
+      #     example: 10
+      #   parent_id:
+      #     type: string
+      #     example: 1
+      #   comment:
+      #     type: array
+      #     items:
       #       type: string
-      #       example: cmt_101
-      #     created_at:
-      #       type: integer
-      #       format: int64
-      #       description: Unix timestamp
-      #       example: 1757999400
-      #     updated_at:
-      #       type: integer
-      #       format: int64
-      #       description: Unix timestamp
-      #       example: 1758000000
+      #     example: [這是一則留言。, 留言二]
+      # required: [comment]
+      allOf:
+        - $ref: "#/components/schemas/CommentInput"
+        - type: object
+          properties:
+            id:
+              type: string
+              example: cmt_101
+            created_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1757999400
+            updated_at:
+              type: integer
+              format: int64
+              description: Unix timestamp
+              example: 1758000000
 
     CommentWithLike:
       allOf:
@@ -958,6 +958,7 @@ components:
             liked_by_user:
               type: string
               example: laugh
+
     CommentWithoutLike:
       allOf:
         - $ref: "#/components/schemas/Comment"
