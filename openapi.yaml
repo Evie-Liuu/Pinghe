@@ -27,8 +27,10 @@ servers:
     description: 生產環境
 
 tags:
-  - name: Authentication
+  - name: Auth
     description: 使用者登入與驗證
+  - name: Institutions
+    description: 機構 CRUD 操作
   - name: Users
     description: 使用者註冊與個人資料管理
   - name: Posts
@@ -128,6 +130,28 @@ paths:
                     example: true
                   content:
                     $ref: "#/components/schemas/User"
+        "401":
+          description: 尚未登入
+
+  /institutions:
+    get:
+      tags: [Institutions]
+      summary: 取得所有機構清單
+      responses:
+        "200":
+          description: 機構清單
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Institution"
         "401":
           description: 尚未登入
 
@@ -743,6 +767,18 @@ components:
           type: string
           format: uri
           example: https://example.com/avatar.png
+
+    Institution:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: 彰化國小
+        description:
+          type: string
 
     User:
       type: object
