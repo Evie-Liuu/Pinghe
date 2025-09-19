@@ -330,7 +330,7 @@ paths:
   /posts/{id}/comments:
     get:
       tags: [Comments]
-      summary: 取得文章留言（包含 reactions 與 liked_by_user）
+      summary: 取得文章所有留言（包含 reactions 與 liked_by_user）
       parameters:
         - $ref: "#/components/parameters/PostId"
       security:
