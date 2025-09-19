@@ -47,8 +47,8 @@ paths:
                       id: "act_123"
                       title: "團隊會議"
                       description: "討論專案進度"
-                      startTime: "2024-01-15T10:00:00Z"
-                      endTime: "2024-01-15T12:00:00Z"
+                      startTime: "1746028800"
+                      endTime: "1753977600"
                       members: ["user1", "user2"]
                       stages: []
         "400":
@@ -137,8 +137,8 @@ paths:
                       id: "act_123"
                       title: "團隊會議"
                       description: "討論專案進度"
-                      startTime: "2024-01-15T10:00:00Z"
-                      endTime: "2024-01-15T12:00:00Z"
+                      startTime: "1746028800"
+                      endTime: "1753977600"
                       members: ["user1", "user2"]
                       stages: []
         "404":
@@ -648,7 +648,7 @@ components:
           type: string
           format: date-time
           description: 回應時間戳
-          example: "2024-01-15T10:00:00Z"
+          example: "1746028800"
 
     SuccessResponse:
       allOf:
@@ -783,12 +783,12 @@ components:
           type: string
           format: date-time
           description: 活動開始時間
-          example: "2024-01-15T10:00:00Z"
+          example: "1746028800"
         endTime:
           type: string
           format: date-time
           description: 活動結束時間
-          example: "2024-01-15T12:00:00Z"
+          example: "1753977600"
         members:
           type: array
           items:
@@ -895,7 +895,7 @@ components:
           type: string
           format: date-time
           description: 階段開始時間
-          example: "2024-01-15T10:00:00Z"
+          example: "1746028800"
         endTime:
           type: string
           format: date-time

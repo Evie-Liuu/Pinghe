@@ -267,16 +267,9 @@ import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
 import { apiService } from "@/services/api.js";
 
-const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
+const { isTeacher, user, isAuthenticated } = useAuth();
 const { formatDate } = useDateFormat();
 
-// 初始檢查
-onMounted(() => {
-  checkAuth();
-  // console.log("Story.vue onMounted - isAuthenticated:", isAuthenticated.value);
-  // console.log("Story.vue onMounted - user:", user.value);
-  // console.log("Story.vue onMounted - isTeacher:", isTeacher.value);
-});
 
 const path = "../assets/images/";
 

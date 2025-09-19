@@ -127,18 +127,31 @@ paths:
         "401":
           description: 尚未登入
 
-  /posts:
+  /institutions/{InstitutionId}/posts:
     get:
       tags: [Posts]
-      summary: 取得所有文章 (可依機構篩選，含有最新幾篇留言)
+      summary: 取得所有文章 (可依條件篩選，含有最新幾篇留言)
       parameters:
-        # GET /posts?institution_id=1
-        - name: institution_id
+        # GET /posts?page=1&limit=6&keyword="永續"
+        - $ref: "#/components/parameters/InstitutionId"
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 頁碼
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 每頁顯示數量
+        - name: keyword
           in: query
           required: false
           schema:
             type: string
-          description: 機構 ID (optional)
+          description: 搜尋關鍵字
       responses:
         "200":
           description: 成功取得文章列表
@@ -179,34 +192,7 @@ paths:
                   # content:
                   #   $ref: "#/components/schemas/Post"
 
-  /posts/search:
-    get:
-      tags: [Posts]
-      summary: 搜尋文章 (待確認)
-      parameters:
-        - name: keyword
-          in: query
-          required: true
-          schema:
-            type: string
-          description: 搜尋關鍵字
-      responses:
-        "200":
-          description: 搜尋結果
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  content:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Post"
-
-  /posts/own:
+  /institutions/{InstitutionId}/posts/own:
     get:
       tags: [Posts]
       summary: 取得自己的文章清單(可編輯)
@@ -233,7 +219,7 @@ paths:
                       type: integer
                     example: ["1", "2", "13"]
 
-  /posts/{PostId}:
+  /institutions/{InstitutionId}/posts/{PostId}:
     get:
       tags: [Posts]
       summary: 取得單篇文章
@@ -327,7 +313,7 @@ paths:
                     type: boolean
                     example: false
 
-  /posts/{PostId}/comments:
+  /institutions/{InstitutionId}/posts/{PostId}/comments:
     get:
       tags: [Comments]
       summary: 取得文章所有留言（包含 reactions 與 liked_by_user）
@@ -434,7 +420,7 @@ paths:
     #                   type: boolean
     #                   example: false
 
-  /posts/{PostId}/comments/{CommentId}/like:
+  /institutions/{InstitutionId}/posts/{PostId}/comments/{CommentId}/like:
     post:
       tags: [Comments]
       summary: 對留言新增表情反應
