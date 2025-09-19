@@ -43,7 +43,7 @@ paths:
                 success:
                   value:
                     success: true
-
+                    message: "活動建立成功"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -51,11 +51,12 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
     get:
-      summary: 取得全部活動清單
+      summary: 取得全部活動清單 (使用者)
       description: 支援分頁、排序和篩選的活動清單查詢
       tags:
         - Activities
       parameters:
+        - $ref: "#/components/parameters/UserId"
         - $ref: "#/components/parameters/Page"
         - $ref: "#/components/parameters/Limit"
         # - $ref: "#/components/parameters/Sort"
@@ -203,7 +204,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/JoinRequestInput"
+              type: object
+              properties:
+                success:
+                  type: boolean
+                  example: true
+                content:
+                  $ref: "#/components/schemas/JoinRequestInput"
       responses:
         "201":
           description: 加入請求已建立
@@ -262,7 +269,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/JoinRequest"
+                    $ref: "#/components/schemas/JoinReult"
         "403":
           description: 無權限操作
         "404":
@@ -288,7 +295,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/JoinRequest"
+                    $ref: "#/components/schemas/JoinReult"
 
         "403":
           description: 無權限操作
@@ -654,6 +661,15 @@ components:
       bearerFormat: JWT
 
   parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: 使用者的唯一識別碼
+      schema:
+        type: string
+        example: 1
+
     InstitutionId:
       name: institutionId
       in: path
@@ -987,7 +1003,7 @@ components:
           type: string
           maxLength: 1000
           description: 活動描述
-          example: "解決剩食問題的策略"
+          example: "暫無描述"
         start_time:
           type: string
           description: 活動開始時間
@@ -1052,43 +1068,25 @@ components:
               type: string
               format: date-time
               description: 建立時間
-              example: "2024-01-15T09:00:00Z"
+              example: "1746028800"
             updated_at:
               type: string
               format: date-time
               description: 最後更新時間
-              example: "2024-01-15T09:30:00Z"
+              example: "1753977600"
             stages:
               type: array
               description: 活動階段列表
               items:
                 $ref: "#/components/schemas/Stage"
-            join_state:
+            state_by_user:
               type: boolean
               description: 是否已加入活動 #學生身分(-1: 未加入; 0:申請加入; 1:已加入;)
               example: -1
             tasks:
               $ref: "#/components/schemas/Task"
             comments:
-              type: array
-              description: 留言列表
-              items:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    example: "cmt_123"
-                  user_id:
-                    type: string
-                    example: "user1"
-                  parent_id:
-                    type: string
-                    example: "task_123"
-                  content:
-                    type: string
-                    example: "今天剩食有減少"
-
-                # $ref: "#/components/schemas/Comment"
+              $ref: "#/components/schemas/Comment"
 
     # 加入請求相關 Schema
     JoinRequestInput:
@@ -1099,22 +1097,46 @@ components:
           type: string
           example: "23"
 
+    JoinReult:
+      description: 回復請求後列表
+      type: object
+      required: [id, user_id, time]
+      properties:
+        id:
+          type: string
+          example: "req_001"
+        user_id:
+          type: string
+          example: "user_123"
+        time:
+          type: string
+          example: "1783977600"
+      example:
+        - id: "req_002"
+          user_id: "user_456"
+          time: "1783981200"
+
     JoinRequest:
-      type: array
       description: 加入請求列表
-      items:
-        type: object
-        required: [id, user_id, time]
-        properties:
-          id:
-            type: string
-            example: "req_456"
-          user_id:
-            type: string
-            example: "user_123"
-          time:
-            type: string
-            example: "1783977600"
+      type: object
+      required: [id, user_id, time]
+      properties:
+        id:
+          type: string
+          example: "req_001"
+        user_id:
+          type: string
+          example: "user_123"
+        time:
+          type: string
+          example: "1783977600"
+      example:
+        - id: "req_001"
+          user_id: "user_123"
+          time: "1783977600"
+        - id: "req_002"
+          user_id: "user_456"
+          time: "1783981200"
 
     # 階段相關 Schema
     StageBase:
@@ -1165,17 +1187,17 @@ components:
               type: string
               format: date-time
               description: 建立時間
-              example: "2024-01-15T09:00:00Z"
+              example: "1746028800"
             updated_at:
               type: string
               format: date-time
               description: 最後更新時間
-              example: "2024-01-15T09:30:00Z"
+              example: "1753977600"
 
     # 任務相關 Schema
     TaskBase:
       type: object
-      required: [content, stage]
+      required: [content, stage, allowed_comment]
       properties:
         id:
           type: string
@@ -1191,6 +1213,9 @@ components:
         stage:
           type: integer
           example: 1
+        allowed_comment:
+          type: boolean
+          example: true
 
     Task:
       type: array
@@ -1246,7 +1271,7 @@ components:
           minLength: 1
           maxLength: 2000
           description: 留言內容
-          example: "挑食狀況蠻明顯的"
+          example: "<p>挑食狀況蠻明顯的</p>"
 
     CommentCreate:
       $ref: "#/components/schemas/CommentBase"
