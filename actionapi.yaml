@@ -19,6 +19,16 @@ servers:
 security:
   - bearerAuth: []
 
+tags:
+  - name: Activities
+    description: 活動 CRUD 操作
+  - name: Activities verify
+    description: 活動 CRUD 加入行動操作
+  - name: Tasks
+    description: 貼文 CRUD 操作
+  - name: Comments
+    description: 留言 CRUD 與按讚功能
+
 paths:
   /institutions/{institutionId}/activities:
     post:
@@ -307,7 +317,7 @@ paths:
       summary: 取得單一貼文
       description: 根據活動 ID 取得活動詳細資料
       tags:
-        - Activities
+        - Tasks
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
@@ -333,7 +343,7 @@ paths:
       summary: 編輯貼文
       description: 更新指定貼文的資料
       tags:
-        - Activities
+        - Tasks
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
@@ -369,7 +379,7 @@ paths:
       summary: 刪除貼文
       description: 永久刪除指定的貼文
       tags:
-        - Activities
+        - Tasks
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
