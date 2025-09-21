@@ -108,16 +108,17 @@ export const useAuth = () => {
         }
       }
 
-      // 4. 設置用戶狀態
+      // TODO 4. 設置用戶狀態
       state.user = {
-        email: userCredential.user.email,
-        role: role,
-        username: username,
-        displayName: '老師',
-        uid: userCredential.user.uid,
+        full_name: username,
         institution_id: school,
-        id_token: idToken
+        role: role,
+        id_token: idToken,
+        email: userCredential.user.email,
+        uid: userCredential.user.uid,
+        displayName: '老師'
       }
+      // state.user = [...backendUserData]
       state.isAuthenticated = true
       localStorage.setItem('auth_token', idToken)
       localStorage.setItem('user_data', JSON.stringify(state.user))
