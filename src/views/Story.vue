@@ -20,7 +20,8 @@
           <h1 class="text-2xl md:text-3xl font-bold">故事牆</h1>
         </div>
         <div class="w-1/3 flex items-center justify-end pr-4 gap-2">
-          <router-link v-if="isTeacher" to="/story/new" title="建立新故事">
+          <!-- <router-link v-if="isTeacher" to="/story/new" title="建立新故事"> -->
+          <router-link to="/story/new" title="建立新故事">
             <div
               class="w-10 h-10 bg-orange-300 rounded-full flex items-center justify-center text-white cursor-pointer transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110"
             >
@@ -269,7 +270,6 @@ import { apiService } from "@/services/api.js";
 
 const { isTeacher, user, isAuthenticated } = useAuth();
 const { formatDate } = useDateFormat();
-
 
 const path = "../assets/images/";
 

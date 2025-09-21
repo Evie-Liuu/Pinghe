@@ -12,7 +12,7 @@ const routes = [
     path: "/actions/new",
     name: "actions-new",
     component: () => import("@/views/ActionNew.vue"),
-    meta: { requiresTeacher: true }
+    // meta: { requiresTeacher: true }
   },
   {
     path: "/actions/:id",
@@ -26,7 +26,7 @@ const routes = [
     path: "/story/new",
     name: "story-new",
     component: () => import("@/views/StoryNew.vue"),
-    meta: { requiresTeacher: true }
+    // meta: { requiresTeacher: true }
   },
   {
     path: "/story/:id",

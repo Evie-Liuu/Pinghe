@@ -36,6 +36,40 @@
           </p>
         </div>
 
+        <!-- Time Input -->
+        <div class="flex flex-row gap-5">
+          <div class="w-1/2">
+            <label for="startTime" class="block text-lg font-medium"
+              >起始時間*</label
+            >
+            <input
+              type="date"
+              v-model="story.startTime"
+              id="startTime"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              :class="{ 'border-red-500': errors.startTime }"
+            />
+            <p v-if="errors.startTime" class="text-red-500 text-sm mt-1">
+              請輸入起始時間
+            </p>
+          </div>
+          <div class="w-1/2">
+            <label for="endTime" class="block text-lg font-medium"
+              >結束時間*</label
+            >
+            <input
+              type="date"
+              v-model="story.endTime"
+              id="endTime"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              :class="{ 'border-red-500': errors.endTime }"
+            />
+            <p v-if="errors.endTime" class="text-red-500 text-sm mt-1">
+              請輸入結束時間
+            </p>
+          </div>
+        </div>
+
         <!-- SDGs Input -->
         <div>
           <label class="block text-lg font-medium">SDGs標籤*</label>
@@ -180,6 +214,8 @@ const story = ref({
   intro: "",
   time: Math.floor(Date.now() / 1000),
   types: [],
+  startTime: "",
+  endTime: "",
 });
 
 // Filter out the "All" option and clean titles
@@ -231,6 +267,8 @@ const errors = ref({
   title: false,
   tags: false,
   content: false,
+  startTime: false,
+  endTime: false,
 });
 
 const editor = useEditor({
