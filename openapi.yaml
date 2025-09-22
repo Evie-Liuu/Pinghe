@@ -777,8 +777,12 @@ components:
         name:
           type: string
           example: 彰化國小
-        description:
+        region_code:
           type: string
+          example: CH
+        region_name:
+          type: string
+          example: 彰化縣
 
     User:
       type: object
