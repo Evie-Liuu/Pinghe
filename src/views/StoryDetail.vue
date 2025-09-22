@@ -94,6 +94,42 @@
             <!-- Toolbar -->
             <div v-if="editor" class="border p-2 flex gap-2 rounded-t-md">
               <button
+                @click="
+                  editor.chain().focus().toggleHeading({ level: 1 }).run()
+                "
+                :class="{
+                  'is-active': editor.isActive('heading', { level: 1 }),
+                }"
+                class="p-2 rounded hover:bg-blue-200"
+                title="標題 1"
+              >
+                H1
+              </button>
+              <button
+                @click="
+                  editor.chain().focus().toggleHeading({ level: 2 }).run()
+                "
+                :class="{
+                  'is-active': editor.isActive('heading', { level: 2 }),
+                }"
+                class="p-2 rounded hover:bg-blue-200"
+                title="標題 2"
+              >
+                H2
+              </button>
+              <button
+                @click="
+                  editor.chain().focus().toggleHeading({ level: 3 }).run()
+                "
+                :class="{
+                  'is-active': editor.isActive('heading', { level: 3 }),
+                }"
+                class="p-2 rounded hover:bg-blue-200"
+                title="標題 3"
+              >
+                H3
+              </button>
+              <button
                 @click="editor.chain().focus().toggleTaskList().run()"
                 :class="{
                   'bg-blue-200': editor.isActive('taskList'),
@@ -111,7 +147,34 @@
               >
                 <i class="fa-solid fa-list-ul"></i>
               </button>
-              <!-- Add other Tiptap controls here -->
+              <button
+                @click="$refs.imageInput.click()"
+                class="p-2 rounded hover:bg-blue-200"
+                title="插入圖片"
+              >
+                <i class="fa-solid fa-image"></i>
+              </button>
+              <button
+                @click="$refs.fileInput.click()"
+                class="p-2 rounded hover:bg-blue-200"
+                title="插入檔案"
+              >
+                <i class="fa-solid fa-paperclip"></i>
+              </button>
+              <!-- Hidden file inputs -->
+              <input
+                ref="imageInput"
+                type="file"
+                accept="image/*"
+                @change="handleEditorImageUpload"
+                style="display: none"
+              />
+              <input
+                ref="fileInput"
+                type="file"
+                @change="handleEditorFileUpload"
+                style="display: none"
+              />
             </div>
             <!-- Editor -->
             <EditorContent
@@ -337,6 +400,8 @@ import { EditorContent, useEditor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
 
 const props = defineProps({ id: String });
 const handleAppScroll = inject("handleAppScroll");
@@ -370,6 +435,8 @@ const editor = useEditor({
     TaskItem.configure({
       nested: true,
     }),
+    Image,
+    Link,
   ],
 });
 
@@ -542,9 +609,39 @@ const removeEditTag = (tagValue) => {
 const filterEditSdgs = () => {
   // handled by computed
 };
+
+// --- Editor Upload Handlers ---
+const handleEditorImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file && editor.value) {
+    const url = URL.createObjectURL(file);
+    editor.value.chain().focus().setImage({ src: url }).run();
+  }
+  // Reset input
+  event.target.value = "";
+};
+
+const handleEditorFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file && editor.value) {
+    const url = URL.createObjectURL(file);
+    editor.value
+      .chain()
+      .focus()
+      .extendMarkRange("link")
+      .setLink({ href: url })
+      .insertContent(file.name)
+      .run();
+  }
+  // Reset input
+  event.target.value = "";
+};
 </script>
 
 <style scoped>
+/* .is-active {
+  @apply bg-blue-200;
+} */
 /* Scoped styles for Tiptap task lists */
 .prose :deep(ul[data-type="taskList"]) {
   list-style: none;
@@ -580,5 +677,30 @@ const filterEditSdgs = () => {
 .prose :deep(ul:not([data-type="taskList"])) li {
   margin-top: 0.25em;
   margin-bottom: 0.25em;
+}
+
+/* Scoped styles for Tiptap headings */
+.prose :deep(h1) {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.prose :deep(h2) {
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 2.25rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose :deep(h3) {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 </style>
