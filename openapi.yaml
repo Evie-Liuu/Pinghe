@@ -37,6 +37,8 @@ tags:
     description: 文章 CRUD 操作
   - name: Comments
     description: 留言 CRUD 與按讚功能
+  - name: Medias
+    description: 媒體檔案
 
 paths:
   /auth/login:
@@ -458,6 +460,153 @@ paths:
                     example: true
                   content:
                     $ref: "#/components/schemas/CommentWithoutLike"
+
+  /upload/images:
+    post:
+      tags: [Medias]
+      summary: 上傳圖片
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 圖片儲存路徑
+          example: files/example.txt
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 圖片檔案
+      responses:
+        "200":
+          description: 上傳成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        example: https://example.com/image.png
+                      message:
+                        type: string
+                        example: 圖片上傳成功
+    delete:
+      deprecated: false
+      tags: [Medias]
+      summary: 刪除圖片
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 圖片儲存路徑
+          example: images/example.png
+      responses:
+        "200":
+          description: 刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 圖片刪除成功
+  /upload/files:
+    post:
+      tags: [Medias]
+      summary: 上傳文件
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 文件儲存路徑
+          example: files/example.txt
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 文件檔案
+      responses:
+        "200":
+          description: 上傳成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        example: https://example.com/example.txt
+                      message:
+                        type: string
+                        example: 文件上傳成功
+    delete:
+      deprecated: false
+      tags: [Medias]
+      summary: 刪除文件
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 文件儲存路徑
+          example: files/example.txt
+      responses:
+        "200":
+          description: 刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 文件刪除成功
 
 components:
   securitySchemes:
