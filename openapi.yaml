@@ -411,7 +411,7 @@ paths:
                   content:
                     $ref: "#/components/schemas/CommentWithLike"
 
-  /institutions/{InstitutionId}/posts/{PostId}/comments/{CommentId}/like:
+  /institutions/{InstitutionId}/posts/{PostId}/like:
     post:
       tags: [Comments]
       summary: 對留言新增表情反應
