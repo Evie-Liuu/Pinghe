@@ -179,7 +179,7 @@
             <!-- Editor -->
             <EditorContent
               :editor="editor"
-              class="w-full prose max-w-none border-x border-b p-4 rounded-b-md"
+              class="w-full prose max-w-none border-x border-b p-4 rounded-b-md overflow-hidden"
             />
           </div>
         </section>
@@ -642,7 +642,12 @@ const handleEditorFileUpload = (event) => {
 /* .is-active {
   @apply bg-blue-200;
 } */
-/* Scoped styles for Tiptap task lists */
+/* Scoped styles for Tiptap editor */
+.prose :deep(.ProseMirror) {
+  padding: 1rem;
+  /* outline: none; */
+}
+
 .prose :deep(ul[data-type="taskList"]) {
   list-style: none;
   padding: 0;
@@ -650,7 +655,7 @@ const handleEditorFileUpload = (event) => {
 
 .prose :deep(li[data-type="taskItem"]) {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
 }
 
@@ -686,6 +691,8 @@ const handleEditorFileUpload = (event) => {
   line-height: 2.5rem;
   margin-top: 0;
   margin-bottom: 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .prose :deep(h2) {
