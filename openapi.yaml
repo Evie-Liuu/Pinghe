@@ -704,7 +704,7 @@ components:
               example: admin
             institution_id:
               type: string
-              example: 1
+              example: CH_1
             permissions:
               type: array
               items:
@@ -751,7 +751,7 @@ components:
           example: admin
         institution_id:
           type: string
-          example: 1
+          example: CH_1
       required: [id_token, full_name, role, institution_id]
 
     UserUpdate:
@@ -799,7 +799,7 @@ components:
           example: user@example.com
         institution_id:
           type: string
-          example: 1
+          example: CH_1
         # bio:
         #   type: string
         #   example: 我是彰化國小的學生
