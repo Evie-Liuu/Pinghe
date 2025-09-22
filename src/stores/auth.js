@@ -306,8 +306,7 @@ export const useAuth = () => {
   })
 
   const isTeacher = computed(() => {
-    // return state.user && state.user.role === 'teacher'
-    return true
+    return state.user && state.user.role === 'teacher'
   })
 
   const isStudent = computed(() => {

@@ -24,13 +24,13 @@ tags:
     description: 活動 CRUD 操作
   - name: Activities verify
     description: 活動 CRUD 加入行動操作
-  - name: Tasks
+  - name: Posts
     description: 貼文 CRUD 操作 與按讚功能
   - name: Comments
     description: 留言 CRUD
 
 paths:
-  /institutions/{institutionId}/activities:
+  /activities:
     post:
       summary: 新增活動
       description: 建立一個新的任務活動
@@ -113,7 +113,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /institutions/{institutionId}/activities/{activityId}:
+  /activities/{activityId}:
     get:
       summary: 取得單一活動
       description: 根據活動 ID 取得活動詳細資料
@@ -200,7 +200,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /institutions/{institutionId}/activities/{activityId}/join-requests:
+  /activities/{activityId}/join-requests:
     post:
       summary: 提交加入請求
       description: 使用者對活動發送加入請求
@@ -259,7 +259,41 @@ paths:
         "404":
           description: 活動不存在
 
-  /institutions/{institutionId}/activities/{activityId}/join-requests/{requestId}/accept:
+  /activities/{activity_id}/join-requests/{userId}:
+    post:
+      summary: 舉辦方是否接受加入請求
+      description: 舉辦方同意或拒絕特定使用者加入活動
+      tags:
+        - Activities verify
+      parameters:
+        # - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/UserId"
+        - name: approve
+          in: query
+          required: true
+          description: 是否接受加入請求
+          schema:
+            type: boolean
+            example: true
+      responses:
+        "200":
+          description: 加入請求已接受
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    $ref: "#/components/schemas/JoinReult"
+        "403":
+          description: 無權限操作
+        "404":
+          description: 請求不存在
+
+  /activities/{activityId}/join-requests/{requestId}/accept:
     post:
       summary: 舉辦方接受加入請求
       description: 舉辦方同意特定使用者加入活動
@@ -285,7 +319,7 @@ paths:
         "404":
           description: 請求不存在
 
-  /institutions/{institutionId}/activities/{activityId}/join-requests/{requestId}/reject:
+  /activities/{activityId}/join-requests/{requestId}/reject:
     post:
       summary: 舉辦方拒絕加入請求
       description: 舉辦方拒絕特定使用者加入活動
@@ -312,16 +346,16 @@ paths:
         "404":
           description: 請求不存在
 
-  /institutions/{institutionId}/activities/{activityId}/tasks/{taskId}:
+  /activities/{activityId}/posts/{postId}:
     get:
       summary: 取得單一貼文
       description: 根據活動 ID 取得活動詳細資料
       tags:
-        - Tasks
+        - Posts
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: 活動資料
@@ -343,11 +377,11 @@ paths:
       summary: 編輯貼文
       description: 更新指定貼文的資料
       tags:
-        - Tasks
+        - Posts
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
       requestBody:
         required: true
         content:
@@ -379,11 +413,11 @@ paths:
       summary: 刪除貼文
       description: 永久刪除指定的貼文
       tags:
-        - Tasks
+        - Posts
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
       responses:
         "200":
           description: 刪除成功
@@ -402,16 +436,16 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /institutions/{InstitutionId}/activities/{activityId}/tasks/{taskId}/like:
+  /activities/{activityId}/posts/{postId}/like:
     post:
-      tags: 
-        - Tasks
+      tags:
+        - Posts
       summary: 對留言新增表情反應
       security:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/UserId"
       responses:
         "200":
@@ -427,13 +461,13 @@ paths:
                   content:
                     $ref: "#/components/schemas/Task"
     delete:
-      tags: [Tasks]
+      tags: [Posts]
       summary: 取消對留言表情反應
       security:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
         - $ref: "#/components/parameters/UserId"
       responses:
         "200":
@@ -449,7 +483,7 @@ paths:
                   content:
                     $ref: "#/components/schemas/Task"
 
-  /institutions/{institutionId}/activities/{activityId}/tasks/{taskId}/comments:
+  /activities/{activityId}/posts/{postId}/comments:
     post:
       summary: 發表留言
       description: 在指定貼文下新增留言
@@ -458,7 +492,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
       requestBody:
         required: true
         content:
@@ -494,7 +528,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
         - $ref: "#/components/parameters/ActivityId"
-        - $ref: "#/components/parameters/TaskId"
+        - $ref: "#/components/parameters/PostId"
         # - $ref: "#/components/parameters/Page"
         # - $ref: "#/components/parameters/Limit"
         # - $ref: "#/components/parameters/Sort"
@@ -519,7 +553,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}:
+  # /activities/{activityId}/comments/{commentId}:
   #   put:
   #     summary: 編輯留言
   #     description: 更新指定留言的內容
@@ -579,7 +613,7 @@ paths:
   #       "403":
   #         $ref: "#/components/responses/Forbidden"
 
-  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/replies:
+  # /activities/{activityId}/comments/{commentId}/replies:
   #   post:
   #     summary: 回覆留言
   #     description: 對指定留言進行回覆
@@ -640,7 +674,7 @@ paths:
   #       "401":
   #         $ref: "#/components/responses/Unauthorized"
 
-  # /institutions/{institutionId}/activities/{activityId}/comments/{commentId}/reactions:
+  # /activities/{activityId}/comments/{commentId}/reactions:
   #   post:
   #     summary: 新增表情反應
   #     description: 對指定留言新增表情反應
@@ -720,7 +754,7 @@ components:
   parameters:
     UserId:
       name: userId
-      in: path
+      in: query
       required: true
       description: 使用者的唯一識別碼
       schema:
@@ -729,7 +763,7 @@ components:
 
     InstitutionId:
       name: institutionId
-      in: path
+      in: query
       required: true
       description: 機構的唯一識別碼
       schema:
@@ -738,7 +772,7 @@ components:
 
     ActivityId:
       name: activityId
-      in: path
+      in: query
       required: true
       description: 活動的唯一識別碼
       schema:
@@ -746,9 +780,9 @@ components:
         pattern: "^act_[a-zA-Z0-9]+$"
         example: act_123
 
-    TaskId:
-      name: taskId
-      in: path
+    PostId:
+      name: postId
+      in: query
       required: true
       description: 任務的唯一識別碼
       schema:
@@ -758,7 +792,7 @@ components:
 
     CommentId:
       name: commentId
-      in: path
+      in: query
       required: true
       description: 留言的唯一識別碼
       schema:
@@ -768,7 +802,7 @@ components:
 
     RequestId:
       name: requestId
-      in: path
+      in: query
       required: true
       description: 加入行動請求的唯一識別碼
       schema:
@@ -930,7 +964,7 @@ components:
         #   type: string
         #   format: date-time
         #   description: 回應時間戳
-        #   example: "1746028800"
+        #   example: "2025-07-05T09:00:00"
 
     SuccessResponse:
       allOf:
@@ -1063,12 +1097,14 @@ components:
           example: "暫無描述"
         start_time:
           type: string
+          format: date-time
           description: 活動開始時間
-          example: "1746028800"
+          example: "2025-07-05T09:00:00"
         end_time:
           type: string
+          format: date-time
           description: 活動結束時間
-          example: "1753977600"
+          example: "2025-10-05T09:00:00"
         types:
           type: array
           description: 活動SGDs類型
@@ -1125,12 +1161,12 @@ components:
               type: string
               format: date-time
               description: 建立時間
-              example: "1746028800"
+              example: "2025-07-05T09:00:00"
             updated_at:
               type: string
               format: date-time
               description: 最後更新時間
-              example: "1753977600"
+              example: "2025-10-05T09:00:00"
             stages:
               type: array
               description: 活動階段列表
@@ -1176,24 +1212,41 @@ components:
     JoinRequest:
       description: 加入請求列表
       type: object
-      required: [id, user_id, time]
+      # required: [id, user_id, time]
       properties:
-        id:
-          type: string
-          example: "req_001"
-        user_id:
-          type: string
-          example: "user_123"
-        time:
-          type: string
-          example: "1783977600"
-      example:
-        - id: "req_001"
-          user_id: "user_123"
-          time: "1783977600"
-        - id: "req_002"
-          user_id: "user_456"
-          time: "1783981200"
+        request_list:
+          type: array
+          description: 等待回復請求列表
+          items:
+            type: object
+            required: [user_id, time]
+            properties:
+              user_id:
+                type: string
+                example: "22"
+              time:
+                type: string
+                example: "2025-09-11T09:00:00"
+        rejected_list:
+          type: array
+          description: 拒絕請求列表
+          items:
+            type: object
+            required: [user_id, time]
+            properties:
+              user_id:
+                type: string
+                example: "24"
+              time:
+                type: string
+                example: "2025-09-20T09:00:00"
+      # example:
+      #   - id: "req_001"
+      #     user_id: "user_123"
+      #     time: "1783977600"
+      #   - id: "req_002"
+      #     user_id: "user_456"
+      #     time: "1783981200"
 
     # 階段相關 Schema
     StageBase:
@@ -1214,10 +1267,14 @@ components:
           example: true
         start_time:
           type: string
-          example: "1746028800"
+          format: date-time
+          description: 開始時間
+          example: "2025-07-05T09:00:00"
         end_time:
           type: string
-          example: "1753977600"
+          format: date-time
+          description: 結束時間
+          example: "2025-10-05T09:00:00"
 
     StageCreate:
       type: object
@@ -1244,12 +1301,12 @@ components:
               type: string
               format: date-time
               description: 建立時間
-              example: "1746028800"
+              example: "2025-07-05T09:00:00"
             updated_at:
               type: string
               format: date-time
               description: 最後更新時間
-              example: "1753977600"
+              example: "2025-10-05T09:00:00"
 
     # 任務相關 Schema
     TaskBase:
@@ -1286,13 +1343,14 @@ components:
             properties:
               created_at:
                 type: string
+                format: date-time
                 description: 建立時間
-                example: "1746028800"
+                example: "2025-07-05T09:00:00"
               updated_at:
                 type: string
                 format: date-time
                 description: 最後更新時間
-                example: "1753977600"
+                example: "2025-10-05T09:00:00"
               replies_count:
                 type: integer
                 example: 0
@@ -1349,7 +1407,7 @@ components:
               type: string
               format: date-time
               description: 建立時間
-              example: "1746028800"
+              example: "2025-07-05T09:00:00"
             updated_at:
               type: string
               format: date-time
