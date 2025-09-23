@@ -33,7 +33,7 @@ tags:
     description: 機構 CRUD 操作
   - name: Users
     description: 使用者註冊與個人資料管理
-  - name: Posts
+  - name: Showcases
     description: 文章 CRUD 操作
   - name: Comments
     description: 留言 CRUD 與按讚功能
@@ -157,12 +157,12 @@ paths:
         "401":
           description: 尚未登入
 
-  /institutions/{InstitutionId}/posts:
+  /institutions/{InstitutionId}/showcases:
     get:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 取得所有文章 (可依條件篩選，含有最新幾篇留言)
       parameters:
-        # GET /posts?page=1&limit=6&keyword="永續"
+        # GET /showcases?page=1&limit=6&keyword="永續"
         - $ref: "#/components/parameters/InstitutionId"
         - name: page
           in: query
@@ -217,7 +217,7 @@ paths:
                     items:
                       $ref: "#/components/schemas/Post"
     post:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 新增文章
       security:
         - bearerAuth: []
@@ -241,9 +241,9 @@ paths:
                   # content:
                   #   $ref: "#/components/schemas/Post"
 
-  /institutions/{InstitutionId}/posts/own:
+  /institutions/{InstitutionId}/showcases/own:
     get:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 取得自己的文章清單(可編輯)
       parameters:
         - name: user_id
@@ -268,12 +268,12 @@ paths:
                       type: integer
                     example: ["1", "2", "13"]
 
-  /institutions/{InstitutionId}/posts/{PostId}:
+  /institutions/{InstitutionId}/showcases/{ShowcaseId}:
     get:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 取得單篇文章
       parameters:
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
       responses:
         "200":
           description: 單篇文章資料
@@ -298,12 +298,12 @@ paths:
                     type: boolean
                     example: false
     put:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 更新文章
       security:
         - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
       requestBody:
         required: true
         content:
@@ -334,12 +334,12 @@ paths:
                     type: boolean
                     example: false
     delete:
-      tags: [Posts]
+      tags: [Showcases]
       summary: 刪除文章
       security:
         - bearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
       responses:
         "200":
           description: 刪除成功
@@ -362,13 +362,13 @@ paths:
                     type: boolean
                     example: false
 
-  /institutions/{InstitutionId}/posts/{PostId}/comments:
+  /institutions/{InstitutionId}/showcases/{ShowcaseId}/comments:
     get:
       tags: [Comments]
       summary: 取得文章所有留言（包含 reactions 與 liked_by_user）
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
       security:
         - bearerAuth: []
       responses:
@@ -391,7 +391,7 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
         - $ref: "#/components/parameters/UserId"
       requestBody:
         required: true
@@ -413,7 +413,7 @@ paths:
                   content:
                     $ref: "#/components/schemas/CommentWithLike"
 
-  /institutions/{InstitutionId}/posts/{PostId}/like:
+  /institutions/{InstitutionId}/showcases/{ShowcaseId}/like:
     post:
       tags: [Comments]
       summary: 對留言新增表情反應
@@ -421,7 +421,7 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
       responses:
@@ -444,7 +444,7 @@ paths:
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
-        - $ref: "#/components/parameters/PostId"
+        - $ref: "#/components/parameters/ShowcaseId"
         - $ref: "#/components/parameters/CommentId"
         - $ref: "#/components/parameters/UserId"
       responses:
@@ -899,8 +899,8 @@ components:
       schema:
         type: string
       description: 使用者 ID
-    PostId:
-      name: post_id
+    ShowcaseId:
+      name: showcase_id
       in: path
       required: true
       schema:
@@ -1259,10 +1259,10 @@ components:
           example: figure2.png
         img_path:
           type: string
-          example: /images/[post_id]/
+          example: /images/[showcase_id]/
         file_path:
           type: string
-          example: /files/[post_id]/
+          example: /files/[showcase_id]/
         intro:
           type: string
           example: 這是一篇關於永續發展的文章內容。
