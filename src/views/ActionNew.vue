@@ -206,16 +206,18 @@ import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useDateTime } from "@/composables/useDateTime.js";
 import sdgsData from "@/data/SDGs_goal.json";
 
 const router = useRouter();
+const { formatISO } = useDateTime();
 
 const story = ref({
   title: "",
   img_url: "",
   content: "",
   intro: "",
-  time: Math.floor(Date.now() / 1000),
+  time: formatISO(Date.now() / 1000),
   types: [],
   startTime: "",
   endTime: "",
@@ -303,9 +305,6 @@ onUnmounted(() => {
 
 const saveStory = () => {
   // Reset errors
-  console.log(new Date(story.value.startTime));
-  console.log(new Date(story.value.endTime));
-  
   errors.value = {
     title: false,
     tags: false,
@@ -351,11 +350,25 @@ const saveStory = () => {
     return;
   }
 
-  // 3. "Save" data (log to console for now)
-  console.log("New Story Data:", story.value);
+  // 3. Convert dates to ISO format
+  const startTimeTimestamp = Math.floor(
+    new Date(story.value.startTime).getTime() / 1000
+  );
+  const endTimeTimestamp = Math.floor(
+    new Date(story.value.endTime).getTime() / 1000
+  );
+
+  const storyData = {
+    ...story.value,
+    startTime: formatISO(startTimeTimestamp),
+    endTime: formatISO(endTimeTimestamp),
+  };
+
+  // 4. "Save" data (log to console for now)
+  console.log("New Story Data:", storyData);
   alert("故事已儲存 (請查看主控台)！");
 
-  // 4. Navigate back
+  // 5. Navigate back
   // router.push("/story");
 };
 </script>

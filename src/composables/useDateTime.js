@@ -1,6 +1,8 @@
 export function useDateTime() {
     const formatISO = (ts, useUTC = false) => {
         const date = new Date(ts * 1000); // 轉毫秒
+        console.log(date);
+        
         const y = useUTC ? date.getUTCFullYear() : date.getFullYear();
         const m = String((useUTC ? date.getUTCMonth() : date.getMonth()) + 1).padStart(2, '0');
         const d = String(useUTC ? date.getUTCDate() : date.getDate()).padStart(2, '0');
