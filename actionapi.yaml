@@ -313,7 +313,38 @@ paths:
         "404":
           description: 請求不存在
 
-  /activities/{activityId}/posts/{postId}:
+  /institutions/{InstitutionId}/posts:
+    get:
+      summary: 取得活動所有貼文
+      description: 根據活動 ID 取得貼文清單
+      tags:
+        - Posts
+      parameters:
+        - $ref: "#/components/parameters/InstitutionId"
+        - $ref: "#/components/parameters/rel_ActivityId"
+      responses:
+        "200":
+          description: 活動資料
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Task"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+ 
+  /institutions/{InstitutionId}/posts/{postId}:
     get:
       summary: 取得單一貼文
       description: 根據活動 ID 取得活動詳細資料
@@ -321,7 +352,7 @@ paths:
         - Posts
       parameters:
         - $ref: "#/components/parameters/InstitutionId"
-        - $ref: "#/components/parameters/ActivityId"
+        - $ref: "#/components/parameters/rel_ActivityId"
         - $ref: "#/components/parameters/PostId"
       responses:
         "200":
@@ -403,7 +434,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /activities/{activityId}/posts/{postId}/like:
+  /institutions/{InstitutionId}/posts/{postId}/like:
     post:
       tags:
         - Posts
@@ -450,7 +481,7 @@ paths:
                   content:
                     $ref: "#/components/schemas/Task"
 
-  /activities/{activityId}/posts/{postId}/comments:
+  /institutions/{InstitutionId}/posts/{postId}/comments:
     post:
       summary: 發表留言
       description: 在指定貼文下新增留言
@@ -520,7 +551,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  # /activities/{activityId}/comments/{commentId}:
+  # /institutions/{InstitutionId}/comments/{commentId}:
   #   put:
   #     summary: 編輯留言
   #     description: 更新指定留言的內容
@@ -580,7 +611,7 @@ paths:
   #       "403":
   #         $ref: "#/components/responses/Forbidden"
 
-  # /activities/{activityId}/comments/{commentId}/replies:
+  # /institutions/{InstitutionId}/comments/{commentId}/replies:
   #   post:
   #     summary: 回覆留言
   #     description: 對指定留言進行回覆
@@ -641,7 +672,7 @@ paths:
   #       "401":
   #         $ref: "#/components/responses/Unauthorized"
 
-  # /activities/{activityId}/comments/{commentId}/reactions:
+  # /institutions/{InstitutionId}/comments/{commentId}/reactions:
   #   post:
   #     summary: 新增表情反應
   #     description: 對指定留言新增表情反應
@@ -730,7 +761,7 @@ components:
 
     InstitutionId:
       name: institutionId
-      in: query
+      in: path
       required: true
       description: 機構的唯一識別碼
       schema:
@@ -739,7 +770,7 @@ components:
 
     ActivityId:
       name: activityId
-      in: query
+      in: path
       required: true
       description: 活動的唯一識別碼
       schema:
@@ -747,9 +778,18 @@ components:
         pattern: "^act_[a-zA-Z0-9]+$"
         example: act_123
 
+    rel_ActivityId:
+      name: related_activity_id
+      in: query
+      required: true
+      description: 活動的唯一識別碼
+      schema:
+        type: string
+        example: act_123
+
     PostId:
       name: postId
-      in: query
+      in: path
       required: true
       description: 任務的唯一識別碼
       schema:
@@ -759,7 +799,7 @@ components:
 
     CommentId:
       name: commentId
-      in: query
+      in: path
       required: true
       description: 留言的唯一識別碼
       schema:
@@ -769,7 +809,7 @@ components:
 
     RequestId:
       name: requestId
-      in: query
+      in: path
       required: true
       description: 加入行動請求的唯一識別碼
       schema:
@@ -1170,10 +1210,10 @@ components:
             properties:
               user_id:
                 type: string
-                # example: "22"
+                example: "22"
               time:
                 type: string
-                # example: "2025-09-11T09:00:00"
+                example: "2025-09-11T09:00:00"
         rejected_list:
           type: array
           description: 拒絕請求列表
