@@ -228,7 +228,7 @@
                   <span v-else>點擊選擇圖片或拖曳到此處</span>
                 </p>
                 <p class="text-sm text-gray-500">
-                  支援 JPG、PNG、GIF、WebP 格式，大小不超過 5MB
+                  支援 JPG、PNG、GIF、WebP 格式，大小不超過 1MB
                 </p>
               </div>
             </div>
@@ -265,6 +265,7 @@ import TrainTrack from "@/components/TrainTrack.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 
 const { isAuthenticated, user, isTeacher } = useAuth();
 const { formatDate } = useDateFormat();
@@ -292,7 +293,7 @@ const allInfos = ref(carouselImages);
 
 onMounted(async () => {
   try {
-    let res = await apiService.getPosts(user.institution_id);
+    let res = await apiService.getPosts(user.value.institution_id);
     console.log(res);
     // allInfos.value = res.data || res; // Adjust based on API response structure
   } catch (error) {
@@ -494,14 +495,14 @@ const saveEdit = async () => {
   // If there's a pending file upload, try to upload it now
   if (editStory.value._pendingFile) {
     try {
-      const result = await apiService.uploadImage(
-        editStory.value._pendingFile,
-        "story"
-      );
-      if (result && result.url) {
-        editStory.value.img_url = result.url;
-        delete editStory.value._pendingFile;
-      }
+      // const result = await apiService.uploadImage(
+      //   editStory.value._pendingFile,
+      //   "story"
+      // );
+      // if (result && result.url) {
+      //   editStory.value.img_url = result.url;
+      //   delete editStory.value._pendingFile;
+      // }
     } catch (error) {
       console.warn("Failed to upload pending file during save:", error);
       // Continue with local URL - user was already warned
@@ -632,7 +633,7 @@ const processFileUpload = async (file) => {
   if (!file || !editStory.value) {
     return;
   }
-
+  return;
   // Validate file using API service
   const validationErrors = apiService.validateImageFile(file);
   if (validationErrors.length > 0) {
