@@ -67,7 +67,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, inject } from "vue";
+import { ref, computed, inject, onMounted } from "vue";
 import infosData from "@/data/Action.json";
 import typeTags from "@/data/SDGs_goal.json";
 import HeaderFilter from "@/components/HeaderFilter.vue";
@@ -76,6 +76,7 @@ import PageLabel from "@/components/PageLabel.vue";
 import CJKSub from "@/components/CJKSub.vue";
 import TrainTrack from "@/components/TrainTrack.vue";
 import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 
 const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 
@@ -91,6 +92,16 @@ const filters = ref({
 });
 const currentPage = ref(1);
 const itemsPerPage = 3;
+
+onMounted(async () => {
+  try {
+    let res = await apiService.getPosts(user.value.institution_id);
+    console.log(res);
+    // allActions.value = res.items;
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+  }
+});
 
 const handleFilterUpdate = (newFilters) => {
   filters.value = newFilters;

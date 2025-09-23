@@ -295,7 +295,7 @@ onMounted(async () => {
   try {
     let res = await apiService.getPosts(user.value.institution_id);
     console.log(res);
-    // allInfos.value = res.data || res; // Adjust based on API response structure
+    // allInfos.value = res.items
   } catch (error) {
     console.error("Failed to fetch posts:", error);
   }
