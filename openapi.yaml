@@ -1259,10 +1259,10 @@ components:
           example: figure2.png
         img_path:
           type: string
-          example: images/[post_id]/
+          example: /images/[post_id]/
         file_path:
           type: string
-          example: files/[post_id]/
+          example: /files/[post_id]/
         intro:
           type: string
           example: 這是一篇關於永續發展的文章內容。
