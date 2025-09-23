@@ -69,6 +69,9 @@
             </p>
           </div>
         </div>
+        <p v-if="timeRangeError" class="text-red-500 text-sm mt-1">
+          結束時間必須晚於起始時間
+        </p>
 
         <!-- SDGs Input -->
         <div>
@@ -136,7 +139,7 @@
 
         <!-- Intro Input -->
         <div>
-          <label for="intro" class="block text-lg font-medium">簡介</label>
+          <label for="intro" class="block text-lg font-medium">描述</label>
           <input
             type="text"
             v-model="story.intro"
@@ -146,7 +149,7 @@
         </div>
 
         <!-- Tiptap Editor -->
-        <div>
+        <!-- <div>
           <label class="block text-lg font-medium">內容*</label>
           <div
             v-if="editor"
@@ -178,7 +181,7 @@
           <p v-if="errors.content" class="text-red-500 text-sm mt-1">
             請輸入內容
           </p>
-        </div>
+        </div> -->
 
         <!-- Save Button -->
         <div class="self-end">
@@ -244,6 +247,11 @@ const selectedSdgs = computed(() => {
   return sdgOptions.filter((sdg) => story.value.types.includes(sdg.value));
 });
 
+const timeRangeError = computed(() => {
+  if (!story.value.startTime || !story.value.endTime) return false;
+  return new Date(story.value.startTime) > new Date(story.value.endTime);
+});
+
 const selectTag = (sdg) => {
   if (!story.value.types.includes(sdg.value)) {
     story.value.types.push(sdg.value);
@@ -269,6 +277,7 @@ const errors = ref({
   content: false,
   startTime: false,
   endTime: false,
+  timeRange: false,
 });
 
 const editor = useEditor({
@@ -294,7 +303,17 @@ onUnmounted(() => {
 
 const saveStory = () => {
   // Reset errors
-  errors.value = { title: false, tags: false, content: false };
+  console.log(new Date(story.value.startTime));
+  console.log(new Date(story.value.endTime));
+  
+  errors.value = {
+    title: false,
+    tags: false,
+    content: false,
+    startTime: false,
+    endTime: false,
+    timeRange: false,
+  };
 
   // 1. Set editor content
   if (editor.value) {
@@ -303,6 +322,18 @@ const saveStory = () => {
 
   // 2. Validation
   let hasError = false;
+  if (!story.value.startTime) {
+    errors.value.startTime = true;
+    hasError = true;
+  }
+  if (!story.value.endTime) {
+    errors.value.endTime = true;
+    hasError = true;
+  }
+  if (timeRangeError.value) {
+    errors.value.timeRange = true;
+    hasError = true;
+  }
   if (!story.value.title.trim()) {
     errors.value.title = true;
     hasError = true;
@@ -325,7 +356,7 @@ const saveStory = () => {
   alert("故事已儲存 (請查看主控台)！");
 
   // 4. Navigate back
-  router.push("/story");
+  // router.push("/story");
 };
 </script>
 
@@ -359,4 +390,3 @@ const saveStory = () => {
   margin-bottom: 0.25em;
 }
 </style>
-
