@@ -265,9 +265,8 @@ import TrainTrack from "@/components/TrainTrack.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
-import { apiService } from "@/services/api.js";
 
-const { isTeacher, user, isAuthenticated } = useAuth();
+const { isAuthenticated, user, isTeacher } = useAuth();
 const { formatDate } = useDateFormat();
 
 const path = "../assets/images/";
@@ -290,6 +289,16 @@ onBeforeMount(() => {
 const handleAppScroll = inject("handleAppScroll");
 
 const allInfos = ref(carouselImages);
+
+onMounted(async () => {
+  try {
+    let res = await apiService.getPosts(user.institution_id);
+    console.log(res);
+    // allInfos.value = res.data || res; // Adjust based on API response structure
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+  }
+});
 
 const showEditModal = ref(false);
 const selectedInfo = ref(null);

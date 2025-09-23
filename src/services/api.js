@@ -163,8 +163,15 @@ class ApiService {
     });
   }
 
-  async getProfile() {
-    return this.request('/users/profile');
+  async getInstitutions() {
+    return this.request('/institutions/public');
+  }
+
+  async getProfile(credentials) {
+    return this.request('/auth/user', {
+      method: 'GET',
+      body: JSON.stringify(credentials),
+    });
   }
 
   async updateProfile(userData) {
@@ -172,6 +179,17 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify(userData),
     });
+  }
+
+  /* 
+  故事牆文章
+   */
+  async getPosts(institution_id, post_id) {
+    return this.request(`institutions/${institution_id}/posts`);
+  }
+
+  async getSelectedPost(institution_id, post_id) {
+    return this.request(`institutions/${institution_id}/posts/${post_id}`);
   }
 }
 

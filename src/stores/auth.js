@@ -27,14 +27,8 @@ onAuthStateChanged(auth, (firebaseUser) => {
     const userData = localStorage.getItem('user_data');
     if (userData) {
       const parsedUserData = JSON.parse(userData);
-      // 檢查用戶 UID 是否匹配，如果不匹配則清除舊資料
-      if (parsedUserData.uid === firebaseUser.uid) {
-        state.user = parsedUserData;
-      } else {
-        // UID 不匹配，清除舊資料並等待新的登入資料
-        localStorage.removeItem('user_data');
-        state.user = null;
-      }
+      // 在刷新时直接使用本地数据，不检查 UID 匹配
+      state.user = parsedUserData;
     } else {
       // 如果沒有本地資料，設置為 null 等待登入過程完成
       state.user = null;
@@ -45,10 +39,30 @@ onAuthStateChanged(auth, (firebaseUser) => {
       localStorage.setItem('auth_token', token);
     });
   } else {
-    state.isAuthenticated = false;
-    state.user = null;
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
+    // 檢查是否有測試角色的本地資料
+    const userData = localStorage.getItem('user_data');
+    const authToken = localStorage.getItem('auth_token');
+
+    if (userData && authToken) {
+      const parsedUserData = JSON.parse(userData);
+      // 檢查是否為測試角色（這些角色有特殊的 token）
+      const testTokens = ['admin_token', 'teacher_token', 'student_token', 'visitor_token'];
+      if (testTokens.includes(authToken)) {
+        state.isAuthenticated = true;
+        state.user = parsedUserData;
+      } else {
+        // 不是測試角色，清除資料
+        state.isAuthenticated = false;
+        state.user = null;
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+      }
+    } else {
+      state.isAuthenticated = false;
+      state.user = null;
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+    }
   }
   // 首次 onAuthStateChanged 觸發時，解析 Promise，通知應用程式驗證已就緒。
   if (authReadyResolver) {
@@ -229,7 +243,8 @@ export const useAuth = () => {
           account: userData.account || 'admin',
           role: 'admin',
           displayName: '管理員',
-          icon: 'fa-user-shield'
+          icon: 'fa-user-shield',
+          uid: 'admin_uid'
         }
         localStorage.setItem('auth_token', 'admin_token')
         localStorage.setItem('user_data', JSON.stringify(state.user))
@@ -240,7 +255,8 @@ export const useAuth = () => {
           account: userData.account || 'teacher',
           role: 'teacher',
           displayName: '老師',
-          icon: 'fa-user-tie'
+          icon: 'fa-user-tie',
+          uid: 'teacher_uid'
         }
         localStorage.setItem('auth_token', 'teacher_token')
         localStorage.setItem('user_data', JSON.stringify(state.user))
@@ -251,7 +267,8 @@ export const useAuth = () => {
           account: userData.name || '學生',
           role: 'student',
           displayName: '學生',
-          icon: 'fa-user-graduate'
+          icon: 'fa-user-graduate',
+          uid: 'student_uid'
         }
         localStorage.setItem('auth_token', 'student_token')
         localStorage.setItem('user_data', JSON.stringify(state.user))
@@ -262,7 +279,8 @@ export const useAuth = () => {
           account: '訪客',
           role: 'visitor',
           displayName: '訪客',
-          icon: 'fa-user'
+          icon: 'fa-user',
+          uid: 'visitor_uid'
         }
         localStorage.setItem('auth_token', 'visitor_token')
         localStorage.setItem('user_data', JSON.stringify(state.user))

@@ -126,9 +126,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 import { getRegions, getSchoolsByRegion } from "@/data/schools";
 
 const username = ref("");
@@ -143,6 +144,15 @@ const isError = ref(false);
 
 const auth = useAuth();
 const router = useRouter();
+
+onMounted(async () => {
+  try {
+    let institutions = await apiService.getInstitutions();
+    console.log(institutions);
+  } catch (error) {
+    console.error("Failed to fetch institutions:", error);
+  }
+});
 
 // 獲取所有地區
 const regions = getRegions();
