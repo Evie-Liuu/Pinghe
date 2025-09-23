@@ -336,14 +336,14 @@ paths:
                   content:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Task"
+                      $ref: "#/components/schemas/Post"
         "400":
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "401":
           $ref: "#/components/responses/Unauthorized"
- 
+
   /institutions/{InstitutionId}/posts/{postId}:
     get:
       summary: 取得單一貼文
@@ -366,7 +366,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/TaskBase"
+                    $ref: "#/components/schemas/PostBase"
         "404":
           $ref: "#/components/responses/NotFound"
         "401":
@@ -385,7 +385,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TaskBase"
+              $ref: "#/components/schemas/PostBase"
       responses:
         "200":
           description: 更新成功
@@ -457,7 +457,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/Task"
+                    $ref: "#/components/schemas/Post"
     delete:
       tags: [Posts]
       summary: 取消對留言表情反應
@@ -479,7 +479,7 @@ paths:
                     type: boolean
                     example: true
                   content:
-                    $ref: "#/components/schemas/Task"
+                    $ref: "#/components/schemas/Post"
 
   /institutions/{InstitutionId}/posts/{postId}/comments:
     post:
@@ -795,7 +795,7 @@ components:
       schema:
         type: string
         # pattern: "^act_[a-zA-Z0-9]+$"
-        example: task_123
+        example: post_123
 
     CommentId:
       name: commentId
@@ -1116,14 +1116,6 @@ components:
           type: array
           description: 活動SGDs類型
           example: [2, 4, 13]
-        # members:
-        #   type: array
-        #   items:
-        #     type: string
-        #   minItems: 1
-        #   maxItems: 50
-        #   description: 參與成員列表
-        #   example: ["user1", "user2", "user3"]
 
     ActivityCreate:
       allOf:
@@ -1179,12 +1171,24 @@ components:
               description: 活動階段列表
               items:
                 $ref: "#/components/schemas/Stage"
-            state_by_user:
+            allowed_join_open:
+              type: boolean
+              description: 是否允許自由加入活動
+              example: false
+            joined_by_user:
               type: boolean
               description: 是否已加入活動 #學生身分(-1: 未加入; 0:申請加入; 1:已加入;)
               example: -1
-            tasks:
-              $ref: "#/components/schemas/Task"
+            members:
+              type: array
+              items:
+                type: string
+              minItems: 1
+              maxItems: 50
+              description: 參與成員列表
+              example: ["user1", "user2", "user3"]
+            posts:
+              $ref: "#/components/schemas/Post"
             comments:
               $ref: "#/components/schemas/Comment"
 
@@ -1328,14 +1332,14 @@ components:
               example: "2025-10-05T09:00:00"
 
     # 任務相關 Schema
-    TaskBase:
+    PostBase:
       type: object
       required: [content, stage, allowed_comment]
       properties:
         id:
           type: string
           description: 任務唯一識別碼
-          example: "task_123"
+          example: "post_123"
         user_id:
           type: string
           description: 作者識別碼
@@ -1350,12 +1354,12 @@ components:
           type: boolean
           example: true
 
-    Task:
+    Post:
       type: array
       description: 任務列表
       items:
         allOf:
-          - $ref: "#/components/schemas/TaskBase"
+          - $ref: "#/components/schemas/PostBase"
           - type: object
             required:
               [id, author, created_at, updated_at, reactions, replyCount]
@@ -1388,6 +1392,12 @@ components:
               liked_by_user:
                 type: string
                 example: laugh
+              img_path:
+                type: string
+                example: images/[post_id]/
+              file_path:
+                type: string
+                example: files/[post_id]/
 
     # 留言相關 Schema
     CommentBase:
@@ -1421,7 +1431,7 @@ components:
           properties:
             parent_id:
               type: string
-              example: "task_123"
+              example: "post_123"
             created_at:
               type: string
               format: date-time

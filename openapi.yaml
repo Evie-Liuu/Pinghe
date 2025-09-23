@@ -226,7 +226,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ArticleInput"
+              $ref: "#/components/schemas/PostInput"
       responses:
         "201":
           description: 文章建立成功
@@ -309,7 +309,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ArticleInput"
+              $ref: "#/components/schemas/PostInput"
       responses:
         "200":
           description: 文章更新成功
@@ -474,7 +474,7 @@ paths:
           schema:
             type: string
           description: 圖片儲存路徑
-          example: files/example.txt
+          example: images/
       requestBody:
         required: true
         content:
@@ -502,7 +502,7 @@ paths:
                     properties:
                       url:
                         type: string
-                        example: https://example.com/image.png
+                        example: https://example.com/images/example.png
                       message:
                         type: string
                         example: 圖片上傳成功
@@ -512,14 +512,17 @@ paths:
       summary: 刪除圖片
       security:
         - bearerAuth: []
-      parameters:
-        - name: path
-          in: query
-          required: true
-          schema:
-            type: string
-          description: 圖片儲存路徑
-          example: images/example.png
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: 圖片檔案
+                  example: images/example.png
       responses:
         "200":
           description: 刪除成功
@@ -534,6 +537,141 @@ paths:
                   message:
                     type: string
                     example: 圖片刪除成功
+  /upload/images/batch:
+    post:
+      tags: [Medias]
+      summary: 批量上傳圖片
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 圖片儲存路徑
+          example: images/
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 圖片檔案（支援批量上傳多個檔案）
+      responses:
+        "200":
+          description: 批量上傳成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      uploaded:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                              example: image1.png
+                            url:
+                              type: string
+                              example: https://example.com/images/image1.png
+                      failed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                              example: invalid.jpg
+                            error:
+                              type: string
+                              example: 檔案格式不支援
+                      message:
+                        type: string
+                        example: 批量上傳完成，成功 8 個，失敗 2 個
+        "400":
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "413":
+          description: 檔案過大
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Medias]
+      summary: 批量刪除圖片
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                  description: 要刪除的圖片檔案路徑列表
+                  example: ["images/image1.png", "images/image2.jpg"]
+              required: [files]
+      responses:
+        "200":
+          description: 批量刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      deleted:
+                        type: array
+                        items:
+                          type: string
+                        example: ["images/image1.png"]
+                      failed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            file:
+                              type: string
+                              example: images/image2.jpg
+                            error:
+                              type: string
+                              example: 檔案不存在
+                      message:
+                        type: string
+                        example: 批量刪除完成，成功 1 個，失敗 1 個
+        "400":
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /upload/files:
     post:
       tags: [Medias]
@@ -547,7 +685,7 @@ paths:
           schema:
             type: string
           description: 文件儲存路徑
-          example: files/example.txt
+          example: files/
       requestBody:
         required: true
         content:
@@ -585,14 +723,17 @@ paths:
       summary: 刪除文件
       security:
         - bearerAuth: []
-      parameters:
-        - name: path
-          in: query
-          required: true
-          schema:
-            type: string
-          description: 文件儲存路徑
-          example: files/example.txt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: 文件檔案
+                  example: files/example.txt
       responses:
         "200":
           description: 刪除成功
@@ -607,6 +748,141 @@ paths:
                   message:
                     type: string
                     example: 文件刪除成功
+
+  /upload/files/batch:
+    post:
+      tags: [Medias]
+      summary: 批量上傳文件
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 文件儲存路徑
+          example: files/
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 文件檔案（支援批量上傳多個檔案）
+      responses:
+        "200":
+          description: 批量上傳成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      uploaded:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                              example: document1.pdf
+                            url:
+                              type: string
+                              example: https://example.com/files/document1.pdf
+                      failed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                              example: invalid.exe
+                            error:
+                              type: string
+                              example: 檔案格式不支援
+                      message:
+                        type: string
+                        example: 批量上傳完成，成功 5 個，失敗 1 個
+        "400":
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "413":
+          description: 檔案過大
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags: [Medias]
+      summary: 批量刪除文件
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                  description: 要刪除的文件檔案路徑列表
+                  example: ["files/document1.pdf", "files/document2.docx"]
+              required: [files]
+      responses:
+        "200":
+          description: 批量刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  content:
+                    type: object
+                    properties:
+                      deleted:
+                        type: array
+                        items:
+                          type: string
+                        example: ["files/document1.pdf"]
+                      failed:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            file:
+                              type: string
+                              example: files/document2.docx
+                            error:
+                              type: string
+                              example: 檔案不存在
+                      message:
+                        type: string
+                        example: 批量刪除完成，成功 1 個，失敗 1 個
+        "400":
+          description: 請求參數錯誤
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -853,7 +1129,7 @@ components:
               example: admin
             institution_id:
               type: string
-              example: CH_1
+              example: 1
             permissions:
               type: array
               items:
@@ -900,7 +1176,7 @@ components:
           example: admin
         institution_id:
           type: string
-          example: CH_1
+          example: 1
       required: [id_token, full_name, role, institution_id]
 
     UserUpdate:
@@ -948,7 +1224,7 @@ components:
           example: user@example.com
         institution_id:
           type: string
-          example: CH_1
+          example: 1
         # bio:
         #   type: string
         #   example: 我是彰化國小的學生
@@ -962,7 +1238,7 @@ components:
           description: Unix timestamp
           example: 1757997600
 
-    ArticleInput:
+    PostInput:
       type: object
       properties:
         title:
@@ -978,9 +1254,15 @@ components:
           items:
             type: integer
           example: [1, 4]
-        img_url:
+        cover_img:
           type: string
           example: figure2.png
+        img_path:
+          type: string
+          example: images/[post_id]/
+        file_path:
+          type: string
+          example: files/[post_id]/
         intro:
           type: string
           example: 這是一篇關於永續發展的文章內容。
@@ -991,7 +1273,7 @@ components:
 
     Post:
       allOf:
-        - $ref: "#/components/schemas/ArticleInput"
+        - $ref: "#/components/schemas/PostInput"
         - type: object
           properties:
             id:
