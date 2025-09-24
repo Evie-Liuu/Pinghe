@@ -111,6 +111,45 @@
           />
         </div>
 
+        <!-- Start Time Input -->
+        <div>
+          <label for="start_time" class="block text-lg font-medium">時間*</label>
+          <input
+            type="datetime-local"
+            v-model="story.start_time"
+            id="start_time"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            :class="{ 'border-red-500': errors.start_time }"
+          />
+          <p v-if="errors.start_time" class="text-red-500 text-sm mt-1">
+            請選擇開始時間
+          </p>
+        </div>
+
+        <!-- End Time Input -->
+        <div>
+          <!-- <label for="end_time" class="block text-lg font-medium">結束時間</label> -->
+          <div class="mt-1 flex gap-2 items-center">
+            <button
+              @click="addEndTime"
+              class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+              加入結束時間
+            </button>
+            <input
+              type="datetime-local"
+              v-model="story.end_time"
+              id="end_time"
+              class="flex-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              :class="{ 'border-red-500': errors.end_time }"
+              readonly
+            />
+          </div>
+          <p v-if="errors.end_time" class="text-red-500 text-sm mt-1">
+            請新增有效的結束時間
+          </p>
+        </div>
+
         <!-- Tiptap Editor -->
         <div>
           <label class="block text-lg font-medium">內容*</label>
@@ -179,6 +218,10 @@ const story = ref({
   content: "",
   intro: "",
   time: Math.floor(Date.now() / 1000),
+  start_time: "",
+  end_time: "",
+  duration_value: 1,
+  duration_unit: "day",
   types: [],
 });
 
@@ -208,6 +251,32 @@ const selectedSdgs = computed(() => {
   return sdgOptions.filter((sdg) => story.value.types.includes(sdg.value));
 });
 
+const durationDisplay = computed(() => {
+  if (!story.value.start_time || !story.value.duration_value) return "";
+  const startDate = new Date(story.value.start_time);
+  const endDate = new Date(startDate);
+
+  switch (story.value.duration_unit) {
+    case 'day':
+      endDate.setDate(endDate.getDate() + parseInt(story.value.duration_value));
+      break;
+    case 'week':
+      endDate.setDate(endDate.getDate() + parseInt(story.value.duration_value) * 7);
+      break;
+    case 'month':
+      endDate.setMonth(endDate.getMonth() + parseInt(story.value.duration_value));
+      break;
+  }
+
+  return endDate.toLocaleString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+});
+
 const selectTag = (sdg) => {
   if (!story.value.types.includes(sdg.value)) {
     story.value.types.push(sdg.value);
@@ -227,10 +296,52 @@ const filterSdgs = () => {
   // This is handled by computed
 };
 
+const addDuration = (amount, unit) => {
+  if (!story.value.start_time) {
+    alert("請先選擇開始時間");
+    return;
+  }
+
+  const startDate = new Date(story.value.start_time);
+  const endDate = new Date(startDate);
+
+  switch (unit) {
+    case 'day':
+      endDate.setDate(endDate.getDate() + amount);
+      break;
+    case 'week':
+      endDate.setDate(endDate.getDate() + amount * 7);
+      break;
+    case 'month':
+      endDate.setMonth(endDate.getMonth() + amount);
+      break;
+  }
+
+  // Format to datetime-local format (YYYY-MM-DDTHH:MM)
+  const year = endDate.getFullYear();
+  const month = String(endDate.getMonth() + 1).padStart(2, '0');
+  const day = String(endDate.getDate()).padStart(2, '0');
+  const hours = String(endDate.getHours()).padStart(2, '0');
+  const minutes = String(endDate.getMinutes()).padStart(2, '0');
+
+  story.value.end_time = `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const addEndTime = () => {
+  if (!story.value.start_time) {
+    alert("請先選擇開始時間");
+    return;
+  }
+  // 設置默認結束時間為開始時間 + 1 天
+  addDuration(1, 'day');
+};
+
 const errors = ref({
   title: false,
   tags: false,
   content: false,
+  start_time: false,
+  end_time: false,
 });
 
 const editor = useEditor({
@@ -256,7 +367,7 @@ onUnmounted(() => {
 
 const saveStory = () => {
   // Reset errors
-  errors.value = { title: false, tags: false, content: false };
+  errors.value = { title: false, tags: false, content: false, start_time: false, end_time: false };
 
   // 1. Set editor content
   if (editor.value) {
@@ -277,17 +388,38 @@ const saveStory = () => {
     errors.value.content = true;
     hasError = true;
   }
+  if (!story.value.start_time) {
+    errors.value.start_time = true;
+    hasError = true;
+  }
+  if (story.value.end_time && story.value.start_time) {
+    const startDate = new Date(story.value.start_time);
+    const endDate = new Date(story.value.end_time);
+    if (endDate <= startDate) {
+      errors.value.end_time = true;
+      hasError = true;
+    }
+  }
 
   if (hasError) {
     return;
   }
 
-  // 3. "Save" data (log to console for now)
-  console.log("New Story Data:", story.value);
+  // 3. Convert datetime-local to timestamps
+  const processedStory = { ...story.value };
+  if (processedStory.start_time) {
+    processedStory.start_time = Math.floor(new Date(processedStory.start_time).getTime() / 1000);
+  }
+  if (processedStory.end_time) {
+    processedStory.end_time = Math.floor(new Date(processedStory.end_time).getTime() / 1000);
+  }
+
+  // 4. "Save" data (log to console for now)
+  console.log("New Story Data:", processedStory);
   alert("故事已儲存 (請查看主控台)！");
 
-  // 4. Navigate back
-  router.push("/story");
+  // 5. Navigate back
+  // router.push("/story");
 };
 </script>
 
@@ -321,4 +453,3 @@ const saveStory = () => {
   margin-bottom: 0.25em;
 }
 </style>
-
