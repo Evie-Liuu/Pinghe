@@ -181,31 +181,80 @@ class ApiService {
     });
   }
 
-  /* 
-  故事牆
+  /*
+  故事牆 (Showcases)
    */
-  async getShowcases(institution_id) {
-    return this.request(`/institutions/${institution_id}/showcase`);
+  async getShowcases(institutionId, params = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.order) queryParams.append('order', params.order);
+    if (params.title) queryParams.append('title', params.title);
+    if (params.startDate) queryParams.append('startDate', params.startDate);
+    if (params.endDate) queryParams.append('endDate', params.endDate);
+
+    const queryString = queryParams.toString();
+    const endpoint = `/institutions/${institutionId}/showcase${queryString ? `?${queryString}` : ''}`;
+
+    return this.request(endpoint);
   }
-  async createShowcase(showcaseData) {
-    return this.request(`/institutions/${institution_id}/showcase`, {
+
+  async createShowcase(institutionId, showcaseData) {
+    return this.request(`/institutions/${institutionId}/showcase`, {
       method: 'POST',
       body: JSON.stringify(showcaseData),
     });
   }
 
-  async getSelectedshowcase({institution_id, showcase_id}) {
-    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`);
+  async getOwnShowcases(institutionId, userId) {
+    return this.request(`/institutions/${institutionId}/showcase/own?user_id=${userId}`);
   }
-    async updateShowcase({showcase_id, showcaseData}) {
-    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`, {
+
+  async getShowcase(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}`);
+  }
+
+  async updateShowcase(institutionId, showcaseId, showcaseData) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}`, {
       method: 'PUT',
       body: JSON.stringify(showcaseData)
     });
   }
-  async removeShowcase(showcase_id) {
-    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`, {
+
+  async deleteShowcase(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}`, {
       method: 'DELETE',
+    });
+  }
+
+  async getShowcaseComments(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/comments`);
+  }
+
+  async createShowcaseComment(institutionId, showcaseId, commentData) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(commentData),
+    });
+  }
+
+  async addCommentReaction(institutionId, showcaseId, commentId, userId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
+      method: 'POST',
+      body: JSON.stringify({
+        comment_id: commentId,
+        user_id: userId
+      }),
+    });
+  }
+
+  async removeCommentReaction(institutionId, showcaseId, commentId, userId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        comment_id: commentId,
+        user_id: userId
+      }),
     });
   }
 
