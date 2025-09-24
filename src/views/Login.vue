@@ -14,6 +14,8 @@
               id="email"
               required
               class="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              name="email"
+              autocomplete="email"
             />
           </div>
           <div>
@@ -28,6 +30,8 @@
               id="password"
               required
               class="block w-full px-3 py-2 mt-1 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              name="password"
+              autocomplete="current-password"
             />
           </div>
         </div>

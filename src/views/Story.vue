@@ -274,9 +274,14 @@
           </button>
           <button
             @click="confirmDelete"
-            class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+            :disabled="isDeleting"
+            class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            確認刪除
+            <span v-if="isDeleting">
+              <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+              刪除中...
+            </span>
+            <span v-else>確認刪除</span>
           </button>
         </div>
       </div>
@@ -322,11 +327,13 @@ const allInfos = ref(carouselImages);
 
 onMounted(async () => {
   try {
-    let res = await apiService.getShowcases(user.value.institution_id);
-    console.log(res);
-    // allInfos.value = res.items
-    allInfos.value = [...carouselImages, ...res.items];
-    console.log(allInfos.value);
+    if (user.value) {
+      let res = await apiService.getShowcases(user.value.institution_id);
+      console.log(res);
+      // allInfos.value = res.items
+      allInfos.value = [...carouselImages, ...res.items];
+      console.log(allInfos.value);
+    }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
   }
@@ -335,6 +342,7 @@ onMounted(async () => {
 const showEditModal = ref(false);
 const showDeleteModal = ref(false);
 const storyToDelete = ref(null);
+const isDeleting = ref(false);
 const selectedInfo = ref(null);
 const editStory = ref({
   sdgs_goals: [],
@@ -370,26 +378,53 @@ const handleDelete = (storyId) => {
 };
 
 const confirmDelete = async () => {
-  if (storyToDelete.value) {
-    //TODO
-    try {
-      await apiService.deleteShowcase(
-        user.value.institution_id,
-        storyToDelete.value
-      );
-      const index = allInfos.value.findIndex(
-        (story) => story.post_id === storyToDelete.value
-      );
-      if (index !== -1) {
-        allInfos.value.splice(index, 1);
-      }
-    } catch (error) {
-      console.error("Failed to delete story:", error);
-      alert("刪除失敗，請重試");
-    }
+  if (!storyToDelete.value || isDeleting.value) {
+    return;
   }
-  showDeleteModal.value = false;
-  storyToDelete.value = null;
+
+  isDeleting.value = true;
+
+  try {
+    console.log(user.value.institution_id, storyToDelete.value);
+
+    await apiService.deleteShowcase(
+      user.value.institution_id,
+      storyToDelete.value
+    );
+
+    // 只有 API 呼叫成功後才從本地陣列移除
+    const index = allInfos.value.findIndex(
+      (story) => story && story.post_id === storyToDelete.value
+    );
+    console.log("Found index:", index);
+
+    if (index !== -1) {
+      allInfos.value.splice(index, 1);
+      console.log("Story removed from local array");
+    } else {
+      console.warn(
+        "Story not found in local array, but API deletion succeeded"
+      );
+    }
+  } catch (error) {
+    console.error("Failed to delete story:", error);
+
+    // 提供更具體的錯誤訊息
+    let errorMessage = "刪除失敗，請重試";
+    if (error.message?.includes("404")) {
+      errorMessage = "故事不存在或已被刪除";
+    } else if (error.message?.includes("403")) {
+      errorMessage = "沒有權限刪除此故事";
+    } else if (error.message?.includes("API_BASE_URL_NOT_CONFIGURED")) {
+      errorMessage = "目前無法連接到伺服器";
+    }
+
+    alert(errorMessage);
+  } finally {
+    isDeleting.value = false;
+    showDeleteModal.value = false;
+    storyToDelete.value = null;
+  }
 };
 
 const cancelDelete = () => {

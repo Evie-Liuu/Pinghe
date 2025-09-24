@@ -95,9 +95,11 @@ const itemsPerPage = 3;
 
 onMounted(async () => {
   try {
-    let res = await apiService.getPosts(user.value.institution_id);
-    console.log(res);
-    // allActions.value = res.items;
+    if (user.value) {
+      let res = await apiService.getPosts(user.value.institution_id);
+      console.log(res);
+      // allActions.value = res.items;
+    }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
   }
