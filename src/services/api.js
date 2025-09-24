@@ -259,30 +259,115 @@ class ApiService {
   }
 
 
-  /* 
+  /*
   行動
    */
-  async getActivities() {
-    return this.request(`/activities`);
+  async getActivities(params = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.userId) queryParams.append('userId', params.userId);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.order) queryParams.append('order', params.order);
+    if (params.title) queryParams.append('title', params.title);
+    if (params.startDate) queryParams.append('startDate', params.startDate);
+    if (params.endDate) queryParams.append('endDate', params.endDate);
+
+    const queryString = queryParams.toString();
+    const endpoint = `/activities${queryString ? `?${queryString}` : ''}`;
+
+    return this.request(endpoint);
   }
+
+  async getActivity(activityId) {
+    return this.request(`/activities/${activityId}`);
+  }
+
   async createActivity(activityData) {
     return this.request('/activities', {
       method: 'POST',
       body: JSON.stringify(activityData),
     });
   }
-  async removeActivity(activity_id) {
-    return this.request(`/activities/${activity_id}`, {
+
+  async updateActivity(activityId, activityData) {
+    return this.request(`/activities/${activityId}`, {
+      method: 'PUT',
+      body: JSON.stringify(activityData),
+    });
+  }
+
+  async removeActivity(activityId) {
+    return this.request(`/activities/${activityId}`, {
       method: 'DELETE',
     });
   }
 
-  async getPosts(institution_id, activity_id) {
-    return this.request(`institutions/${institution_id}/posts?${activity_id ? `related_activity_id=${activity_id}` : ''}`);
+  async getOwnActivities(activityId, userId) {
+    return this.request(`/activities/${activityId}/own?userId=${userId}`);
   }
 
-  async getSelectedPosts(institution_id, post_id) {
-    return this.request(`institutions/${institution_id}/posts/${post_id}`);
+  // Activities verify
+  async submitJoinRequest(activityId, userId, requestData) {
+    return this.request(`/activities/${activityId}/join-requests?userId=${userId}`, {
+      method: 'POST',
+      body: JSON.stringify(requestData),
+    });
+  }
+
+  async getJoinRequests(activityId) {
+    return this.request(`/activities/${activityId}/join-requests`);
+  }
+
+  async approveJoinRequest(activityId, userId, approve) {
+    return this.request(`/activities/${activityId}/join-requests/${userId}?approve=${approve}`, {
+      method: 'POST',
+    });
+  }
+
+  // Posts
+  async getPosts(institutionId, activityId) {
+    return this.request(`/institutions/${institutionId}/posts?related_activity_id=${activityId}`);
+  }
+
+  async getPost(institutionId, postId) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}`);
+  }
+
+  async updatePost(institutionId, postId, postData) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}`, {
+      method: 'PUT',
+      body: JSON.stringify(postData),
+    });
+  }
+
+  async deletePost(institutionId, postId) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async addPostLike(institutionId, postId, userId) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}/like?userId=${userId}`, {
+      method: 'POST',
+    });
+  }
+
+  async removePostLike(institutionId, postId, userId) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}/like?userId=${userId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Comments
+  async createComment(institutionId, postId, commentData) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(commentData),
+    });
+  }
+
+  async getComments(institutionId, postId) {
+    return this.request(`/institutions/${institutionId}/posts/${postId}/comments`);
   }
 }
 
