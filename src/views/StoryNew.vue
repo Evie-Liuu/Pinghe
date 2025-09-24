@@ -221,11 +221,10 @@ const { formatISO } = useDateTime();
 
 const story = ref({
   title: "",
-  img_url: "",
   content: "",
   intro: "",
-  start_time: "",
-  end_time: "",
+  start_time: null,
+  end_time: null,
   duration_value: 1,
   duration_unit: "day",
   sdgs_goals: [],
@@ -427,6 +426,8 @@ const saveStory = () => {
 
   // 3. Convert datetime-local to timestamps
   const processedStory = { ...story.value };
+  // Ensure sdgs_goals is a plain array, not a proxy
+  processedStory.sdgs_goals = [...story.value.sdgs_goals];
   if (processedStory.start_time) {
     processedStory.start_time = formatISO(
       new Date(processedStory.start_time).getTime() / 1000

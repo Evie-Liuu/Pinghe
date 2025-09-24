@@ -695,16 +695,19 @@ const openFileSelector = () => {
 
 // Extract file processing logic for reuse
 const processFileUpload = async (file) => {
+  console.log(file);
+
   if (!file || !editStory.value) {
     return;
   }
-  return;
+
   // Validate file using API service
   const validationErrors = apiService.validateImageFile(file);
   if (validationErrors.length > 0) {
     alert(`文件驗證失敗:\n${validationErrors.join("\n")}`);
     return;
   }
+  return;
 
   isUploadingImage.value = true;
 
