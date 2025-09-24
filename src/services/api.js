@@ -1,7 +1,7 @@
 // API service for handling server requests
 console.log(import.meta.env.DEV);
 
-const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
+const API_BASE_URL = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'https://api.sdgs-journey.com/api/v1');
 const UPLOAD_MAX_SIZE = parseInt(import.meta.env.VITE_UPLOAD_MAX_SIZE) || 5242880; // 5MB
 const UPLOAD_ALLOWED_TYPES = (import.meta.env.VITE_UPLOAD_ALLOWED_TYPES || 'image/jpeg,image/jpg,image/png,image/gif,image/webp').split(',');
 
