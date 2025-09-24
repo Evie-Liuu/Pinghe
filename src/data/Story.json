@@ -1,9 +1,10 @@
 [
     {
-        "id": 1,
+        "post_id": 51,
         "title": "讀經教育",
-        "time": "1753977600",
-        "types": [
+        "start_time": "2025-04-11T09:00:00",
+        "end_time": "",
+        "sdgs_goals": [
             4,3,9,15
         ],
         "intro": "全校讀論語 星期四讀經和鎮長。",
@@ -11,10 +12,11 @@
         "content": "全校讀論語 星期四讀經和鎮長。"
     },
     {
-        "id": 2,
+        "post_id": 52,
         "title": "舞蹈社團",
-        "time": "1741977600",
-        "types": [
+        "start_time": "2025-04-14T09:00:00",
+        "end_time": "",
+        "sdgs_goals": [
             4
         ],
         "intro": "精彩的舞蹈表演，獲得滿堂彩。",
@@ -44,10 +46,11 @@
         ]
     },
     {
-        "id": 3,
+        "post_id": 53,
         "title": "社區踏查",
-        "time": "1753907600",
-        "types": [
+        "start_time": "2025-04-21T09:00:00",
+        "end_time": "",
+        "sdgs_goals": [
             11
         ],
         "intro": "",
@@ -55,10 +58,11 @@
         "content": ""
     },
     {
-        "id": 4,
+        "post_id": 54,
         "title": "社區踏查",
-        "time": "",
-        "types": [
+        "start_time": "",
+        "end_time": "",
+        "sdgs_goals": [
             11
         ],
         "intro": "",

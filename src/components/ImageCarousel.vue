@@ -12,19 +12,19 @@
     >
       <SwiperSlide
         v-for="(img, index) in props.images"
-        :key="img.id"
+        :key="img.post_id"
         class="relative"
         v-slot="{ isActive }"
       >
         <div
-          @click="handleSlideClick(isActive, img.id, index)"
+          @click="handleSlideClick(isActive, img.post_id, index)"
           class="h-full cursor-pointer"
         >
           <!-- Label -->
           <div class="absolute top-2 left-2 z-20">
             <div class="flex flex-wrap gap-2 mt-2">
               <span
-                v-for="t in img.types"
+                v-for="t in img.sdgs_goals"
                 :key="t"
                 class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
               >
@@ -35,24 +35,24 @@
           <!-- Kebab Menu -->
           <div v-if="isTeacher" class="absolute top-2 right-2 z-20">
             <button
-              @click.stop="toggleMenu(img.id)"
+              @click.stop="toggleMenu(img.post_id)"
               class="text-white bg-black/30 rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/50"
             >
               <i class="fa-solid fa-ellipsis-vertical"></i>
             </button>
             <!-- Dropdown -->
             <div
-              v-if="isMenuOpen === img.id"
+              v-if="isMenuOpen === img.post_id"
               ref="menuDropdown"
               class="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg text-black ring-1 ring-black ring-opacity-5"
             >
               <a
-                @click.stop="editStory(img.id)"
+                @click.stop="editStory(img.post_id)"
                 class="block px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
                 >編輯</a
               >
               <a
-                @click.stop="deleteStory(img.id)"
+                @click.stop="deleteStory(img.post_id)"
                 class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 cursor-pointer"
                 >刪除</a
               >
@@ -68,7 +68,9 @@
             class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-orange-300/70 text-center rounded-lg px-2"
           >
             <p>{{ img.title }}</p>
-            <small class="text-xs">{{ formatDate(img.time * 1000) }}</small>
+            <small class="text-xs">{{
+              formatDate(formatTimestamp(img.start_time))
+            }}</small>
             <p class="text-sm text-justify leading-relaxed">
               {{ img.intro }}
             </p>
@@ -96,7 +98,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 const router = useRouter();
-const { formatDate } = useDateFormat();
+const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 const { isTeacher, user, isAuthenticated, checkAuth } = useAuth();
 
 const props = defineProps({

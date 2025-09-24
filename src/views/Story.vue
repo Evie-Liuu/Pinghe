@@ -90,7 +90,9 @@
           <input
             type="date"
             :value="
-              editStory.time ? formatDate(editStory.time * 1000, '-') : ''
+              editStory.start_time
+                ? formatDate(formatTimestamp(editStory.start_time), '-')
+                : ''
             "
             @input="updateTime"
             class="w-full p-2 border border-gray-300 rounded-md"
@@ -268,7 +270,7 @@ import { useAuth } from "@/stores/auth";
 import { apiService } from "@/services/api.js";
 
 const { isAuthenticated, user, isTeacher } = useAuth();
-const { formatDate } = useDateFormat();
+const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 
 const path = "../assets/images/";
 
@@ -296,6 +298,8 @@ onMounted(async () => {
     let res = await apiService.getShowcases(user.value.institution_id);
     console.log(res);
     // allInfos.value = res.items
+    allInfos.value = [...carouselImages, ...res.items];
+    console.log(allInfos.value);
   } catch (error) {
     console.error("Failed to fetch posts:", error);
   }
@@ -304,24 +308,29 @@ onMounted(async () => {
 const showEditModal = ref(false);
 const selectedInfo = ref(null);
 const editStory = ref({
-  types: [],
+  sdgs_goals: [],
   title: "",
   intro: "",
-  time: null,
+  start_time: null,
   img_url: "",
 });
+console.log(formatISO(formatTimestamp("2025-10-05T09:00:00") / 1000));
 
 const handleEdit = (storyId) => {
-  const story = allInfos.value.find((item) => item.id === parseInt(storyId));
+  const story = allInfos.value.find(
+    (item) => item.post_id === parseInt(storyId)
+  );
+
+  console.log(story);
 
   if (story) {
     selectedInfo.value = story;
     editStory.value = {
       ...story,
-      types: [...(story.types || [])],
+      sdgs_goals: [...(story.sdgs_goals || [])],
       title: story.title || "",
       intro: story.intro || "",
-      time: story.time || null,
+      start_time: story.start_time || null,
       img_url: story.img_url || "",
     };
   }
@@ -360,8 +369,8 @@ const allFilteredInfos = computed(() => {
   if (filters.value.sdgs.length > 0) {
     result = result.filter(
       (info) =>
-        info.types &&
-        info.types.some((type) => filters.value.sdgs.includes(type))
+        info.sdgs_goals &&
+        info.sdgs_goals.some((type) => filters.value.sdgs.includes(type))
     );
   }
 
@@ -369,8 +378,9 @@ const allFilteredInfos = computed(() => {
   if (filters.value.time !== "all") {
     const now = new Date();
     result = result.filter((info) => {
-      if (!info.time || String(info.time).trim() === "") return false;
-      const infoDate = new Date(Number(info.time) * 1000);
+      if (!info.start_time || String(info.start_time).trim() === "")
+        return false;
+      const infoDate = formatTimestamp(info.start_time);
 
       if (filters.value.time === "day") {
         const yesterday = new Date();
@@ -413,21 +423,23 @@ const editDropdown = ref(null);
 const sdgOptions = sdgsData.filter((s) => s.value !== 0);
 
 const selectedEditSdgs = computed(() => {
-  if (!editStory.value || !editStory.value.types) return [];
-  return sdgOptions.filter((sdg) => editStory.value.types.includes(sdg.value));
+  if (!editStory.value || !editStory.value.sdgs_goals) return [];
+  return sdgOptions.filter((sdg) =>
+    editStory.value.sdgs_goals.includes(sdg.value)
+  );
 });
 
 const filteredEditSdgs = computed(() => {
-  if (!editStory.value || !editStory.value.types) return sdgOptions;
+  if (!editStory.value || !editStory.value.sdgs_goals) return sdgOptions;
 
   if (!editSdgSearch.value)
     return sdgOptions.filter(
-      (sdg) => !editStory.value.types.includes(sdg.value)
+      (sdg) => !editStory.value.sdgs_goals.includes(sdg.value)
     );
   return sdgOptions.filter(
     (sdg) =>
       sdg.title.toLowerCase().includes(editSdgSearch.value.toLowerCase()) &&
-      !editStory.value.types.includes(sdg.value)
+      !editStory.value.sdgs_goals.includes(sdg.value)
   );
 });
 
@@ -459,7 +471,7 @@ const closeEditModal = () => {
 
   // Reset editStory to default state
   editStory.value = {
-    types: [],
+    sdgs_goals: [],
     title: "",
     intro: "",
     time: null,
@@ -482,8 +494,8 @@ const saveEdit = async () => {
   }
   if (
     !editStory.value ||
-    !editStory.value.types ||
-    editStory.value.types.length === 0
+    !editStory.value.sdgs_goals ||
+    editStory.value.sdgs_goals.length === 0
   ) {
     errors.value.tags = true;
     hasError = true;
@@ -512,8 +524,8 @@ const saveEdit = async () => {
   if (selectedInfo.value && editStory.value) {
     selectedInfo.value.title = editStory.value.title;
     selectedInfo.value.intro = editStory.value.intro;
-    selectedInfo.value.time = editStory.value.time;
-    selectedInfo.value.types = editStory.value.types;
+    selectedInfo.value.start_time = editStory.value.start_time;
+    selectedInfo.value.sdgs_goals = editStory.value.sdgs_goals;
     selectedInfo.value.img_url = editStory.value.img_url;
 
     // TODO: Save to server API when available
@@ -554,20 +566,20 @@ const updateTime = (event) => {
 const selectEditTag = (sdg) => {
   if (
     editStory.value &&
-    editStory.value.types &&
-    !editStory.value.types.includes(sdg.value)
+    editStory.value.sdgs_goals &&
+    !editStory.value.sdgs_goals.includes(sdg.value)
   ) {
-    editStory.value.types.push(sdg.value);
+    editStory.value.sdgs_goals.push(sdg.value);
   }
   editSdgSearch.value = "";
   showEditDropdown.value = false;
 };
 
 const removeEditTag = (tagValue) => {
-  if (editStory.value && editStory.value.types) {
-    const index = editStory.value.types.indexOf(tagValue);
+  if (editStory.value && editStory.value.sdgs_goals) {
+    const index = editStory.value.sdgs_goals.indexOf(tagValue);
     if (index !== -1) {
-      editStory.value.types.splice(index, 1);
+      editStory.value.sdgs_goals.splice(index, 1);
     }
   }
 };
