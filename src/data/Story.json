@@ -5,7 +5,10 @@
         "start_time": "2025-04-11T09:00:00",
         "end_time": "",
         "sdgs_goals": [
-            4,3,9,15
+            4,
+            3,
+            9,
+            15
         ],
         "intro": "全校讀論語 星期四讀經和鎮長。",
         "img_url": "figure3.png",

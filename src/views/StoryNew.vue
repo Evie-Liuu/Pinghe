@@ -444,7 +444,7 @@ const saveStory = () => {
   apiService.createShowcase(user.value.institution_id, processedStory);
 
   // 5. Navigate back
-  // router.push("/story");
+  router.push("/story");
 };
 </script>
 

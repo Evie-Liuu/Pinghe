@@ -254,6 +254,33 @@
         </div>
       </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+      v-if="showDeleteModal"
+      class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 text-black"
+    >
+      <div class="bg-white p-6 rounded-md max-w-md w-full mx-4">
+        <h2 class="text-xl mb-4 text-center">確認刪除</h2>
+        <p class="text-gray-700 mb-6 text-center">
+          確定要刪除這篇故事嗎？<br />此操作無法復原。
+        </p>
+        <div class="flex justify-center gap-4">
+          <button
+            @click="cancelDelete"
+            class="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+          >
+            取消
+          </button>
+          <button
+            @click="confirmDelete"
+            class="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+          >
+            確認刪除
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -306,6 +333,8 @@ onMounted(async () => {
 });
 
 const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const storyToDelete = ref(null);
 const selectedInfo = ref(null);
 const editStory = ref({
   sdgs_goals: [],
@@ -317,9 +346,7 @@ const editStory = ref({
 console.log(formatISO(formatTimestamp("2025-10-05T09:00:00") / 1000));
 
 const handleEdit = (storyId) => {
-  const story = allInfos.value.find(
-    (item) => item.post_id === parseInt(storyId)
-  );
+  const story = allInfos.value.find((item) => item.post_id === storyId);
 
   console.log(story);
 
@@ -338,12 +365,36 @@ const handleEdit = (storyId) => {
   showEditModal.value = true;
 };
 const handleDelete = (storyId) => {
-  if (confirm("確定要刪除這篇故事嗎？此操作無法復原。")) {
-    const index = allInfos.value.findIndex((story) => story.id === storyId);
-    if (index !== -1) {
-      allInfos.value.splice(index, 1);
+  storyToDelete.value = storyId;
+  showDeleteModal.value = true;
+};
+
+const confirmDelete = async () => {
+  if (storyToDelete.value) {
+    //TODO
+    try {
+      await apiService.deleteShowcase(
+        user.value.institution_id,
+        storyToDelete.value
+      );
+      const index = allInfos.value.findIndex(
+        (story) => story.post_id === storyToDelete.value
+      );
+      if (index !== -1) {
+        allInfos.value.splice(index, 1);
+      }
+    } catch (error) {
+      console.error("Failed to delete story:", error);
+      alert("刪除失敗，請重試");
     }
   }
+  showDeleteModal.value = false;
+  storyToDelete.value = null;
+};
+
+const cancelDelete = () => {
+  showDeleteModal.value = false;
+  storyToDelete.value = null;
 };
 
 // --- Filter Logic ---
@@ -528,14 +579,16 @@ const saveEdit = async () => {
     selectedInfo.value.sdgs_goals = editStory.value.sdgs_goals;
     selectedInfo.value.img_url = editStory.value.img_url;
 
-    // TODO: Save to server API when available
-    // try {
-    //   await apiService.updateArticle(selectedInfo.value.id, selectedInfo.value);
-    //   console.log('Story updated on server');
-    // } catch (error) {
-    //   console.warn('Failed to update story on server:', error);
-    //   alert('故事已在本地更新，但無法同步到服務器。');
-    // }
+    try {
+      let res = await apiService.updateShowcase(
+        user.value.institution_id,
+        selectedInfo.value.post_id,
+        selectedInfo.value
+      );
+      // console.log(res);
+    } catch (error) {
+      console.error("Failed to fetch:", error);
+    }
   }
 
   showEditModal.value = false;

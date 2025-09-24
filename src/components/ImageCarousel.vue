@@ -124,9 +124,9 @@ const toggleMenu = (storyId) => {
   isMenuOpen.value = isMenuOpen.value === storyId ? null : storyId;
 };
 
-useClickOutside(menuDropdown, () => {
-  isMenuOpen.value = null;
-});
+// useClickOutside(menuDropdown, () => {
+//   isMenuOpen.value = null;
+// });
 
 const editStory = (storyId) => {
   isMenuOpen.value = null; // Close menu
