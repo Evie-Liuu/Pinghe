@@ -293,7 +293,7 @@ const allInfos = ref(carouselImages);
 
 onMounted(async () => {
   try {
-    let res = await apiService.getPosts(user.value.institution_id);
+    let res = await apiService.getShowcases(user.value.institution_id);
     console.log(res);
     // allInfos.value = res.items
   } catch (error) {

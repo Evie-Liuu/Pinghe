@@ -182,13 +182,57 @@ class ApiService {
   }
 
   /* 
-  故事牆文章
+  故事牆
    */
-  async getPosts(institution_id, post_id) {
-    return this.request(`institutions/${institution_id}/posts`);
+  async getShowcases(institution_id) {
+    return this.request(`/institutions/${institution_id}/showcase`);
+  }
+  async createShowcase(showcaseData) {
+    return this.request(`/institutions/${institution_id}/showcase`, {
+      method: 'POST',
+      body: JSON.stringify(showcaseData),
+    });
   }
 
-  async getSelectedPost(institution_id, post_id) {
+  async getSelectedshowcase({institution_id, showcase_id}) {
+    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`);
+  }
+    async updateShowcase({showcase_id, showcaseData}) {
+    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`, {
+      method: 'PUT',
+      body: JSON.stringify(showcaseData)
+    });
+  }
+  async removeShowcase(showcase_id) {
+    return this.request(`/institutions/${institution_id}/showcase/${showcase_id}`, {
+      method: 'DELETE',
+    });
+  }
+
+
+  /* 
+  行動
+   */
+  async getActivities() {
+    return this.request(`/activities`);
+  }
+  async createActivity(activityData) {
+    return this.request('/activities', {
+      method: 'POST',
+      body: JSON.stringify(activityData),
+    });
+  }
+  async removeActivity(activity_id) {
+    return this.request(`/activities/${activity_id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getPosts(institution_id, activity_id) {
+    return this.request(`institutions/${institution_id}/posts?${activity_id ? `related_activity_id=${activity_id}` : ''}`);
+  }
+
+  async getSelectedPosts(institution_id, post_id) {
     return this.request(`institutions/${institution_id}/posts/${post_id}`);
   }
 }
