@@ -546,7 +546,6 @@ const story = ref({
   img_url: "",
   content: "",
   intro: "",
-  time: formatISO(Date.now() / 1000),
   types: [],
   startTime: "",
   endTime: "",

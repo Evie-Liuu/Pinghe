@@ -113,7 +113,9 @@
 
         <!-- Start Time Input -->
         <div>
-          <label for="start_time" class="block text-lg font-medium">時間*</label>
+          <label for="start_time" class="block text-lg font-medium"
+            >時間*</label
+          >
           <input
             type="datetime-local"
             v-model="story.start_time"
@@ -208,21 +210,27 @@ import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import { useClickOutside } from "@/composables/useClickOutside.js";
+import { useDateTime } from "@/composables/useDateTime.js";
 import sdgsData from "@/data/SDGs_goal.json";
+import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 
+const { isAuthenticated, user } = useAuth();
 const router = useRouter();
+const { formatISO } = useDateTime();
 
 const story = ref({
   title: "",
   img_url: "",
   content: "",
   intro: "",
-  time: Math.floor(Date.now() / 1000),
   start_time: "",
   end_time: "",
   duration_value: 1,
   duration_unit: "day",
-  types: [],
+  sdgs_goals: [],
+  author_id: user.value.id,
+  post_type: "general",
 });
 
 // Filter out the "All" option and clean titles
@@ -239,16 +247,18 @@ const dropdown = ref(null);
 
 const filteredSdgs = computed(() => {
   if (!sdgSearch.value)
-    return sdgOptions.filter((sdg) => !story.value.types.includes(sdg.value));
+    return sdgOptions.filter(
+      (sdg) => !story.value.sdgs_goals.includes(sdg.value)
+    );
   return sdgOptions.filter(
     (sdg) =>
       sdg.title.toLowerCase().includes(sdgSearch.value.toLowerCase()) &&
-      !story.value.types.includes(sdg.value)
+      !story.value.sdgs_goals.includes(sdg.value)
   );
 });
 
 const selectedSdgs = computed(() => {
-  return sdgOptions.filter((sdg) => story.value.types.includes(sdg.value));
+  return sdgOptions.filter((sdg) => story.value.sdgs_goals.includes(sdg.value));
 });
 
 const durationDisplay = computed(() => {
@@ -257,38 +267,42 @@ const durationDisplay = computed(() => {
   const endDate = new Date(startDate);
 
   switch (story.value.duration_unit) {
-    case 'day':
+    case "day":
       endDate.setDate(endDate.getDate() + parseInt(story.value.duration_value));
       break;
-    case 'week':
-      endDate.setDate(endDate.getDate() + parseInt(story.value.duration_value) * 7);
+    case "week":
+      endDate.setDate(
+        endDate.getDate() + parseInt(story.value.duration_value) * 7
+      );
       break;
-    case 'month':
-      endDate.setMonth(endDate.getMonth() + parseInt(story.value.duration_value));
+    case "month":
+      endDate.setMonth(
+        endDate.getMonth() + parseInt(story.value.duration_value)
+      );
       break;
   }
 
-  return endDate.toLocaleString('zh-TW', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  return endDate.toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 });
 
 const selectTag = (sdg) => {
-  if (!story.value.types.includes(sdg.value)) {
-    story.value.types.push(sdg.value);
+  if (!story.value.sdgs_goals.includes(sdg.value)) {
+    story.value.sdgs_goals.push(sdg.value);
   }
   sdgSearch.value = "";
   showDropdown.value = false;
 };
 
 const removeTag = (tagValue) => {
-  const index = story.value.types.indexOf(tagValue);
+  const index = story.value.sdgs_goals.indexOf(tagValue);
   if (index !== -1) {
-    story.value.types.splice(index, 1);
+    story.value.sdgs_goals.splice(index, 1);
   }
 };
 
@@ -306,23 +320,23 @@ const addDuration = (amount, unit) => {
   const endDate = new Date(startDate);
 
   switch (unit) {
-    case 'day':
+    case "day":
       endDate.setDate(endDate.getDate() + amount);
       break;
-    case 'week':
+    case "week":
       endDate.setDate(endDate.getDate() + amount * 7);
       break;
-    case 'month':
+    case "month":
       endDate.setMonth(endDate.getMonth() + amount);
       break;
   }
 
   // Format to datetime-local format (YYYY-MM-DDTHH:MM)
   const year = endDate.getFullYear();
-  const month = String(endDate.getMonth() + 1).padStart(2, '0');
-  const day = String(endDate.getDate()).padStart(2, '0');
-  const hours = String(endDate.getHours()).padStart(2, '0');
-  const minutes = String(endDate.getMinutes()).padStart(2, '0');
+  const month = String(endDate.getMonth() + 1).padStart(2, "0");
+  const day = String(endDate.getDate()).padStart(2, "0");
+  const hours = String(endDate.getHours()).padStart(2, "0");
+  const minutes = String(endDate.getMinutes()).padStart(2, "0");
 
   story.value.end_time = `${year}-${month}-${day}T${hours}:${minutes}`;
 };
@@ -333,7 +347,7 @@ const addEndTime = () => {
     return;
   }
   // 設置默認結束時間為開始時間 + 1 天
-  addDuration(1, 'day');
+  addDuration(1, "day");
 };
 
 const errors = ref({
@@ -367,7 +381,13 @@ onUnmounted(() => {
 
 const saveStory = () => {
   // Reset errors
-  errors.value = { title: false, tags: false, content: false, start_time: false, end_time: false };
+  errors.value = {
+    title: false,
+    tags: false,
+    content: false,
+    start_time: false,
+    end_time: false,
+  };
 
   // 1. Set editor content
   if (editor.value) {
@@ -380,7 +400,7 @@ const saveStory = () => {
     errors.value.title = true;
     hasError = true;
   }
-  if (story.value.types.length === 0) {
+  if (story.value.sdgs_goals.length === 0) {
     errors.value.tags = true;
     hasError = true;
   }
@@ -408,18 +428,23 @@ const saveStory = () => {
   // 3. Convert datetime-local to timestamps
   const processedStory = { ...story.value };
   if (processedStory.start_time) {
-    processedStory.start_time = Math.floor(new Date(processedStory.start_time).getTime() / 1000);
+    processedStory.start_time = formatISO(
+      new Date(processedStory.start_time).getTime() / 1000
+    );
   }
   if (processedStory.end_time) {
-    processedStory.end_time = Math.floor(new Date(processedStory.end_time).getTime() / 1000);
+    processedStory.end_time = formatISO(
+      new Date(processedStory.end_time).getTime() / 1000
+    );
   }
 
-  // 4. "Save" data (log to console for now)
+  // 4. "Save" data
   console.log("New Story Data:", processedStory);
-  alert("故事已儲存 (請查看主控台)！");
+  // alert("故事已儲存 (請查看主控台)！");
+  apiService.createShowcase(user.value.institution_id, processedStory);
 
   // 5. Navigate back
-  // router.push("/story");
+  router.push("/story");
 };
 </script>
 
