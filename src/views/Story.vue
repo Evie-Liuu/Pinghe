@@ -332,9 +332,9 @@ onMounted(async () => {
     if (user.value) {
       let res = await apiService.getShowcases(user.value.institution_id);
       console.log(res);
-      // allInfos.value = res.items
-      allInfos.value = [...carouselImages, ...res.items];
-      console.log(allInfos.value);
+      allInfos.value = res.items
+      // allInfos.value = [...carouselImages, ...res.items];
+      // console.log(allInfos.value);
     }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
