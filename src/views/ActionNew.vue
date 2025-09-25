@@ -26,7 +26,7 @@
           <label for="title" class="block text-lg font-medium">標題*</label>
           <input
             type="text"
-            v-model="story.title"
+            v-model="action.title"
             id="title"
             class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             :class="{ 'border-red-500': errors.title }"
@@ -44,7 +44,7 @@
             >
             <input
               type="date"
-              v-model="story.startTime"
+              v-model="action.startTime"
               id="startTime"
               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               :class="{ 'border-red-500': errors.startTime }"
@@ -59,7 +59,7 @@
             >
             <input
               type="date"
-              v-model="story.endTime"
+              v-model="action.endTime"
               id="endTime"
               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               :class="{ 'border-red-500': errors.endTime }"
@@ -142,7 +142,7 @@
           <label for="intro" class="block text-lg font-medium">描述</label>
           <input
             type="text"
-            v-model="story.intro"
+            v-model="action.intro"
             id="intro"
             class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
@@ -156,15 +156,15 @@
           <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <div class="flex items-center gap-2 text-sm text-blue-800">
               <i class="fa-solid fa-info-circle"></i>
-              <span v-if="story.startTime && story.endTime">
-                行動期間：{{ formatDateForDisplay(story.startTime) }} 至
-                {{ formatDateForDisplay(story.endTime) }} （{{
+              <span v-if="action.startTime && action.endTime">
+                行動期間：{{ formatDateForDisplay(action.startTime) }} 至
+                {{ formatDateForDisplay(action.endTime) }} （{{
                   getActionDurationText()
                 }}）
               </span>
-              <span v-else-if="story.startTime">
+              <span v-else-if="action.startTime">
                 行動起始：{{
-                  formatDateForDisplay(story.startTime)
+                  formatDateForDisplay(action.startTime)
                 }}（無結束期限）
               </span>
               <span v-else class="text-orange-600">
@@ -175,7 +175,7 @@
 
           <!-- Timeline Visualization -->
           <div
-            v-if="story.stages.length > 0 && hasValidActionTime"
+            v-if="action.stages.length > 0 && hasValidActionTime"
             class="mt-4"
           >
             <div class="text-sm font-medium text-gray-700 mb-2">
@@ -273,8 +273,8 @@
                       type="date"
                       v-model="newStage.startTime"
                       id="newStageStartTime"
-                      :min="story.startTime"
-                      :max="story.endTime"
+                      :min="action.startTime"
+                      :max="action.endTime"
                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       :class="{
                         'border-orange-500': newStageTimeWarning.start,
@@ -297,8 +297,8 @@
                       type="date"
                       v-model="newStage.endTime"
                       id="newStageEndTime"
-                      :min="newStage.startTime || story.startTime"
-                      :max="story.endTime"
+                      :min="newStage.startTime || action.startTime"
+                      :max="action.endTime"
                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       :class="{ 'border-orange-500': newStageTimeWarning.end }"
                     />
@@ -338,17 +338,17 @@
             </div>
 
             <!-- Existing Stages List -->
-            <div v-if="story.stages.length > 0" class="mt-4">
+            <div v-if="action.stages.length > 0" class="mt-4">
               <div class="flex items-center justify-between mb-3">
                 <div class="text-sm font-medium text-gray-700">
-                  已規劃階段 ({{ story.stages.length }})
+                  已規劃階段 ({{ action.stages.length }})
                 </div>
                 <div class="text-xs text-gray-500">可拖曳調整順序</div>
               </div>
 
               <div ref="sortableContainer" class="space-y-3">
                 <div
-                  v-for="(stage, index) in story.stages"
+                  v-for="(stage, index) in action.stages"
                   :key="stage.id"
                   :data-id="stage.id"
                   class="sortable-item p-4 border rounded-lg bg-white hover:shadow-md transition-all duration-200"
@@ -436,8 +436,8 @@
                         <input
                           type="date"
                           v-model="editingStage.startTime"
-                          :min="story.startTime"
-                          :max="story.endTime"
+                          :min="action.startTime"
+                          :max="action.endTime"
                           class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                       </div>
@@ -448,8 +448,8 @@
                         <input
                           type="date"
                           v-model="editingStage.endTime"
-                          :min="editingStage.startTime || story.startTime"
-                          :max="story.endTime"
+                          :min="editingStage.startTime || action.startTime"
+                          :max="action.endTime"
                           class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                       </div>
@@ -514,7 +514,7 @@
         <!-- Save Button -->
         <div class="self-end">
           <button
-            @click="saveStory"
+            @click="saveAction"
             class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
           >
             儲存
@@ -541,7 +541,7 @@ import Sortable from "sortablejs";
 const router = useRouter();
 const { formatISO } = useDateTime();
 
-const story = ref({
+const action = ref({
   title: "",
   img_url: "",
   content: "",
@@ -582,21 +582,21 @@ let sortableInstance = null;
 
 const filteredSdgs = computed(() => {
   if (!sdgSearch.value)
-    return sdgOptions.filter((sdg) => !story.value.types.includes(sdg.value));
+    return sdgOptions.filter((sdg) => !action.value.types.includes(sdg.value));
   return sdgOptions.filter(
     (sdg) =>
       sdg.title.toLowerCase().includes(sdgSearch.value.toLowerCase()) &&
-      !story.value.types.includes(sdg.value)
+      !action.value.types.includes(sdg.value)
   );
 });
 
 const selectedSdgs = computed(() => {
-  return sdgOptions.filter((sdg) => story.value.types.includes(sdg.value));
+  return sdgOptions.filter((sdg) => action.value.types.includes(sdg.value));
 });
 
 const timeRangeError = computed(() => {
-  if (!story.value.startTime || !story.value.endTime) return false;
-  return new Date(story.value.startTime) > new Date(story.value.endTime);
+  if (!action.value.startTime || !action.value.endTime) return false;
+  return new Date(action.value.startTime) > new Date(action.value.endTime);
 });
 
 const canAddStage = computed(() => {
@@ -611,23 +611,23 @@ const canAddStage = computed(() => {
 
 // Timeline and validation computed properties
 const hasValidActionTime = computed(() => {
-  return story.value.startTime;
+  return action.value.startTime;
 });
 
 const hasEndTime = computed(() => {
-  return !!story.value.endTime;
+  return !!action.value.endTime;
 });
 
 const timelineStart = computed(() => {
-  return story.value.startTime;
+  return action.value.startTime;
 });
 
 const timelineEnd = computed(() => {
-  return story.value.endTime || getDefaultEndTime();
+  return action.value.endTime || getDefaultEndTime();
 });
 
 const validStages = computed(() => {
-  return story.value.stages.filter((stage) => stage.startTime && stage.endTime);
+  return action.value.stages.filter((stage) => stage.startTime && stage.endTime);
 });
 
 const stageOverlaps = computed(() => {
@@ -656,14 +656,14 @@ const newStageTimeWarning = computed(() => {
 
   if (newStage.value.startTime) {
     if (
-      story.value.startTime &&
-      new Date(newStage.value.startTime) < new Date(story.value.startTime)
+      action.value.startTime &&
+      new Date(newStage.value.startTime) < new Date(action.value.startTime)
     ) {
       warnings.start = "開始時間不能早於行動開始時間";
     }
     if (
-      story.value.endTime &&
-      new Date(newStage.value.startTime) > new Date(story.value.endTime)
+      action.value.endTime &&
+      new Date(newStage.value.startTime) > new Date(action.value.endTime)
     ) {
       warnings.start = "開始時間不能晚於行動結束時間";
     }
@@ -671,8 +671,8 @@ const newStageTimeWarning = computed(() => {
 
   if (newStage.value.endTime) {
     if (
-      story.value.endTime &&
-      new Date(newStage.value.endTime) > new Date(story.value.endTime)
+      action.value.endTime &&
+      new Date(newStage.value.endTime) > new Date(action.value.endTime)
     ) {
       warnings.end = "結束時間不能晚於行動結束時間";
     }
@@ -715,17 +715,17 @@ const canSaveStageTime = computed(() => {
 });
 
 const selectTag = (sdg) => {
-  if (!story.value.types.includes(sdg.value)) {
-    story.value.types.push(sdg.value);
+  if (!action.value.types.includes(sdg.value)) {
+    action.value.types.push(sdg.value);
   }
   sdgSearch.value = "";
   showDropdown.value = false;
 };
 
 const removeTag = (tagValue) => {
-  const index = story.value.types.indexOf(tagValue);
+  const index = action.value.types.indexOf(tagValue);
   if (index !== -1) {
-    story.value.types.splice(index, 1);
+    action.value.types.splice(index, 1);
   }
 };
 
@@ -738,7 +738,7 @@ const addStage = () => {
   if (!canAddStage.value) return;
 
   const newId = Date.now().toString();
-  story.value.stages.push({
+  action.value.stages.push({
     id: newId,
     name: newStage.value.name.trim(),
     startTime: newStage.value.startTime,
@@ -754,7 +754,7 @@ const addStage = () => {
 };
 
 const removeStage = (index) => {
-  story.value.stages.splice(index, 1);
+  action.value.stages.splice(index, 1);
   if (editingStageIndex.value === index) {
     editingStageIndex.value = -1;
   } else if (editingStageIndex.value > index) {
@@ -764,7 +764,7 @@ const removeStage = (index) => {
 
 const editStageTime = (index) => {
   editingStageIndex.value = index;
-  const stage = story.value.stages[index];
+  const stage = action.value.stages[index];
   editingStage.value = {
     startTime: stage.startTime || "",
     endTime: stage.endTime || "",
@@ -777,8 +777,8 @@ const saveStageTime = (index) => {
       new Date(editingStage.value.startTime) <=
       new Date(editingStage.value.endTime)
     ) {
-      story.value.stages[index].startTime = editingStage.value.startTime;
-      story.value.stages[index].endTime = editingStage.value.endTime;
+      action.value.stages[index].startTime = editingStage.value.startTime;
+      action.value.stages[index].endTime = editingStage.value.endTime;
       editingStageIndex.value = -1;
     } else {
       alert("結束時間必須晚於或等於開始時間");
@@ -803,9 +803,9 @@ const formatDateForDisplay = (dateString) => {
 
 // New helper methods for timeline and validation
 const getActionDurationText = () => {
-  if (!story.value.startTime || !story.value.endTime) return "";
-  const start = new Date(story.value.startTime);
-  const end = new Date(story.value.endTime);
+  if (!action.value.startTime || !action.value.endTime) return "";
+  const start = new Date(action.value.startTime);
+  const end = new Date(action.value.endTime);
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return `${diffDays} 天`;
@@ -821,8 +821,8 @@ const getDurationText = (startTime, endTime) => {
 };
 
 const getDefaultEndTime = () => {
-  if (!story.value.startTime) return null;
-  const start = new Date(story.value.startTime);
+  if (!action.value.startTime) return null;
+  const start = new Date(action.value.startTime);
   start.setMonth(start.getMonth() + 3); // Default to 3 months later
   return start.toISOString().split("T")[0];
 };
@@ -830,13 +830,13 @@ const getDefaultEndTime = () => {
 const isStageTimeValidForAction = (stage) => {
   if (!stage.startTime || !stage.endTime) return false;
   if (
-    story.value.startTime &&
-    new Date(stage.startTime) < new Date(story.value.startTime)
+    action.value.startTime &&
+    new Date(stage.startTime) < new Date(action.value.startTime)
   )
     return false;
   if (
-    story.value.endTime &&
-    new Date(stage.endTime) > new Date(story.value.endTime)
+    action.value.endTime &&
+    new Date(stage.endTime) > new Date(action.value.endTime)
   )
     return false;
   return true;
@@ -901,7 +901,7 @@ const getTotalTimelineDuration = () => {
 };
 
 const getStageOriginalIndex = (stage) => {
-  return story.value.stages.findIndex((s) => s.id === stage.id);
+  return action.value.stages.findIndex((s) => s.id === stage.id);
 };
 
 const getStageCardClass = (stage, index) => {
@@ -943,14 +943,14 @@ const getStageValidationMessage = (stage, index) => {
 
   if (!isStageTimeValidForAction(stage)) {
     if (
-      story.value.startTime &&
-      new Date(stage.startTime) < new Date(story.value.startTime)
+      action.value.startTime &&
+      new Date(stage.startTime) < new Date(action.value.startTime)
     ) {
       return "開始時間早於行動開始時間";
     }
     if (
-      story.value.endTime &&
-      new Date(stage.endTime) > new Date(story.value.endTime)
+      action.value.endTime &&
+      new Date(stage.endTime) > new Date(action.value.endTime)
     ) {
       return "結束時間晚於行動結束時間";
     }
@@ -989,11 +989,11 @@ const initSortable = () => {
         const { oldIndex, newIndex } = evt;
         if (oldIndex !== newIndex) {
           // Move the stage in the array
-          const movedStage = story.value.stages.splice(oldIndex, 1)[0];
-          story.value.stages.splice(newIndex, 0, movedStage);
+          const movedStage = action.value.stages.splice(oldIndex, 1)[0];
+          action.value.stages.splice(newIndex, 0, movedStage);
 
           // Reset time for all stages after reordering
-          story.value.stages.forEach((stage) => {
+          action.value.stages.forEach((stage) => {
             stage.startTime = "";
             stage.endTime = "";
           });
@@ -1046,7 +1046,7 @@ onUnmounted(() => {
   }
 });
 
-const saveStory = () => {
+const saveAction = () => {
   // Reset errors
   errors.value = {
     title: false,
@@ -1059,16 +1059,16 @@ const saveStory = () => {
 
   // 1. Set editor content
   if (editor.value) {
-    story.value.content = editor.value.getHTML();
+    action.value.content = editor.value.getHTML();
   }
 
   // 2. Validation
   let hasError = false;
-  if (!story.value.startTime) {
+  if (!action.value.startTime) {
     errors.value.startTime = true;
     hasError = true;
   }
-  if (!story.value.endTime) {
+  if (!action.value.endTime) {
     errors.value.endTime = true;
     hasError = true;
   }
@@ -1076,11 +1076,11 @@ const saveStory = () => {
     errors.value.timeRange = true;
     hasError = true;
   }
-  if (!story.value.title.trim()) {
+  if (!action.value.title.trim()) {
     errors.value.title = true;
     hasError = true;
   }
-  if (story.value.types.length === 0) {
+  if (action.value.types.length === 0) {
     errors.value.tags = true;
     hasError = true;
   }
@@ -1095,24 +1095,24 @@ const saveStory = () => {
 
   // 3. Convert dates to ISO format
   const startTimeTimestamp = Math.floor(
-    new Date(story.value.startTime).getTime() / 1000
+    new Date(action.value.startTime).getTime() / 1000
   );
   const endTimeTimestamp = Math.floor(
-    new Date(story.value.endTime).getTime() / 1000
+    new Date(action.value.endTime).getTime() / 1000
   );
 
-  const storyData = {
-    ...story.value,
+  const actionData = {
+    ...action.value,
     startTime: formatISO(startTimeTimestamp),
     endTime: formatISO(endTimeTimestamp),
   };
 
   // 4. "Save" data (log to console for now)
-  console.log("New Story Data:", storyData);
+  console.log("New Action Data:", actionData);
   alert("故事已儲存 (請查看主控台)！");
 
   // 5. Navigate back
-  // router.push("/story");
+  // router.push("/action");
 };
 </script>
 
