@@ -77,13 +77,13 @@
         <div>
           <label class="block text-lg font-medium">SDGs標籤*</label>
           <div class="mt-2 relative">
-            <!-- Search Input with Selected Tags -->
+            <!-- Search Input with Selected Sdgs Goals -->
             <div class="relative">
               <div
                 class="flex flex-wrap items-center gap-1 p-2 border border-gray-300 rounded-md shadow-sm focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-[2.5rem]"
-                :class="{ 'border-red-500': errors.tags }"
+                :class="{ 'border-red-500': errors.sdgs_goals }"
               >
-                <!-- Selected Tags inside input -->
+                <!-- Selected sdgs_goals inside input -->
                 <span
                   v-for="sdg in selectedSdgs"
                   :key="sdg.value"
@@ -131,7 +131,7 @@
                 </div>
               </div>
             </div>
-            <p v-if="errors.tags" class="text-red-500 text-sm mt-1">
+            <p v-if="errors.sdgs_goals" class="text-red-500 text-sm mt-1">
               請至少選擇一個SDGs標籤
             </p>
           </div>
@@ -537,19 +537,20 @@ import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateTime } from "@/composables/useDateTime.js";
 import sdgsData from "@/data/SDGs_goal.json";
 import Sortable from "sortablejs";
+import apiService from "../services/api";
 
 const router = useRouter();
 const { formatISO } = useDateTime();
 
 const action = ref({
   title: "",
-  img_url: "",
   content: "",
   intro: "",
-  types: [],
   startTime: "",
   endTime: "",
+  sdgs_goals: [],
   stages: [],
+  cover_image_url: null,
 });
 
 // Filter out the "All" option and clean titles
@@ -582,16 +583,20 @@ let sortableInstance = null;
 
 const filteredSdgs = computed(() => {
   if (!sdgSearch.value)
-    return sdgOptions.filter((sdg) => !action.value.types.includes(sdg.value));
+    return sdgOptions.filter(
+      (sdg) => !action.value.sdgs_goals.includes(sdg.value)
+    );
   return sdgOptions.filter(
     (sdg) =>
       sdg.title.toLowerCase().includes(sdgSearch.value.toLowerCase()) &&
-      !action.value.types.includes(sdg.value)
+      !action.value.sdgs_goals.includes(sdg.value)
   );
 });
 
 const selectedSdgs = computed(() => {
-  return sdgOptions.filter((sdg) => action.value.types.includes(sdg.value));
+  return sdgOptions.filter((sdg) =>
+    action.value.sdgs_goals.includes(sdg.value)
+  );
 });
 
 const timeRangeError = computed(() => {
@@ -627,7 +632,9 @@ const timelineEnd = computed(() => {
 });
 
 const validStages = computed(() => {
-  return action.value.stages.filter((stage) => stage.startTime && stage.endTime);
+  return action.value.stages.filter(
+    (stage) => stage.startTime && stage.endTime
+  );
 });
 
 const stageOverlaps = computed(() => {
@@ -715,17 +722,17 @@ const canSaveStageTime = computed(() => {
 });
 
 const selectTag = (sdg) => {
-  if (!action.value.types.includes(sdg.value)) {
-    action.value.types.push(sdg.value);
+  if (!action.value.sdgs_goals.includes(sdg.value)) {
+    action.value.sdgs_goals.push(sdg.value);
   }
   sdgSearch.value = "";
   showDropdown.value = false;
 };
 
 const removeTag = (tagValue) => {
-  const index = action.value.types.indexOf(tagValue);
+  const index = action.value.sdgs_goals.indexOf(tagValue);
   if (index !== -1) {
-    action.value.types.splice(index, 1);
+    action.value.sdgs_goals.splice(index, 1);
   }
 };
 
@@ -1008,7 +1015,7 @@ const initSortable = () => {
 
 const errors = ref({
   title: false,
-  tags: false,
+  sdgs_goals: false,
   content: false,
   startTime: false,
   endTime: false,
@@ -1046,21 +1053,21 @@ onUnmounted(() => {
   }
 });
 
-const saveAction = () => {
+const saveAction = async () => {
   // Reset errors
   errors.value = {
     title: false,
-    tags: false,
+    sdgs_goals: false,
     content: false,
     startTime: false,
     endTime: false,
     timeRange: false,
   };
 
-  // 1. Set editor content
-  if (editor.value) {
-    action.value.content = editor.value.getHTML();
-  }
+  // // 1. Set editor content
+  // if (editor.value) {
+  //   action.value.content = editor.value.getHTML();
+  // }
 
   // 2. Validation
   let hasError = false;
@@ -1080,14 +1087,14 @@ const saveAction = () => {
     errors.value.title = true;
     hasError = true;
   }
-  if (action.value.types.length === 0) {
-    errors.value.tags = true;
+  if (action.value.sdgs_goals.length === 0) {
+    errors.value.sdgs_goals = true;
     hasError = true;
   }
-  if (editor.value.isEmpty) {
-    errors.value.content = true;
-    hasError = true;
-  }
+  // if (editor.value.isEmpty) {
+  //   errors.value.content = true;
+  //   hasError = true;
+  // }
 
   if (hasError) {
     return;
@@ -1109,10 +1116,14 @@ const saveAction = () => {
 
   // 4. "Save" data (log to console for now)
   console.log("New Action Data:", actionData);
-  alert("故事已儲存 (請查看主控台)！");
+  // alert("故事已儲存 (請查看主控台)！");
+  try {
+    let res = await apiService.createActivity(actionData);
+    console.log(res);
 
-  // 5. Navigate back
-  // router.push("/action");
+    // 5. Navigate back
+    // router.push("/action");
+  } catch (error) {}
 };
 </script>
 
