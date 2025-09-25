@@ -184,6 +184,26 @@
           </div>
         </section>
 
+        <!-- Article Like and Comment Count -->
+        <div class="flex items-center gap-4 mb-4">
+          <button @click="toggleArticleLike" class="flex items-center gap-2">
+            <!-- <i
+              :class="[
+                'fa-heart',
+                userLiked ? 'fa-solid text-red-500' : 'fa-regular',
+              ]"
+            ></i> -->
+            <span v-if="userLiked" class="text-red-500">{{
+              reactions.user_reactions[0]
+            }}</span>
+            <span v-else>按讚</span>
+            <span>{{ reactions.total_reactions }}</span>
+          </button>
+          <span class="text-gray-600"
+            >留言數: {{ selectedComment ? selectedComment.length : 0 }}</span
+          >
+        </div>
+
         <!-- Comments Section -->
         <section class="my-20">
           <h2 class="text-xl mb-4">留言板</h2>
@@ -194,27 +214,13 @@
               :key="comment.uuid"
               :class="[
                 'p-4 rounded-md',
-                comment.author_id === currentUser.author_id
+                comment.author_id === currentUser.id
                   ? 'bg-green-100'
                   : 'bg-gray-100',
               ]"
             >
               <p class="font-bold">{{ comment.author_name }}</p>
               <p class="text-gray-800">{{ comment.content }}</p>
-              <div class="flex items-center justify-end mt-2">
-                <button
-                  @click="toggleLike(comment.uuid)"
-                  class="text-gray-500 hover:text-red-500"
-                >
-                  <i
-                    :class="[
-                      'fa-heart',
-                      comment.liked ? 'fa-solid text-red-500' : 'fa-regular',
-                    ]"
-                  ></i>
-                  <span class="ml-1">{{ comment.likes }}</span>
-                </button>
-              </div>
             </div>
           </div>
           <!-- Post Comment Form -->
@@ -388,7 +394,14 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, onUnmounted, onMounted } from "vue";
+import {
+  ref,
+  computed,
+  inject,
+  onUnmounted,
+  onMounted,
+  onBeforeMount,
+} from "vue";
 import infos from "@/data/Story.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
@@ -412,6 +425,9 @@ const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 // jsonData
 const selectedInfo = ref(null);
 const selectedComment = ref(null);
+const userLiked = ref(false);
+const reactions = ref(null);
+const reactionUsers = ref(null);
 
 const isEditing = ref(false);
 
@@ -448,7 +464,8 @@ const editor = useEditor({
   ],
 });
 
-onMounted(async () => {
+// onMounted(async () => {
+onBeforeMount(async () => {
   try {
     if (user.value) {
       // let res = await apiService.getShowcases(user.value.institution_id);
@@ -464,13 +481,27 @@ onMounted(async () => {
       );
       selectedComment.value = res.items;
       console.log(selectedComment.value);
+
+      reactions.value = await apiService.getShowcaseReactions(
+        user.value.institution_id,
+        props.id
+      );
+      reactionUsers.value = await apiService.getShowcaseReactionUsers(
+        user.value.institution_id,
+        props.id,
+        "👍"
+      );
+
+      console.log(reactions.value);
+      console.log(reactionUsers.value);
+      userLiked.value = reactions.value.user_reacted;
     }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
     //TODO
-    selectedInfo.value = infos.find((item) => item.post_id === props.id);
-    console.log(selectedInfo.value);
-    selectedComment.value = selectedInfo.value.comment;
+    // selectedInfo.value = infos.find((item) => item.post_id === props.id);
+    // console.log(selectedInfo.value);
+    // selectedComment.value = selectedInfo.value.comment;
   }
 });
 onUnmounted(() => {
@@ -552,15 +583,28 @@ const addComment = async () => {
 
   newComment.value = "";
 };
-const toggleLike = (commentId) => {
-  const comment = selectedInfo.value.comment.find((c) => c.uuid === commentId);
-  if (comment) {
-    if (comment.liked) {
-      comment.likes--;
+const toggleArticleLike = async () => {
+  if (selectedInfo.value) {
+    if (userLiked.value) {
+      //TODO
+      // await apiService.addShowcaseReaction(
+      //   user.value.institution_id,
+      //   props.id,
+      //   {
+      //     emoji: "👍",
+      //     action: "delete",
+      //   }
+      // );
     } else {
-      comment.likes++;
+      await apiService.addShowcaseReaction(
+        user.value.institution_id,
+        props.id,
+        {
+          emoji: "👍",
+          action: "add",
+        }
+      );
     }
-    comment.liked = !comment.liked;
   }
 };
 

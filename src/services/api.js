@@ -287,8 +287,30 @@ class ApiService {
     });
   }
 
+  /* Showcase 表情回覆 */
+  async getShowcaseReactionUsers(institutionId, showcaseId, reaction_type) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions/${reaction_type}/users`);
+  }
+
+  async getShowcaseReactions(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`);
+  }
+
   async getShowcaseComments(institutionId, showcaseId) {
     return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/comments`);
+  }
+
+  async addShowcaseReaction(institutionId, showcaseId, reactionData) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+      method: 'POST',
+      body: JSON.stringify(reactionData),
+    });
+  }
+  
+  async deleteShowcaseReaction(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+      method: 'DELETE',
+    });
   }
 
   async createShowcaseComment(institutionId, showcaseId, commentData) {
@@ -298,25 +320,25 @@ class ApiService {
     });
   }
 
-  async addCommentReaction(institutionId, showcaseId, commentId, userId) {
-    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
-      method: 'POST',
-      body: JSON.stringify({
-        comment_id: commentId,
-        user_id: userId
-      }),
-    });
-  }
+  // async addCommentReaction(institutionId, showcaseId, commentId, userId) {
+  //   return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       comment_id: commentId,
+  //       user_id: userId
+  //     }),
+  //   });
+  // }
 
-  async removeCommentReaction(institutionId, showcaseId, commentId, userId) {
-    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
-      method: 'DELETE',
-      body: JSON.stringify({
-        comment_id: commentId,
-        user_id: userId
-      }),
-    });
-  }
+  // async removeCommentReaction(institutionId, showcaseId, commentId, userId) {
+  //   return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
+  //     method: 'DELETE',
+  //     body: JSON.stringify({
+  //       comment_id: commentId,
+  //       user_id: userId
+  //     }),
+  //   });
+  // }
 
 
   /*
