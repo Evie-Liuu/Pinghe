@@ -9,8 +9,7 @@ export default defineConfig({
     vue(),
     tailwindcss()
   ],
-  // base: "/Pinghe/",
-  base: "./",
+  base: "/Pinghe/",
   build: {
     outDir: "docs",  // 打包輸出到 docs/
     rollupOptions: {
