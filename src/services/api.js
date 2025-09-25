@@ -28,9 +28,11 @@ class ApiService {
 
     // Add auth token if available
     const token = localStorage.getItem('auth_token');
-    if (token && token !== 'student_token' && token !== 'visitor_token') {
+    if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+    console.log('API Request:', { url, endpoint, headers: config.headers, token: token ? 'Present' : 'None' });
 
     try {
       const response = await fetch(url, config);
@@ -88,7 +90,7 @@ class ApiService {
 
     // Get auth token
     const token = localStorage.getItem('auth_token');
-    const isValidToken = token && token !== 'student_token' && token !== 'visitor_token';
+    const isValidToken = token;
 
     try {
       const response = await fetch(`${this.baseURL}/media/upload`, {
@@ -138,7 +140,7 @@ class ApiService {
 
     // Get auth token
     const token = localStorage.getItem('auth_token');
-    const isValidToken = token && token !== 'student_token' && token !== 'visitor_token';
+    const isValidToken = token;
 
     try {
       const response = await fetch(`${this.baseURL}/media/delete`, {

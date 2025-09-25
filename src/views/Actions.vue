@@ -95,11 +95,18 @@ const itemsPerPage = 3;
 
 onMounted(async () => {
   try {
-    let res = await apiService.getActivities();
-    console.log(res);
-    // allActions.value = res.items;
+    if (user.value) {
+      // console.log('User found:', user.value);
+      // console.log('Auth token:', localStorage.getItem('auth_token'));
+      let res = await apiService.getActivities();
+      console.log('Activities response:', res);
+      // allActions.value = res.items;
+    } else {
+      console.log('No user found, skipping getActivities call');
+    }
   } catch (error) {
-    console.error("Failed to fetch posts:", error);
+    console.error("Failed to fetch activities:", error);
+    console.error("Error details:", error.message);
   }
 });
 
