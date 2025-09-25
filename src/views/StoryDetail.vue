@@ -28,13 +28,13 @@
           class="relative bg-cover bg-center bg-opacity-70 p-7 rounded-md md:h-80 grid grid-cols-1 content-end overflow-hidden"
         >
           <div class="absolute inset-0 bg-black/40"></div>
-          <button
+          <!-- TODO <button
             v-if="isTeacher"
             @click="openEditModal"
             class="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 z-20"
           >
             編輯
-          </button>
+          </button> -->
           <div class="relative z-10 text-white">
             <h1 class="text-4xl font-bold mb-4">{{ selectedInfo.title }}</h1>
             <p class="mb-2 text-lg">{{ selectedInfo.intro }}</p>
@@ -190,16 +190,16 @@
           <!-- Comments List -->
           <div class="flex flex-col gap-4 mb-6 text-black">
             <div
-              v-for="comment in selectedInfo.comment"
+              v-for="comment in selectedComment"
               :key="comment.uuid"
               :class="[
                 'p-4 rounded-md',
-                comment.author_uuid === currentUser.author_uuid
+                comment.author_id === currentUser.author_id
                   ? 'bg-green-100'
                   : 'bg-gray-100',
               ]"
             >
-              <p class="font-bold">{{ comment.author }}</p>
+              <p class="font-bold">{{ comment.author_name }}</p>
               <p class="text-gray-800">{{ comment.text }}</p>
               <div class="flex items-center justify-end mt-2">
                 <button
@@ -409,18 +409,22 @@ const handleAppScroll = inject("handleAppScroll");
 const { user, isTeacher } = useAuth();
 const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 
-
 // jsonData
-const allInfos = ref(infos);
 const selectedInfo = ref(null);
+const selectedComment = ref(null);
 
 const isEditing = ref(false);
 
 const bgImageStyle = computed(() => {
   if (!selectedInfo.value) return {};
-  const img = selectedInfo.value.img_url || "Background_2.png";
+  const img = selectedInfo.value.cover_image_url || "Background_2.png";
   try {
-    const imageUrl = new URL(`../assets/images/${img}`, import.meta.url).href;
+    let imageUrl = null;
+    if (selectedInfo.value.cover_image_url.startsWith("http")) {
+      imageUrl = selectedInfo.value.cover_image_url;
+    } else {
+      imageUrl = new URL(`../assets/images/${img}`, import.meta.url).href;
+    }
     return { backgroundImage: `url(${imageUrl})` };
   } catch (e) {
     const fallbackUrl = new URL(
@@ -447,18 +451,26 @@ const editor = useEditor({
 onMounted(async () => {
   try {
     if (user.value) {
-      let res = await apiService.getShowcases(user.value.institution_id);
-      console.log(res);
-      // infos.value = res.items
-      allInfos.value = [...allInfos.value, ...res.items];
-      console.log(allInfos.value);
-
-      selectedInfo.value = allInfos.value.find((item) => item.post_id === props.id);
+      // let res = await apiService.getShowcases(user.value.institution_id);
+      selectedInfo.value = await apiService.getShowcase(
+        user.value.institution_id,
+        props.id
+      );
       console.log(selectedInfo.value);
-      
+
+      let res = await apiService.getShowcaseComments(
+        user.value.institution_id,
+        props.id
+      );
+      selectedComment.value = res.items;
+      console.log(selectedComment.value);
     }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
+    //TODO
+    selectedInfo.value = infos.find((item) => item.post_id === props.id);
+    console.log(selectedInfo.value);
+    selectedComment.value = selectedInfo.value.comment;
   }
 });
 onUnmounted(() => {
@@ -506,14 +518,14 @@ const share = () => {
 };
 
 // --- Comment Section Logic ---
-const currentUser = { author_uuid: "0", author: "我" }; // Simulate current user
+const currentUser = { author_id: "0", author_name: "我" }; // Simulate current user
 const newComment = ref("");
 const addComment = () => {
   if (newComment.value.trim() === "") return;
   selectedInfo.value.comment.unshift({
     uuid: Date.now(),
-    author_uuid: currentUser.author_uuid,
-    author: currentUser.author,
+    author_id: user.value.id,
+    author_name: user.value.name,
     time: Date.now(),
     delete_time: null,
     text: newComment.value,
@@ -544,18 +556,20 @@ const editDropdown = ref(null);
 const sdgOptions = sdgsData.filter((s) => s.value !== 0);
 
 const selectedEditSdgs = computed(() => {
-  return sdgOptions.filter((sdg) => editStory.value.types.includes(sdg.value));
+  return sdgOptions.filter((sdg) =>
+    editStory.value.sdgs_goals.includes(sdg.value)
+  );
 });
 
 const filteredEditSdgs = computed(() => {
   if (!editSdgSearch.value)
     return sdgOptions.filter(
-      (sdg) => !editStory.value.types.includes(sdg.value)
+      (sdg) => !editStory.value.sdgs_goals.includes(sdg.value)
     );
   return sdgOptions.filter(
     (sdg) =>
       sdg.title.toLowerCase().includes(editSdgSearch.value.toLowerCase()) &&
-      !editStory.value.types.includes(sdg.value)
+      !editStory.value.sdgs_goals.includes(sdg.value)
   );
 });
 
@@ -583,7 +597,7 @@ const saveEdit = () => {
     errors.value.title = true;
     hasError = true;
   }
-  if (editStory.value.types.length === 0) {
+  if (editStory.value.sdgs_goals.length === 0) {
     errors.value.tags = true;
     hasError = true;
   }
@@ -594,15 +608,15 @@ const saveEdit = () => {
   selectedInfo.value.title = editStory.value.title;
   selectedInfo.value.intro = editStory.value.intro;
   selectedInfo.value.time = editStory.value.time;
-  selectedInfo.value.types = editStory.value.types;
-  selectedInfo.value.img_url = editStory.value.img_url;
+  selectedInfo.value.types = editStory.value.sdgs_goals;
+  selectedInfo.value.cover_image_url = editStory.value.cover_image_url;
   showEditModal.value = false;
 };
 
 const handleImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
-    editStory.value.img_url = file.name;
+    editStory.value.cover_image_url = file.name;
     // In a real app, upload the file to server
   }
 };
@@ -613,17 +627,17 @@ const updateTime = (event) => {
 };
 
 const selectEditTag = (sdg) => {
-  if (!editStory.value.types.includes(sdg.value)) {
-    editStory.value.types.push(sdg.value);
+  if (!editStory.value.sdgs_goals.includes(sdg.value)) {
+    editStory.value.sdgs_goals.push(sdg.value);
   }
   editSdgSearch.value = "";
   showEditDropdown.value = false;
 };
 
 const removeEditTag = (tagValue) => {
-  const index = editStory.value.types.indexOf(tagValue);
+  const index = editStory.value.sdgs_goals.indexOf(tagValue);
   if (index !== -1) {
-    editStory.value.types.splice(index, 1);
+    editStory.value.sdgs_goals.splice(index, 1);
   }
 };
 

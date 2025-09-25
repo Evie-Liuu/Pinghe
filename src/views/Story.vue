@@ -351,7 +351,8 @@ const editStory = ref({
   title: "",
   intro: "",
   start_time: null,
-  cover_image_url: "",
+  cover_image_url: null,
+  _pendingFile: [],
 });
 console.log(formatISO(formatTimestamp("2025-10-05T09:00:00") / 1000));
 
@@ -369,6 +370,7 @@ const handleEdit = (storyId) => {
       intro: story.intro || "",
       start_time: story.start_time || null,
       cover_image_url: story.cover_image_url || null,
+      _pendingFile: [],
     };
   }
 
@@ -540,14 +542,16 @@ const errors = ref({
   tags: false,
 });
 
-const closeEditModal = () => {
+const closeEditModal = async () => {
   // Clean up any object URLs to prevent memory leaks
   if (
     editStory.value &&
-    editStory.value.img_url &&
-    editStory.value.img_url.startsWith("blob:")
+    editStory.value._pendingFile.length
+    // editStory.value.cover_image_url.startsWith("http")
   ) {
-    URL.revokeObjectURL(editStory.value.img_url);
+    // URL.revokeObjectURL(editStory.value.cover_image_url);
+    //暫存
+    await apiService.deleteImage(editStory.value._pendingFile);
   }
 
   // Reset states
@@ -564,6 +568,7 @@ const closeEditModal = () => {
     intro: "",
     time: null,
     img_url: "",
+    _pendingFile: [],
   };
 };
 
@@ -753,12 +758,14 @@ const processFileUpload = async (file) => {
       `story/${editStory.value.post_id}`
     );
 
-    if (editStory.value.cover_image_url) {
-      //已存在
-      apiService.deleteImage([editStory.value.cover_image_url]);
+    //TODO暫存
+    if (editStory.value._pendingFile.length) {
+      apiService.deleteImage(editStory.value._pendingFile);
+      editStory.value._pendingFile = [];
     }
 
     editStory.value.cover_image_url = result.uploaded_files[0].file_url; //背景圖片
+    editStory.value._pendingFile.push(editStory.value.cover_image_url);
     console.log("Image uploaded successfully:", result.uploaded_files);
 
     alert("圖片上傳成功！");

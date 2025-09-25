@@ -147,7 +147,7 @@ class ApiService {
           'Content-Type': 'application/json',
           ...(isValidToken ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify({ files: fileList })
+        body: JSON.stringify({ file_urls: fileList })
       });
 
       if (!response.ok) {

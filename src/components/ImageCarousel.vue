@@ -60,7 +60,11 @@
           </div>
 
           <img
-            :src="getImageUrl(img.cover_image_url || 'lightBulb.png')"
+            :src="
+              img.cover_image_url?.startsWith('http')
+                ? img.cover_image_url
+                : getImageUrl(img.cover_image_url || 'lightBulb.png')
+            "
             :alt="`slide-${index}`"
             class="rounded-2xl overflow-hidden transition-all duration-300 ease-in-out w-full h-full object-cover"
           />
