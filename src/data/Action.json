@@ -6,7 +6,7 @@
         "group": "一年忠班",
         "startTime": "1746028800",
         "endTime": "1753977600",
-        "types": [
+        "sdgs_goals": [
             2
         ],
         "intro": "",
@@ -53,7 +53,7 @@
         "group": "一年孝班",
         "startTime": "1746028800",
         "endTime": "1753977600",
-        "types": [
+        "sdgs_goals": [
             2
         ],
         "intro": "",
@@ -89,7 +89,7 @@
         "group": "全校",
         "startTime": "",
         "endTime": "",
-        "types": [
+        "sdgs_goals": [
             6
         ],
         "intro": "",
@@ -125,7 +125,7 @@
         "group": "",
         "startTime": "",
         "endTime": "",
-        "types": [
+        "sdgs_goals": [
             2,
             3
         ],

@@ -86,7 +86,7 @@
           </div>
           <div class="flex flex-wrap gap-2 mt-2 md:col-span-2">
             <span
-              v-for="t in info.types"
+              v-for="t in info.sdgs_goals"
               :key="t"
               class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
             >

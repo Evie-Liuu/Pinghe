@@ -115,8 +115,8 @@ const allFilteredInfos = computed(() => {
   if (filters.value.sdgs.length > 0) {
     result = result.filter(
       (info) =>
-        info.types &&
-        info.types.some((type) => filters.value.sdgs.includes(type))
+        info.sdgs_goals &&
+        info.sdgs_goals.some((type) => filters.value.sdgs.includes(type))
     );
   }
 
