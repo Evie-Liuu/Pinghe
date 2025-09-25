@@ -300,18 +300,30 @@ class ApiService {
     return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/comments`);
   }
 
-  async addShowcaseReaction(institutionId, showcaseId, reactionData) {
-    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+  async addShowcaseLike(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
       method: 'POST',
-      body: JSON.stringify(reactionData),
     });
   }
-  
-  async deleteShowcaseReaction(institutionId, showcaseId) {
-    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+
+  async deleteShowcaseLike(institutionId, showcaseId) {
+    return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/like`, {
       method: 'DELETE',
     });
   }
+
+  // async addShowcaseReaction(institutionId, showcaseId, reactionData) {
+  //   return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+  //     method: 'POST',
+  //     body: JSON.stringify(reactionData),
+  //   });
+  // }
+
+  // async deleteShowcaseReaction(institutionId, showcaseId) {
+  //   return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/reactions`, {
+  //     method: 'DELETE',
+  //   });
+  // }
 
   async createShowcaseComment(institutionId, showcaseId, commentData) {
     return this.request(`/institutions/${institutionId}/showcase/${showcaseId}/comments`, {

@@ -426,8 +426,8 @@ const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 const selectedInfo = ref(null);
 const selectedComment = ref(null);
 const userLiked = ref(false);
-const reactions = ref(null);
-const reactionUsers = ref(null);
+const reactions = ref({});
+const reactionUsers = ref({});
 
 const isEditing = ref(false);
 
@@ -494,7 +494,10 @@ onBeforeMount(async () => {
 
       console.log(reactions.value);
       console.log(reactionUsers.value);
-      userLiked.value = reactions.value.user_reacted;
+      console.log(reactions.value.user_reacted);
+
+      userLiked.value =
+        reactions.value.user_reactions.length > 0 ? true : false;
     }
   } catch (error) {
     console.error("Failed to fetch posts:", error);
@@ -586,25 +589,17 @@ const addComment = async () => {
 const toggleArticleLike = async () => {
   if (selectedInfo.value) {
     if (userLiked.value) {
-      //TODO
-      // await apiService.addShowcaseReaction(
-      //   user.value.institution_id,
-      //   props.id,
-      //   {
-      //     emoji: "👍",
-      //     action: "delete",
-      //   }
-      // );
+      await apiService.deleteShowcaseLike(user.value.institution_id, props.id);
     } else {
-      await apiService.addShowcaseReaction(
-        user.value.institution_id,
-        props.id,
-        {
-          emoji: "👍",
-          action: "add",
-        }
-      );
+      await apiService.addShowcaseLike(user.value.institution_id, props.id);
     }
+
+    reactions.value = await apiService.getShowcaseReactions(
+      user.value.institution_id,
+      props.id
+    );
+
+    userLiked.value = !userLiked.value;
   }
 };
 
