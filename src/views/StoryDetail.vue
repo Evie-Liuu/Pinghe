@@ -388,13 +388,14 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, onUnmounted } from "vue";
+import { ref, computed, inject, onUnmounted, onMounted } from "vue";
 import infos from "@/data/Story.json";
 import sdgsData from "@/data/SDGs_goal.json";
 import CJKSub from "@/components/CJKSub.vue";
 import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateFormat } from "@/composables/useDateFormat.js";
 import { useAuth } from "@/stores/auth";
+import { apiService } from "@/services/api.js";
 
 import { EditorContent, useEditor } from "@tiptap/vue-3";
 import StarterKit from "@tiptap/starter-kit";
@@ -405,11 +406,14 @@ import Link from "@tiptap/extension-link";
 
 const props = defineProps({ id: String });
 const handleAppScroll = inject("handleAppScroll");
-const { formatDate } = useDateFormat();
-const { isTeacher } = useAuth();
+const { user, isTeacher } = useAuth();
+const { formatDate, formatISO, formatTimestamp } = useDateFormat();
 
-const selectedInfo = ref(infos.find((item) => item.id === parseInt(props.id)));
+
 // jsonData
+const allInfos = ref(infos);
+const selectedInfo = ref(null);
+
 const isEditing = ref(false);
 
 const bgImageStyle = computed(() => {
@@ -440,6 +444,23 @@ const editor = useEditor({
   ],
 });
 
+onMounted(async () => {
+  try {
+    if (user.value) {
+      let res = await apiService.getShowcases(user.value.institution_id);
+      console.log(res);
+      // infos.value = res.items
+      allInfos.value = [...allInfos.value, ...res.items];
+      console.log(allInfos.value);
+
+      selectedInfo.value = allInfos.value.find((item) => item.post_id === props.id);
+      console.log(selectedInfo.value);
+      
+    }
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+  }
+});
 onUnmounted(() => {
   if (editor.value) {
     editor.value.destroy();

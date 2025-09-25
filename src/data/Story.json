@@ -1,6 +1,6 @@
 [
     {
-        "post_id": 51,
+        "post_id": "51",
         "title": "讀經教育",
         "start_time": "2025-04-11T09:00:00",
         "end_time": "",
@@ -11,11 +11,11 @@
             15
         ],
         "intro": "全校讀論語 星期四讀經和鎮長。",
-        "img_url": "figure3.png",
+        "cover_image_url": "figure3.png",
         "content": "全校讀論語 星期四讀經和鎮長。"
     },
     {
-        "post_id": 52,
+        "post_id": "52",
         "title": "舞蹈社團",
         "start_time": "2025-04-14T09:00:00",
         "end_time": "",
@@ -23,7 +23,7 @@
             4
         ],
         "intro": "精彩的舞蹈表演，獲得滿堂彩。",
-        "img_url": "figure2.png",
+        "cover_image_url": "figure2.png",
         "content": "精彩的舞蹈表演，獲得滿堂彩。",
         "comment": [
             {
@@ -49,7 +49,7 @@
         ]
     },
     {
-        "post_id": 53,
+        "post_id": "53",
         "title": "社區踏查",
         "start_time": "2025-04-21T09:00:00",
         "end_time": "",
@@ -57,11 +57,11 @@
             11
         ],
         "intro": "",
-        "img_url": "",
+        "cover_image_url": "",
         "content": ""
     },
     {
-        "post_id": 54,
+        "post_id": "54",
         "title": "社區踏查",
         "start_time": "",
         "end_time": "",
@@ -69,7 +69,7 @@
             11
         ],
         "intro": "",
-        "img_url": "figure1.png",
+        "cover_image_url": "figure1.png",
         "content": ""
     }
 ]

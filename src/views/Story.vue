@@ -189,7 +189,7 @@
 
             <!-- Current image preview (if exists) -->
             <div
-              v-if="editStory.img_url && !isUploadingImage"
+              v-if="editStory.cover_image_url && !isUploadingImage"
               class="text-center"
             >
               <div
@@ -197,9 +197,11 @@
               >
                 <img
                   :src="
-                    editStory.img_url.startsWith('blob:')
-                      ? editStory.img_url
-                      : `./src/assets/images/${editStory.img_url}`
+                    editStory.cover_image_url?.startsWith('http')
+                      ? editStory.cover_image_url
+                      : getImageUrl(
+                          editStory.cover_image_url || 'lightBulb.png'
+                        )
                   "
                   :alt="editStory.title || '故事圖片'"
                   class="w-full h-full object-cover"
@@ -208,7 +210,7 @@
               </div>
               <p class="text-sm text-gray-600 mb-2">點擊或拖曳新圖片來替換</p>
               <p class="text-xs text-gray-500">
-                支援 JPG、PNG、GIF、WebP，最大 5MB
+                支援 JPG、PNG、GIF、WebP，最大 1MB
               </p>
             </div>
 
@@ -349,7 +351,7 @@ const editStory = ref({
   title: "",
   intro: "",
   start_time: null,
-  img_url: "",
+  cover_image_url: "",
 });
 console.log(formatISO(formatTimestamp("2025-10-05T09:00:00") / 1000));
 
@@ -366,7 +368,7 @@ const handleEdit = (storyId) => {
       title: story.title || "",
       intro: story.intro || "",
       start_time: story.start_time || null,
-      img_url: story.img_url || "",
+      cover_image_url: story.cover_image_url || null,
     };
   }
 
@@ -612,7 +614,7 @@ const saveEdit = async () => {
     selectedInfo.value.intro = editStory.value.intro;
     selectedInfo.value.start_time = editStory.value.start_time;
     selectedInfo.value.sdgs_goals = editStory.value.sdgs_goals;
-    selectedInfo.value.img_url = editStory.value.img_url;
+    selectedInfo.value.cover_image_url = editStory.value.cover_image_url;
 
     try {
       let res = await apiService.updateShowcase(
@@ -620,7 +622,7 @@ const saveEdit = async () => {
         selectedInfo.value.post_id,
         selectedInfo.value
       );
-      // console.log(res);
+      console.log(res);
     } catch (error) {
       console.error("Failed to fetch:", error);
     }
@@ -742,23 +744,32 @@ const processFileUpload = async (file) => {
     alert(`文件驗證失敗:\n${validationErrors.join("\n")}`);
     return;
   }
-  return;
 
   isUploadingImage.value = true;
 
   try {
-    // Try to upload to server first
-    const result = await apiService.uploadImage(file, "story");
+    const result = await apiService.uploadImage(
+      file,
+      `story/${editStory.value.post_id}`
+    );
 
-    editStory.value.img_url = result.url;
-    console.log("Image uploaded successfully:", result.url);
+    if (editStory.value.cover_image_url) {
+      //已存在
+      apiService.deleteImage([editStory.value.cover_image_url]);
+    }
+
+    editStory.value.cover_image_url = result.uploaded_files[0].file_url; //背景圖片
+    console.log("Image uploaded successfully:", result.uploaded_files);
+
     alert("圖片上傳成功！");
+    console.log(editStory.value);
+    console.log(editStory.value.cover_image_url);
   } catch (error) {
     console.warn("Server upload failed, using local file:", error);
 
     // Fallback: Create a local object URL for preview
     const localUrl = URL.createObjectURL(file);
-    editStory.value.img_url = localUrl;
+    editStory.value.cover_image_url = localUrl;
 
     // Store the file for potential later upload
     editStory.value._pendingFile = file;
@@ -769,6 +780,11 @@ const processFileUpload = async (file) => {
     isUploadingImage.value = false;
   }
 };
+
+function getImageUrl(name) {
+  if (!name) return "";
+  return new URL(`../assets/images/${name}`, import.meta.url).href;
+}
 </script>
 <style scoped>
 </style>

@@ -75,7 +75,7 @@ class ApiService {
   }
 
   // Image upload method
-  async uploadImage(file, type = 'story') {
+  async uploadImage(file, folder = '/') {
     // Validate file first
     const validationErrors = this.validateImageFile(file);
     if (validationErrors.length > 0) {
@@ -83,36 +83,96 @@ class ApiService {
     }
 
     const formData = new FormData();
-    formData.append('image', file);
-    formData.append('type', type);
+    formData.append('files', file);
+    formData.append('folder', folder);
+
+    // Get auth token
+    const token = localStorage.getItem('auth_token');
+    const isValidToken = token && token !== 'student_token' && token !== 'visitor_token';
 
     try {
-      const response = await fetch(`${this.baseURL}/upload/image`, {
+      const response = await fetch(`${this.baseURL}/media/upload`, {
         method: 'POST',
         headers: {
           // Don't set Content-Type for FormData, let browser set it with boundary
-          ...(localStorage.getItem('auth_token') && localStorage.getItem('auth_token') !== 'student_token' && localStorage.getItem('auth_token') !== 'visitor_token'
-            ? { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
-            : {})
+          ...(isValidToken ? { 'Authorization': `Bearer ${token}` } : {})
         },
         body: formData,
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed (${response.status}): ${errorText}`);
+        let errorMessage = `Upload failed (${response.status})`;
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage += `: ${errorText}`;
+          }
+        } catch (textError) {
+          // Ignore text parsing errors
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
 
       // Validate response structure
-      if (!result.url) {
-        throw new Error('Invalid server response: missing URL');
+      if (!result.uploaded_files || !Array.isArray(result.uploaded_files) || result.uploaded_files.length === 0) {
+        throw new Error('Invalid server response: missing or empty uploaded_files array');
       }
 
       return result;
     } catch (error) {
       console.error('Image upload failed:', error);
+      throw error;
+    }
+  }
+
+  async deleteImage(files) {
+    // Validate input
+    if (!files || (!Array.isArray(files) && typeof files !== 'string')) {
+      throw new Error('Invalid files parameter: must be an array of file URLs or a single file URL string');
+    }
+
+    // Ensure files is an array
+    const fileList = Array.isArray(files) ? files : [files];
+
+    // Get auth token
+    const token = localStorage.getItem('auth_token');
+    const isValidToken = token && token !== 'student_token' && token !== 'visitor_token';
+
+    try {
+      const response = await fetch(`${this.baseURL}/media/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(isValidToken ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ files: fileList })
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Delete failed (${response.status})`;
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage += `: ${errorText}`;
+          }
+        } catch (textError) {
+          // Ignore text parsing errors
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Try to parse response as JSON, but don't fail if it's not
+      try {
+        const result = await response.json();
+        return result;
+      } catch (parseError) {
+        // Return success if response is not JSON
+        return { success: true };
+      }
+    } catch (error) {
+      console.error('Image delete failed:', error);
       throw error;
     }
   }

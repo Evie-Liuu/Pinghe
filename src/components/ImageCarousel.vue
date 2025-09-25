@@ -60,7 +60,7 @@
           </div>
 
           <img
-            :src="getImageUrl(img.img_url || 'lightBulb.png')"
+            :src="getImageUrl(img.cover_image_url || 'lightBulb.png')"
             :alt="`slide-${index}`"
             class="rounded-2xl overflow-hidden transition-all duration-300 ease-in-out w-full h-full object-cover"
           />
@@ -161,15 +161,15 @@ const onSwiper = (swiper) => {
   });
 };
 
-watch(
-  () => [swiperInstance.value, props.initialIndex],
-  ([swiper, index]) => {
-    if (swiper && index != null) {
-      swiper.slideToLoop(index, 0);
-    }
-  },
-  { immediate: true }
-);
+// watch(
+//   () => [swiperInstance.value, props.initialIndex],
+//   ([swiper, index]) => {
+//     if (swiper && index != null) {
+//       swiper.slideToLoop(index, 0);
+//     }
+//   },
+//   { immediate: true }
+// );
 
 const goToStory = (id) => {
   if (swiperInstance.value) {
@@ -185,7 +185,8 @@ const handleSlideClick = (isActive, id, index) => {
     goToStory(id);
   } else {
     if (swiperInstance.value) {
-      swiperInstance.value.slideToLoop(swiperInstance.value.clickedIndex);
+      // console.log(swiperInstance.value);
+      // swiperInstance.value.slideToLoop(swiperInstance.value.clickedIndex);
     }
   }
 };
