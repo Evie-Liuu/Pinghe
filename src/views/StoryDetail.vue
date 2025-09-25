@@ -200,7 +200,7 @@
               ]"
             >
               <p class="font-bold">{{ comment.author_name }}</p>
-              <p class="text-gray-800">{{ comment.text }}</p>
+              <p class="text-gray-800">{{ comment.content }}</p>
               <div class="flex items-center justify-end mt-2">
                 <button
                   @click="toggleLike(comment.uuid)"
@@ -486,12 +486,24 @@ const enterEditMode = () => {
   isEditing.value = true;
 };
 
-const saveContent = () => {
+const saveContent = async () => {
   if (editor.value) {
     selectedInfo.value.content = editor.value.getHTML();
   }
   isEditing.value = false;
   console.log("內容已儲存:", editor.value.getJSON());
+
+  // try {
+  //   let res = await apiService.updateShowcase(
+  //     user.value.institution_id,
+  //     selectedInfo.value.post_id,
+  //     selectedInfo.value
+  //   );
+  //   console.log(res);
+  // } catch (error) {
+  //   console.error("Failed to fetch:", error);
+  // }
+
   alert("內容已儲存！");
 };
 
@@ -518,20 +530,26 @@ const share = () => {
 };
 
 // --- Comment Section Logic ---
-const currentUser = { author_id: "0", author_name: "我" }; // Simulate current user
+const currentUser = { id: user.value.id, name: "我" }; // Simulate current user
 const newComment = ref("");
-const addComment = () => {
+const addComment = async () => {
   if (newComment.value.trim() === "") return;
-  selectedInfo.value.comment.unshift({
-    uuid: Date.now(),
-    author_id: user.value.id,
-    author_name: user.value.name,
-    time: Date.now(),
-    delete_time: null,
-    text: newComment.value,
-    likes: 0,
-    liked: false,
-  });
+
+  let commentData = {
+    title: "",
+    content: newComment.value,
+    post_type: "comment",
+    status: "published",
+  };
+  console.log(commentData);
+
+  let res = await apiService.createShowcaseComment(
+    user.value.institution_id,
+    props.id,
+    commentData
+  );
+  console.log(res);
+
   newComment.value = "";
 };
 const toggleLike = (commentId) => {
