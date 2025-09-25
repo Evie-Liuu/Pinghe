@@ -703,12 +703,81 @@ const filterEditSdgs = () => {
 };
 
 // --- Editor Upload Handlers ---
-const handleEditorImageUpload = (event) => {
+const _pendingFile = ref([]);
+const handleEditorImageUpload = async (event) => {
   const file = event.target.files[0];
-  if (file && editor.value) {
-    const url = URL.createObjectURL(file);
-    editor.value.chain().focus().setImage({ src: url }).run();
+  if (!file || !editor.value) return;
+
+  try {
+    // Show loading placeholder
+    const loadingUrl = URL.createObjectURL(file);
+    editor.value
+      .chain()
+      .focus()
+      .setImage({ src: loadingUrl, alt: "上傳中..." })
+      .run();
+
+    // Upload to server
+    const uploadResult = await apiService.uploadImage(
+      file,
+      `/showcase/${props.id}`
+    );
+
+    if (uploadResult.uploaded_files && uploadResult.uploaded_files.length > 0) {
+      const imageUrl = uploadResult.uploaded_files[0].file_url;
+      _pendingFile.value.push(
+        ...uploadResult.uploaded_files.map((file) => file.file_url)
+      );
+      console.log(_pendingFile);
+
+      // // Replace the loading image with the actual uploaded image
+      // // First, remove the loading image by finding it and replacing
+      // const { state } = editor.value;
+      // const { doc } = state;
+      // let imagePos = null;
+
+      // doc.descendants((node, pos) => {
+      //   if (node.type.name === "image" && node.attrs.src === loadingUrl) {
+      //     imagePos = pos;
+      //     return false;
+      //   }
+      // });
+
+      // if (imagePos !== null) {
+      //   editor.value
+      //     .chain()
+      //     .focus()
+      //     .setNodeSelection(imagePos)
+      //     .setImage({ src: imageUrl, alt: file.name })
+      //     .run();
+      // }
+
+      // // Clean up object URL
+      // URL.revokeObjectURL(loadingUrl);
+    } else {
+      throw new Error("上傳失敗：伺服器回應格式錯誤");
+    }
+  } catch (error) {
+    // console.error("圖片上傳失敗:", error);
+    // alert(`圖片上傳失敗: ${error.message}`);
+    // // Remove the loading image on error
+    // const { state } = editor.value;
+    // const { doc } = state;
+    // const loadingUrl = URL.createObjectURL(file);
+    // doc.descendants((node, pos) => {
+    //   if (node.type.name === "image" && node.attrs.src === loadingUrl) {
+    //     editor.value
+    //       .chain()
+    //       .focus()
+    //       .setNodeSelection(pos)
+    //       .deleteSelection()
+    //       .run();
+    //     return false;
+    //   }
+    // });
+    // URL.revokeObjectURL(loadingUrl);
   }
+
   // Reset input
   event.target.value = "";
 };

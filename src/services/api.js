@@ -32,7 +32,7 @@ class ApiService {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
 
-    console.log('API Request:', { url, endpoint, headers: config.headers, token: token ? 'Present' : 'None' });
+    // console.log('API Request:', { url, endpoint, headers: config.headers, token: token ? 'Present' : 'None' });
 
     try {
       const response = await fetch(url, config);
