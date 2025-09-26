@@ -430,6 +430,7 @@ const reactions = ref({});
 const reactionUsers = ref({});
 
 const isEditing = ref(false);
+const originalMediaFiles = ref([]);
 
 const bgImageStyle = computed(() => {
   if (!selectedInfo.value) return {};
@@ -517,13 +518,31 @@ const enterEditMode = () => {
   if (editor.value) {
     editor.value.commands.setContent(selectedInfo.value.content || "");
   }
+  originalMediaFiles.value = [...(selectedInfo.value.media_files || [])];
+  _pendingFile.value = []; //暫存
   isEditing.value = true;
 };
 
 const saveContent = async () => {
   if (editor.value) {
     selectedInfo.value.content = editor.value.getHTML();
-    selectedInfo.value.media_files = _pendingFile.value;
+    const currentImageUrls = extractImageUrls(editor.value.getJSON()).filter(
+      (url) => !url.startsWith("blob:")
+    );
+    selectedInfo.value.media_files = currentImageUrls;
+
+    // Find deleted images
+    const deletedImages = originalMediaFiles.value.filter(
+      (url) => !currentImageUrls.includes(url)
+    );
+    if (deletedImages.length > 0) {
+      try {
+        await apiService.deleteImage(deletedImages);
+        console.log("已刪除的圖片:", deletedImages);
+      } catch (error) {
+        console.error("刪除圖片失敗:", error);
+      }
+    }
   }
 
   console.log("內容已儲存:", editor.value.getJSON());
@@ -538,7 +557,6 @@ const saveContent = async () => {
   } catch (error) {
     console.error("Failed to fetch:", error);
   }
-  _pendingFile.value = [];
   isEditing.value = false;
 
   alert("內容已儲存！");
@@ -552,7 +570,6 @@ const cancelEdit = async () => {
       try {
         //暫存
         await apiService.deleteImage(_pendingFile.value);
-        _pendingFile.value = [];
       } catch (error) {
         console.error("Failed to fetch:", error);
       }
@@ -722,7 +739,7 @@ const handleEditorImageUpload = async (event) => {
   if (!file || !editor.value) return;
 
   try {
-    // //TODO (文件)Validate file using API service
+    // //TODO (文件) Validate file using API service
     // const validationErrors = apiService.validateImageFile(file);
     // if (validationErrors.length > 0) {
     //   alert(`文件驗證失敗:\n${validationErrors.join("\n")}`);
@@ -744,58 +761,55 @@ const handleEditorImageUpload = async (event) => {
     );
 
     if (uploadResult.uploaded_files && uploadResult.uploaded_files.length > 0) {
-      // const imageUrl = uploadResult.uploaded_files[0].file_url;
-      _pendingFile.value.push(
-        ...uploadResult.uploaded_files.map((file) => file.file_url)
-      );
+      const imageUrl = uploadResult.uploaded_files[0].file_url;
+      _pendingFile.value.push(imageUrl);
       console.log(_pendingFile.value);
+      // console.log(editor.value.getHTML());
 
-      // // Replace the loading image with the actual uploaded image
-      // // First, remove the loading image by finding it and replacing
-      // const { state } = editor.value;
-      // const { doc } = state;
-      // let imagePos = null;
+      // Replace the loading image with the actual uploaded image
+      const { state } = editor.value;
+      const { doc } = state;
+      let imagePos = null;
 
-      // doc.descendants((node, pos) => {
-      //   if (node.type.name === "image" && node.attrs.src === loadingUrl) {
-      //     imagePos = pos;
-      //     return false;
-      //   }
-      // });
+      doc.descendants((node, pos) => {
+        if (node.type.name === "image" && node.attrs.src === loadingUrl) {
+          imagePos = pos;
+          return false;
+        }
+      });
 
-      // if (imagePos !== null) {
-      //   editor.value
-      //     .chain()
-      //     .focus()
-      //     .setNodeSelection(imagePos)
-      //     .setImage({ src: imageUrl, alt: file.name })
-      //     .run();
-      // }
+      if (imagePos !== null) {
+        editor.value
+          .chain()
+          .focus()
+          .setNodeSelection(imagePos)
+          .setImage({ src: imageUrl, alt: file.name })
+          .run();
+      }
 
-      // // Clean up object URL
-      // URL.revokeObjectURL(loadingUrl);
+      // Clean up object URL
+      URL.revokeObjectURL(loadingUrl);
     } else {
       throw new Error("上傳失敗：伺服器回應格式錯誤");
     }
   } catch (error) {
-    // console.error("圖片上傳失敗:", error);
-    // alert(`圖片上傳失敗: ${error.message}`);
-    // // Remove the loading image on error
-    // const { state } = editor.value;
-    // const { doc } = state;
-    // const loadingUrl = URL.createObjectURL(file);
-    // doc.descendants((node, pos) => {
-    //   if (node.type.name === "image" && node.attrs.src === loadingUrl) {
-    //     editor.value
-    //       .chain()
-    //       .focus()
-    //       .setNodeSelection(pos)
-    //       .deleteSelection()
-    //       .run();
-    //     return false;
-    //   }
-    // });
-    // URL.revokeObjectURL(loadingUrl);
+    console.error("圖片上傳失敗:", error);
+    alert(`圖片上傳失敗: ${error.message}`);
+    // Remove the loading image on error
+    const { state } = editor.value;
+    const { doc } = state;
+    doc.descendants((node, pos) => {
+      if (node.type === "image" && node.attrs.src === loadingUrl) {
+        editor.value
+          .chain()
+          .focus()
+          .setNodeSelection(pos)
+          .deleteSelection()
+          .run();
+        return false;
+      }
+    });
+    URL.revokeObjectURL(loadingUrl);
   }
 
   // Reset input
@@ -816,6 +830,21 @@ const handleEditorFileUpload = (event) => {
   }
   // Reset input
   event.target.value = "";
+};
+
+// Function to extract image URLs from editor JSON
+const extractImageUrls = (json) => {
+  const urls = [];
+  const traverse = (node) => {
+    if (node.type === "image" && node.attrs && node.attrs.src) {
+      urls.push(node.attrs.src);
+    }
+    if (node.content) {
+      node.content.forEach(traverse);
+    }
+  };
+  traverse(json);
+  return urls;
 };
 </script>
 

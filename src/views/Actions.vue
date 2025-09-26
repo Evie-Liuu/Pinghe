@@ -96,7 +96,7 @@ const itemsPerPage = 3;
 onMounted(async () => {
   try {
     if (user.value) {
-      // console.log("User found:", user.value);
+      console.log("User found:", user.value);
       // console.log("Auth token:", localStorage.getItem("auth_token"));
       let res = await apiService.getActivities();
       console.log("Activities response:", res);
