@@ -442,7 +442,11 @@ const saveStory = () => {
   // 4. "Save" data
   console.log("New Story Data:", processedStory);
   // alert("故事已儲存 (請查看主控台)！");
-  apiService.createShowcase(user.value.institution_id, processedStory);
+  try {
+    apiService.createShowcase(processedStory);
+  } catch (error) {
+    console.error("Error saving story:", error);
+  }
 
   // 5. Navigate back
   router.push("/story");

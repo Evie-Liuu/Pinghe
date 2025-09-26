@@ -67,7 +67,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, inject, onMounted } from "vue";
+import { ref, computed, inject, onMounted, onBeforeMount } from "vue";
 import infosData from "@/data/Action.json";
 import typeTags from "@/data/SDGs_goal.json";
 import HeaderFilter from "@/components/HeaderFilter.vue";
@@ -93,14 +93,14 @@ const filters = ref({
 const currentPage = ref(1);
 const itemsPerPage = 3;
 
-onMounted(async () => {
+onBeforeMount(async () => {
   try {
     if (user.value) {
-      console.log("User found:", user.value);
+      // console.log("User found:", user.value);
       // console.log("Auth token:", localStorage.getItem("auth_token"));
       let res = await apiService.getActivities();
       console.log("Activities response:", res);
-      // allActions.value = res.items;
+      allActions.value = res.items;
     } else {
       console.log("No user found, skipping getActivities call");
     }

@@ -311,7 +311,7 @@ const path = "../assets/images/";
 const initialSlideIndex = ref(0);
 
 // onMounted(() => {
-onBeforeMount(() => {
+onBeforeMount(async () => {
   const storedIndex = sessionStorage.getItem("lastStoryIndex");
   console.log("讀取到的 storedIndex:", storedIndex);
   if (storedIndex !== null && storedIndex !== "") {
@@ -321,6 +321,18 @@ onBeforeMount(() => {
       console.log("設置初始索引為:", initialSlideIndex.value);
     }
   }
+
+  try {
+    if (user.value) {
+      let res = await apiService.getShowcases(user.value.institution_id);
+      console.log(res);
+      allInfos.value = res.items;
+      // allInfos.value = [...carouselImages, ...res.items];
+      // console.log(allInfos.value);
+    }
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+  }
 });
 
 const handleAppScroll = inject("handleAppScroll");
@@ -328,17 +340,17 @@ const handleAppScroll = inject("handleAppScroll");
 const allInfos = ref(carouselImages);
 
 onMounted(async () => {
-  try {
-    if (user.value) {
-      let res = await apiService.getShowcases(user.value.institution_id);
-      console.log(res);
-      allInfos.value = res.items
-      // allInfos.value = [...carouselImages, ...res.items];
-      // console.log(allInfos.value);
-    }
-  } catch (error) {
-    console.error("Failed to fetch posts:", error);
-  }
+  // try {
+  //   if (user.value) {
+  //     let res = await apiService.getShowcases(user.value.institution_id);
+  //     console.log(res);
+  //     allInfos.value = res.items
+  //     // allInfos.value = [...carouselImages, ...res.items];
+  //     // console.log(allInfos.value);
+  //   }
+  // } catch (error) {
+  //   console.error("Failed to fetch posts:", error);
+  // }
 });
 
 const showEditModal = ref(false);

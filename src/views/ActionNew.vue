@@ -39,32 +39,32 @@
         <!-- Time Input -->
         <div class="flex flex-row gap-5">
           <div class="w-1/2">
-            <label for="startTime" class="block text-lg font-medium"
+            <label for="start_date" class="block text-lg font-medium"
               >起始時間*</label
             >
             <input
               type="date"
-              v-model="action.startTime"
-              id="startTime"
+              v-model="action.start_date"
+              id="start_date"
               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              :class="{ 'border-red-500': errors.startTime }"
+              :class="{ 'border-red-500': errors.start_date }"
             />
-            <p v-if="errors.startTime" class="text-red-500 text-sm mt-1">
+            <p v-if="errors.start_date" class="text-red-500 text-sm mt-1">
               請輸入起始時間
             </p>
           </div>
           <div class="w-1/2">
-            <label for="endTime" class="block text-lg font-medium"
+            <label for="end_date" class="block text-lg font-medium"
               >結束時間*</label
             >
             <input
               type="date"
-              v-model="action.endTime"
-              id="endTime"
+              v-model="action.end_date"
+              id="end_date"
               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              :class="{ 'border-red-500': errors.endTime }"
+              :class="{ 'border-red-500': errors.end_date }"
             />
-            <p v-if="errors.endTime" class="text-red-500 text-sm mt-1">
+            <p v-if="errors.end_date" class="text-red-500 text-sm mt-1">
               請輸入結束時間
             </p>
           </div>
@@ -139,11 +139,13 @@
 
         <!-- Intro Input -->
         <div>
-          <label for="intro" class="block text-lg font-medium">描述</label>
+          <label for="description" class="block text-lg font-medium"
+            >描述</label
+          >
           <input
             type="text"
-            v-model="action.intro"
-            id="intro"
+            v-model="action.description"
+            id="description"
             class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
@@ -156,15 +158,15 @@
           <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
             <div class="flex items-center gap-2 text-sm text-blue-800">
               <i class="fa-solid fa-info-circle"></i>
-              <span v-if="action.startTime && action.endTime">
-                行動期間：{{ formatDateForDisplay(action.startTime) }} 至
-                {{ formatDateForDisplay(action.endTime) }} （{{
+              <span v-if="action.start_date && action.end_date">
+                行動期間：{{ formatDateForDisplay(action.start_date) }} 至
+                {{ formatDateForDisplay(action.end_date) }} （{{
                   getActionDurationText()
                 }}）
               </span>
-              <span v-else-if="action.startTime">
+              <span v-else-if="action.start_date">
                 行動起始：{{
-                  formatDateForDisplay(action.startTime)
+                  formatDateForDisplay(action.start_date)
                 }}（無結束期限）
               </span>
               <span v-else class="text-orange-600">
@@ -196,8 +198,8 @@
                     :class="getStageBarColor(index)"
                     @click="editStageTime(getStageOriginalIndex(stage))"
                     :title="`${stage.name}: ${formatDateForDisplay(
-                      stage.startTime
-                    )} - ${formatDateForDisplay(stage.endTime)}`"
+                      stage.start_date
+                    )} - ${formatDateForDisplay(stage.end_date)}`"
                   >
                     <div class="text-xs text-white font-medium p-1 truncate">
                       {{ stage.name }}
@@ -271,10 +273,10 @@
                     >
                     <input
                       type="date"
-                      v-model="newStage.startTime"
+                      v-model="newStage.start_date"
                       id="newStageStartTime"
-                      :min="action.startTime"
-                      :max="action.endTime"
+                      :min="action.start_date"
+                      :max="action.end_date"
                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       :class="{
                         'border-orange-500': newStageTimeWarning.start,
@@ -295,10 +297,10 @@
                     >
                     <input
                       type="date"
-                      v-model="newStage.endTime"
+                      v-model="newStage.end_date"
                       id="newStageEndTime"
-                      :min="newStage.startTime || action.startTime"
-                      :max="action.endTime"
+                      :min="newStage.start_date || action.start_date"
+                      :max="action.end_date"
                       class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       :class="{ 'border-orange-500': newStageTimeWarning.end }"
                     />
@@ -369,15 +371,15 @@
 
                       <div class="mt-2 text-sm">
                         <div
-                          v-if="stage.startTime && stage.endTime"
+                          v-if="stage.start_date && stage.end_date"
                           class="text-gray-600"
                         >
                           <i class="fa-solid fa-calendar mr-1"></i>
-                          {{ formatDateForDisplay(stage.startTime) }} 至
-                          {{ formatDateForDisplay(stage.endTime) }}
+                          {{ formatDateForDisplay(stage.start_date) }} 至
+                          {{ formatDateForDisplay(stage.end_date) }}
                           <span class="text-gray-400 ml-2">
                             ({{
-                              getDurationText(stage.startTime, stage.endTime)
+                              getDurationText(stage.start_date, stage.end_date)
                             }})
                           </span>
                         </div>
@@ -435,9 +437,9 @@
                         >
                         <input
                           type="date"
-                          v-model="editingStage.startTime"
-                          :min="action.startTime"
-                          :max="action.endTime"
+                          v-model="editingStage.start_date"
+                          :min="action.start_date"
+                          :max="action.end_date"
                           class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                       </div>
@@ -447,9 +449,9 @@
                         >
                         <input
                           type="date"
-                          v-model="editingStage.endTime"
-                          :min="editingStage.startTime || action.startTime"
-                          :max="action.endTime"
+                          v-model="editingStage.end_date"
+                          :min="editingStage.start_date || action.start_date"
+                          :max="action.end_date"
                           class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                         />
                       </div>
@@ -537,17 +539,19 @@ import { useClickOutside } from "@/composables/useClickOutside.js";
 import { useDateTime } from "@/composables/useDateTime.js";
 import sdgsData from "@/data/SDGs_goal.json";
 import Sortable from "sortablejs";
+import { useAuth } from "@/stores/auth";
 import apiService from "../services/api";
 
 const router = useRouter();
 const { formatISO } = useDateTime();
+const { isAuthenticated, user } = useAuth();
 
 const action = ref({
   title: "",
   content: "",
-  intro: "",
-  startTime: "",
-  endTime: "",
+  description: "",
+  start_date: "",
+  end_date: "",
   sdgs_goals: [],
   stages: [],
   cover_image_url: null,
@@ -568,14 +572,14 @@ const dropdown = ref(null);
 // Progress Stages
 const newStage = ref({
   name: "",
-  startTime: "",
-  endTime: "",
+  start_date: "",
+  end_date: "",
 });
 
 const editingStageIndex = ref(-1);
 const editingStage = ref({
-  startTime: "",
-  endTime: "",
+  start_date: "",
+  end_date: "",
 });
 
 const sortableContainer = ref(null);
@@ -600,57 +604,58 @@ const selectedSdgs = computed(() => {
 });
 
 const timeRangeError = computed(() => {
-  if (!action.value.startTime || !action.value.endTime) return false;
-  return new Date(action.value.startTime) > new Date(action.value.endTime);
+  if (!action.value.start_date || !action.value.end_date) return false;
+  return new Date(action.value.start_date) > new Date(action.value.end_date);
 });
 
 const canAddStage = computed(() => {
   return (
     newStage.value.name.trim() &&
-    newStage.value.startTime &&
-    newStage.value.endTime &&
-    new Date(newStage.value.startTime) <= new Date(newStage.value.endTime) &&
+    newStage.value.start_date &&
+    newStage.value.end_date &&
+    new Date(newStage.value.start_date) <= new Date(newStage.value.end_date) &&
     isStageTimeValidForAction(newStage.value)
   );
 });
 
 // Timeline and validation computed properties
 const hasValidActionTime = computed(() => {
-  return action.value.startTime;
+  return action.value.start_date;
 });
 
 const hasEndTime = computed(() => {
-  return !!action.value.endTime;
+  return !!action.value.end_date;
 });
 
 const timelineStart = computed(() => {
-  return action.value.startTime;
+  return action.value.start_date;
 });
 
 const timelineEnd = computed(() => {
-  return action.value.endTime || getDefaultEndTime();
+  return action.value.end_date || getDefaultEndTime();
 });
 
 const validStages = computed(() => {
   return action.value.stages.filter(
-    (stage) => stage.startTime && stage.endTime
+    (stage) => stage.start_date && stage.end_date
   );
 });
 
 const stageOverlaps = computed(() => {
   const overlaps = [];
   const sortedStages = [...validStages.value].sort(
-    (a, b) => new Date(a.startTime) - new Date(b.startTime)
+    (a, b) => new Date(a.start_date) - new Date(b.start_date)
   );
 
   for (let i = 0; i < sortedStages.length - 1; i++) {
     const current = sortedStages[i];
     const next = sortedStages[i + 1];
 
-    if (new Date(current.endTime) > new Date(next.startTime)) {
+    if (new Date(current.end_date) > new Date(next.start_date)) {
       overlaps.push({
-        start: next.startTime,
-        end: current.endTime < next.endTime ? current.endTime : next.endTime,
+        start: next.start_date,
+        end:
+          current.end_date < next.end_date ? current.end_date : next.end_date,
       });
     }
   }
@@ -661,25 +666,25 @@ const stageOverlaps = computed(() => {
 const newStageTimeWarning = computed(() => {
   const warnings = { start: "", end: "" };
 
-  if (newStage.value.startTime) {
+  if (newStage.value.start_date) {
     if (
-      action.value.startTime &&
-      new Date(newStage.value.startTime) < new Date(action.value.startTime)
+      action.value.start_date &&
+      new Date(newStage.value.start_date) < new Date(action.value.start_date)
     ) {
       warnings.start = "開始時間不能早於行動開始時間";
     }
     if (
-      action.value.endTime &&
-      new Date(newStage.value.startTime) > new Date(action.value.endTime)
+      action.value.end_date &&
+      new Date(newStage.value.start_date) > new Date(action.value.end_date)
     ) {
       warnings.start = "開始時間不能晚於行動結束時間";
     }
   }
 
-  if (newStage.value.endTime) {
+  if (newStage.value.end_date) {
     if (
-      action.value.endTime &&
-      new Date(newStage.value.endTime) > new Date(action.value.endTime)
+      action.value.end_date &&
+      new Date(newStage.value.end_date) > new Date(action.value.end_date)
     ) {
       warnings.end = "結束時間不能晚於行動結束時間";
     }
@@ -690,14 +695,14 @@ const newStageTimeWarning = computed(() => {
 
 const newStageConflicts = computed(() => {
   const conflicts = [];
-  if (!newStage.value.startTime || !newStage.value.endTime) return conflicts;
+  if (!newStage.value.start_date || !newStage.value.end_date) return conflicts;
 
-  const newStart = new Date(newStage.value.startTime);
-  const newEnd = new Date(newStage.value.endTime);
+  const newStart = new Date(newStage.value.start_date);
+  const newEnd = new Date(newStage.value.end_date);
 
   validStages.value.forEach((stage, index) => {
-    const stageStart = new Date(stage.startTime);
-    const stageEnd = new Date(stage.endTime);
+    const stageStart = new Date(stage.start_date);
+    const stageEnd = new Date(stage.end_date);
 
     // Check for overlaps
     if (
@@ -714,10 +719,10 @@ const newStageConflicts = computed(() => {
 
 const canSaveStageTime = computed(() => {
   return (
-    editingStage.value.startTime &&
-    editingStage.value.endTime &&
-    new Date(editingStage.value.startTime) <=
-      new Date(editingStage.value.endTime)
+    editingStage.value.start_date &&
+    editingStage.value.end_date &&
+    new Date(editingStage.value.start_date) <=
+      new Date(editingStage.value.end_date)
   );
 });
 
@@ -748,15 +753,15 @@ const addStage = () => {
   action.value.stages.push({
     id: newId,
     name: newStage.value.name.trim(),
-    startTime: newStage.value.startTime,
-    endTime: newStage.value.endTime,
+    start_date: newStage.value.start_date,
+    end_date: newStage.value.end_date,
   });
 
   // Reset new stage form
   newStage.value = {
     name: "",
-    startTime: "",
-    endTime: "",
+    start_date: "",
+    end_date: "",
   };
 };
 
@@ -773,19 +778,19 @@ const editStageTime = (index) => {
   editingStageIndex.value = index;
   const stage = action.value.stages[index];
   editingStage.value = {
-    startTime: stage.startTime || "",
-    endTime: stage.endTime || "",
+    start_date: stage.start_date || "",
+    end_date: stage.end_date || "",
   };
 };
 
 const saveStageTime = (index) => {
-  if (editingStage.value.startTime && editingStage.value.endTime) {
+  if (editingStage.value.start_date && editingStage.value.end_date) {
     if (
-      new Date(editingStage.value.startTime) <=
-      new Date(editingStage.value.endTime)
+      new Date(editingStage.value.start_date) <=
+      new Date(editingStage.value.end_date)
     ) {
-      action.value.stages[index].startTime = editingStage.value.startTime;
-      action.value.stages[index].endTime = editingStage.value.endTime;
+      action.value.stages[index].start_date = editingStage.value.start_date;
+      action.value.stages[index].end_date = editingStage.value.end_date;
       editingStageIndex.value = -1;
     } else {
       alert("結束時間必須晚於或等於開始時間");
@@ -798,8 +803,8 @@ const saveStageTime = (index) => {
 const cancelEditStageTime = () => {
   editingStageIndex.value = -1;
   editingStage.value = {
-    startTime: "",
-    endTime: "",
+    start_date: "",
+    end_date: "",
   };
 };
 
@@ -810,40 +815,40 @@ const formatDateForDisplay = (dateString) => {
 
 // New helper methods for timeline and validation
 const getActionDurationText = () => {
-  if (!action.value.startTime || !action.value.endTime) return "";
-  const start = new Date(action.value.startTime);
-  const end = new Date(action.value.endTime);
+  if (!action.value.start_date || !action.value.end_date) return "";
+  const start = new Date(action.value.start_date);
+  const end = new Date(action.value.end_date);
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return `${diffDays} 天`;
 };
 
-const getDurationText = (startTime, endTime) => {
-  if (!startTime || !endTime) return "";
-  const start = new Date(startTime);
-  const end = new Date(endTime);
+const getDurationText = (start_date, end_date) => {
+  if (!start_date || !end_date) return "";
+  const start = new Date(start_date);
+  const end = new Date(end_date);
   const diffTime = Math.abs(end - start);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return `${diffDays} 天`;
 };
 
 const getDefaultEndTime = () => {
-  if (!action.value.startTime) return null;
-  const start = new Date(action.value.startTime);
+  if (!action.value.start_date) return null;
+  const start = new Date(action.value.start_date);
   start.setMonth(start.getMonth() + 3); // Default to 3 months later
   return start.toISOString().split("T")[0];
 };
 
 const isStageTimeValidForAction = (stage) => {
-  if (!stage.startTime || !stage.endTime) return false;
+  if (!stage.start_date || !stage.end_date) return false;
   if (
-    action.value.startTime &&
-    new Date(stage.startTime) < new Date(action.value.startTime)
+    action.value.start_date &&
+    new Date(stage.start_date) < new Date(action.value.start_date)
   )
     return false;
   if (
-    action.value.endTime &&
-    new Date(stage.endTime) > new Date(action.value.endTime)
+    action.value.end_date &&
+    new Date(stage.end_date) > new Date(action.value.end_date)
   )
     return false;
   return true;
@@ -851,8 +856,8 @@ const isStageTimeValidForAction = (stage) => {
 
 const getStageBarStyle = (stage, index) => {
   const totalDuration = getTotalTimelineDuration();
-  const stageStart = new Date(stage.startTime);
-  const stageEnd = new Date(stage.endTime);
+  const stageStart = new Date(stage.start_date);
+  const stageEnd = new Date(stage.end_date);
   const timelineStartDate = new Date(timelineStart.value);
 
   const startOffset = Math.max(
@@ -915,7 +920,7 @@ const getStageCardClass = (stage, index) => {
   let classes = [];
 
   // Validation-based styling
-  if (!stage.startTime || !stage.endTime) {
+  if (!stage.start_date || !stage.end_date) {
     classes.push("border-orange-300 bg-orange-50");
   } else if (!isStageTimeValidForAction(stage)) {
     classes.push("border-red-300 bg-red-50");
@@ -926,10 +931,10 @@ const getStageCardClass = (stage, index) => {
   // Check for conflicts with other stages
   const hasConflict = validStages.value.some((otherStage, otherIndex) => {
     if (otherStage.id === stage.id) return false;
-    const stageStart = new Date(stage.startTime);
-    const stageEnd = new Date(stage.endTime);
-    const otherStart = new Date(otherStage.startTime);
-    const otherEnd = new Date(otherStage.endTime);
+    const stageStart = new Date(stage.start_date);
+    const stageEnd = new Date(stage.end_date);
+    const otherStart = new Date(otherStage.start_date);
+    const otherEnd = new Date(otherStage.end_date);
 
     return (
       (stageStart >= otherStart && stageStart < otherEnd) ||
@@ -946,18 +951,18 @@ const getStageCardClass = (stage, index) => {
 };
 
 const getStageValidationMessage = (stage, index) => {
-  if (!stage.startTime || !stage.endTime) return "";
+  if (!stage.start_date || !stage.end_date) return "";
 
   if (!isStageTimeValidForAction(stage)) {
     if (
-      action.value.startTime &&
-      new Date(stage.startTime) < new Date(action.value.startTime)
+      action.value.start_date &&
+      new Date(stage.start_date) < new Date(action.value.start_date)
     ) {
       return "開始時間早於行動開始時間";
     }
     if (
-      action.value.endTime &&
-      new Date(stage.endTime) > new Date(action.value.endTime)
+      action.value.end_date &&
+      new Date(stage.end_date) > new Date(action.value.end_date)
     ) {
       return "結束時間晚於行動結束時間";
     }
@@ -966,10 +971,10 @@ const getStageValidationMessage = (stage, index) => {
   // Check for conflicts
   const conflicts = validStages.value.filter((otherStage) => {
     if (otherStage.id === stage.id) return false;
-    const stageStart = new Date(stage.startTime);
-    const stageEnd = new Date(stage.endTime);
-    const otherStart = new Date(otherStage.startTime);
-    const otherEnd = new Date(otherStage.endTime);
+    const stageStart = new Date(stage.start_date);
+    const stageEnd = new Date(stage.end_date);
+    const otherStart = new Date(otherStage.start_date);
+    const otherEnd = new Date(otherStage.end_date);
 
     return (
       (stageStart >= otherStart && stageStart < otherEnd) ||
@@ -1001,8 +1006,8 @@ const initSortable = () => {
 
           // Reset time for all stages after reordering
           action.value.stages.forEach((stage) => {
-            stage.startTime = "";
-            stage.endTime = "";
+            stage.start_date = "";
+            stage.end_date = "";
           });
 
           // Cancel any ongoing editing
@@ -1017,8 +1022,8 @@ const errors = ref({
   title: false,
   sdgs_goals: false,
   content: false,
-  startTime: false,
-  endTime: false,
+  start_date: false,
+  end_date: false,
   timeRange: false,
 });
 
@@ -1059,8 +1064,8 @@ const saveAction = async () => {
     title: false,
     sdgs_goals: false,
     content: false,
-    startTime: false,
-    endTime: false,
+    start_date: false,
+    end_date: false,
     timeRange: false,
   };
 
@@ -1071,12 +1076,12 @@ const saveAction = async () => {
 
   // 2. Validation
   let hasError = false;
-  if (!action.value.startTime) {
-    errors.value.startTime = true;
+  if (!action.value.start_date) {
+    errors.value.start_date = true;
     hasError = true;
   }
-  if (!action.value.endTime) {
-    errors.value.endTime = true;
+  if (!action.value.end_date) {
+    errors.value.end_date = true;
     hasError = true;
   }
   if (timeRangeError.value) {
@@ -1102,16 +1107,19 @@ const saveAction = async () => {
 
   // 3. Convert dates to ISO format
   const startTimeTimestamp = Math.floor(
-    new Date(action.value.startTime).getTime() / 1000
+    new Date(action.value.start_date).getTime() / 1000
   );
   const endTimeTimestamp = Math.floor(
-    new Date(action.value.endTime).getTime() / 1000
+    new Date(action.value.end_date).getTime() / 1000
   );
 
   const actionData = {
     ...action.value,
-    startTime: formatISO(startTimeTimestamp),
-    endTime: formatISO(endTimeTimestamp),
+    // start_date: formatISO(startTimeTimestamp),
+    // end_date: formatISO(endTimeTimestamp),
+    activity_type: "workshop",
+    objectives: [],
+    institution_id: user.value.institution_id,
   };
 
   // 4. "Save" data (log to console for now)

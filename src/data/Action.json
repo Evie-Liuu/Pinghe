@@ -9,10 +9,9 @@
         "sdgs_goals": [
             2
         ],
-        "intro": "",
+        "description": "",
         "progress": 10,
         "thumbnail": "thumb2.jpg",
-        "description": "",
         "stage": {
             "0": {
                 "title": "行動規劃",
@@ -56,10 +55,9 @@
         "sdgs_goals": [
             2
         ],
-        "intro": "",
+        "description": "",
         "progress": 40,
         "thumbnail": "thumb2.jpg",
-        "description": "",
         "stage": {
             "0": {
                 "title": "行動規劃",
@@ -92,10 +90,9 @@
         "sdgs_goals": [
             6
         ],
-        "intro": "",
+        "description": "",
         "progress": 80,
         "thumbnail": "thumb2.jpg",
-        "description": "",
         "stage": {
             "0": {
                 "title": "行動規劃",
@@ -129,10 +126,9 @@
             2,
             3
         ],
-        "intro": "",
+        "description": "",
         "progress": 50,
         "thumbnail": "thumb2.jpg",
-        "description": "",
         "stage": {
             "0": {
                 "title": "行動規劃",

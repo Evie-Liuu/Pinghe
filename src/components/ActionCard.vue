@@ -59,7 +59,7 @@
               </template>
               <template #en>Description</template>
             </CJKSub>
-            ：{{ info.intro }}
+            ：{{ info.description }}
           </p>
           <div class="flex items-center w-full md:w-70 gap-3 md:col-span-2">
             <CJKSub align="left">
@@ -90,7 +90,7 @@
               :key="t"
               class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
             >
-              {{ typeTags[t].title }}
+              {{ sdgsData[t].title }}
             </span>
           </div>
         </div>
@@ -104,7 +104,7 @@ import CJKSub from "@/components/CJKSub.vue";
 
 const router = useRouter();
 
-import typeTags from "@/data/SDGs_goal.json";
+import sdgsData from "@/data/SDGs_goal.json";
 
 const props = defineProps({
   filteredInfo: {
@@ -112,6 +112,14 @@ const props = defineProps({
     default: () => [],
   },
 });
+
+const sdgOptions = sdgsData
+  .filter((s) => s.value !== 0)
+  .map((tag) => ({
+    ...tag,
+    title: tag.title.replace(/<br\s*\/?>/g, ""),
+  }));
+console.log(sdgOptions);
 
 const progressColor = (progress) => {
   if (progress < 40) return "bg-red-500";

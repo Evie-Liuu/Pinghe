@@ -35,6 +35,8 @@ class ApiService {
     // console.log('API Request:', { url, endpoint, headers: config.headers, token: token ? 'Present' : 'None' });
 
     try {
+      console.log(config);
+      
       const response = await fetch(url, config);
 
       if (!response.ok) {
