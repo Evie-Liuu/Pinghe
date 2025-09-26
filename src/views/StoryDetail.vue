@@ -523,27 +523,40 @@ const enterEditMode = () => {
 const saveContent = async () => {
   if (editor.value) {
     selectedInfo.value.content = editor.value.getHTML();
+    selectedInfo.value.media_files = _pendingFile.value;
   }
-  isEditing.value = false;
+
   console.log("內容已儲存:", editor.value.getJSON());
 
-  // try {
-  //   let res = await apiService.updateShowcase(
-  //     user.value.institution_id,
-  //     selectedInfo.value.post_id,
-  //     selectedInfo.value
-  //   );
-  //   console.log(res);
-  // } catch (error) {
-  //   console.error("Failed to fetch:", error);
-  // }
+  try {
+    let res = await apiService.updateShowcase(
+      user.value.institution_id,
+      selectedInfo.value.post_id,
+      selectedInfo.value
+    );
+    console.log(res);
+  } catch (error) {
+    console.error("Failed to fetch:", error);
+  }
+  _pendingFile.value = [];
+  isEditing.value = false;
 
   alert("內容已儲存！");
 };
 
-const cancelEdit = () => {
+const cancelEdit = async () => {
   if (editor.value) {
     editor.value.commands.setContent(selectedInfo.value.content || "");
+
+    if (_pendingFile.value.length > 0) {
+      try {
+        //暫存
+        await apiService.deleteImage(_pendingFile.value);
+        _pendingFile.value = [];
+      } catch (error) {
+        console.error("Failed to fetch:", error);
+      }
+    }
   }
   isEditing.value = false;
 };
@@ -709,6 +722,13 @@ const handleEditorImageUpload = async (event) => {
   if (!file || !editor.value) return;
 
   try {
+    // //TODO (文件)Validate file using API service
+    // const validationErrors = apiService.validateImageFile(file);
+    // if (validationErrors.length > 0) {
+    //   alert(`文件驗證失敗:\n${validationErrors.join("\n")}`);
+    //   return;
+    // }
+
     // Show loading placeholder
     const loadingUrl = URL.createObjectURL(file);
     editor.value
@@ -720,15 +740,15 @@ const handleEditorImageUpload = async (event) => {
     // Upload to server
     const uploadResult = await apiService.uploadImage(
       file,
-      `/showcase/${props.id}`
+      `story/${props.id}`
     );
 
     if (uploadResult.uploaded_files && uploadResult.uploaded_files.length > 0) {
-      const imageUrl = uploadResult.uploaded_files[0].file_url;
+      // const imageUrl = uploadResult.uploaded_files[0].file_url;
       _pendingFile.value.push(
         ...uploadResult.uploaded_files.map((file) => file.file_url)
       );
-      console.log(_pendingFile);
+      console.log(_pendingFile.value);
 
       // // Replace the loading image with the actual uploaded image
       // // First, remove the loading image by finding it and replacing
