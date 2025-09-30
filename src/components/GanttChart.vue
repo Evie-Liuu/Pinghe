@@ -188,17 +188,18 @@
             <!-- Post indicators -->
             <div
               v-if="hasPostsOnDay(day)"
-              class="post-indicator absolute right-2 top-1/2 transform -translate-y-1/2 z-10"
+              class="post-indicator absolute right-2 top-1/2 transform -translate-y-1/2 z-10 cursor-pointer"
+              @click="showPostContent(day)"
             >
               <img
                 v-if="avatar"
                 :src="getImageUrl(avatar)"
-                class="w-6 h-6 rounded-full object-cover border-2 border-white shadow-md"
+                class="w-6 h-6 rounded-full object-cover border-2 border-white shadow-md hover:scale-110 transition-transform"
                 alt="使用者頭像"
               />
               <div
                 v-else
-                class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-md"
+                class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-md hover:scale-110 transition-transform"
                 :title="`${postsByDay[day.toDateString()].length} 則貼文`"
               >
                 {{ postsByDay[day.toDateString()].length }}
@@ -215,6 +216,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -267,11 +269,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:scrollTime", "phase-click", "day-click"]);
+const emit = defineEmits(["update:scrollTime", "phase-click", "day-click", "post-click"]);
 
 const selectedUnit = ref("week");
 const scrollContainer = shallowRef(null);
 const currentScrollTime = ref(props.startTime);
+
 
 function getImageUrl(name) {
   if (!name) return "";
@@ -526,6 +529,19 @@ const yearMonthHint = computed(() => {
     month: "long",
   });
 });
+
+// Post click handler
+const showPostContent = (day) => {
+  const key = day.toDateString();
+  const postsForDay = postsByDay.value[key] || [];
+
+  if (postsForDay.length > 0) {
+    emit('post-click', {
+      date: day,
+      posts: postsForDay
+    });
+  }
+};
 
 watch(
   () => props.startTime,

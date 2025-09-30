@@ -85,11 +85,16 @@
             </div>
             <GanttChart
               v-if="actionData.start_date && actionData.end_date"
-              :start-time="Math.floor(new Date(actionData.start_date).getTime() / 1000)"
-              :end-time="Math.floor(new Date(actionData.end_date).getTime() / 1000)"
+              :start-time="
+                Math.floor(new Date(actionData.start_date).getTime() / 1000)
+              "
+              :end-time="
+                Math.floor(new Date(actionData.end_date).getTime() / 1000)
+              "
               :phases="ganttPhases"
               :posts="actionData.post || []"
               :avatar="'student.png'"
+              @post-click="handlePostClick"
             />
             <div v-else class="text-center py-12 text-gray-500">
               <i class="fas fa-chart-bar text-4xl text-gray-300 mb-4"></i>
@@ -104,6 +109,83 @@
           <div class="text-gray-500">載入中...</div>
         </div>
       </main>
+    </div>
+
+    <!-- Post Content Sidebar -->
+    <div
+      v-if="showPostModal"
+      class="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out"
+      :class="showPostModal ? 'translate-x-0' : 'translate-x-full'"
+    >
+      <div class="h-full flex flex-col">
+        <!-- Header -->
+        <div
+          class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50"
+        >
+          <h3 class="text-lg font-semibold text-gray-800">
+            {{ formatModalDate(selectedPostDate) }} 的貼文
+          </h3>
+          <button
+            @click="closePostModal"
+            class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="space-y-6">
+            <div
+              v-for="post in selectedPosts"
+              :key="post.id"
+              class="bg-gradient-to-r from-blue-50 to-white border border-blue-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <h4 class="font-medium text-gray-800 mb-3 text-base">
+                {{ post.title }}
+              </h4>
+              <p class="text-gray-600 text-sm mb-3 leading-relaxed">
+                {{ post.content }}
+              </p>
+              <div class="flex items-center text-xs text-gray-500">
+                <svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                {{ formatPostTime(post.time) }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-gray-200 bg-gray-50">
+          <p class="text-xs text-gray-500 text-center">
+            共 {{ selectedPosts.length }} 則貼文
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -120,6 +202,11 @@ const handleAppScroll = inject("handleAppScroll");
 
 // Data
 const actionData = ref(null);
+
+// Modal state
+const showPostModal = ref(false);
+const selectedPostDate = ref(null);
+const selectedPosts = ref([]);
 
 // Computed
 const actionId = computed(() => parseInt(route.params.id));
@@ -151,6 +238,43 @@ const formatDateRange = (startDate, endDate) => {
   const start = new Date(startDate).toLocaleDateString("zh-TW");
   const end = new Date(endDate).toLocaleDateString("zh-TW");
   return `${start} ~ ${end}`;
+};
+
+// Modal methods
+const handlePostClick = (data) => {
+  selectedPostDate.value = data.date;
+  selectedPosts.value = data.posts;
+  showPostModal.value = true;
+};
+
+const closePostModal = () => {
+  showPostModal.value = false;
+  selectedPostDate.value = null;
+  selectedPosts.value = [];
+};
+
+const formatModalDate = (date) => {
+  if (!date) return "";
+  return date.toLocaleDateString("zh-TW", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  });
+};
+
+const formatPostTime = (time) => {
+  let date;
+  if (typeof time === "string") {
+    date = new Date(time);
+  } else {
+    date = new Date(time * 1000);
+  }
+
+  return date.toLocaleTimeString("zh-TW", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
 // Lifecycle
