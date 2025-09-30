@@ -156,14 +156,14 @@ const allFilteredInfos = computed(() => {
     if (filterStart && filterEnd) {
       result = result.filter((info) => {
         if (
-          !info.startTime ||
-          !info.endTime ||
-          !String(info.startTime).trim() ||
-          !String(info.endTime).trim()
+          !info.start_date ||
+          !info.end_date ||
+          !String(info.start_date).trim() ||
+          !String(info.end_date).trim()
         )
           return false;
-        const projectStart = new Date(Number(info.startTime) * 1000);
-        const projectEnd = new Date(Number(info.endTime) * 1000);
+        const projectStart = new Date(info.start_date);
+        const projectEnd = new Date(info.end_date);
         return projectStart <= filterEnd && projectEnd >= filterStart;
       });
     }

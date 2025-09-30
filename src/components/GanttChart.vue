@@ -253,7 +253,11 @@ const props = defineProps({
     validator: (posts) => {
       return (
         Array.isArray(posts) &&
-        posts.every((post) => post && typeof post.time !== "undefined")
+        posts.every((post) =>
+          post &&
+          typeof post.time !== "undefined" &&
+          (typeof post.time === "string" || typeof post.time === "number")
+        )
       );
     },
   },
@@ -401,15 +405,23 @@ const postsByDay = computed(() => {
         return;
       }
 
-      const timestamp = parseInt(post.time);
-      if (isNaN(timestamp)) {
-        console.warn("Invalid post time:", post.time);
-        return;
+      // Handle both ISO 8601 string format and Unix timestamp
+      let date;
+      if (typeof post.time === "string") {
+        // ISO 8601 format like "2025-04-10T10:00:00"
+        date = new Date(post.time);
+      } else {
+        // Unix timestamp
+        const timestamp = parseInt(post.time);
+        if (isNaN(timestamp)) {
+          console.warn("Invalid post time:", post.time);
+          return;
+        }
+        date = new Date(timestamp * 1000);
       }
 
-      const date = new Date(timestamp * 1000);
       if (isNaN(date.getTime())) {
-        console.warn("Invalid date from timestamp:", timestamp);
+        console.warn("Invalid date from post time:", post.time);
         return;
       }
 

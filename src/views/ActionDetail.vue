@@ -48,7 +48,7 @@
                 <span class="font-semibold text-gray-700 text-sm">時間：</span>
                 <p class="text-gray-600 text-sm mt-1">
                   {{
-                    formatDateRange(actionData.startTime, actionData.endTime)
+                    formatDateRange(actionData.start_date, actionData.end_date)
                   }}
                 </p>
               </div>
@@ -84,9 +84,9 @@
               </router-link> -->
             </div>
             <GanttChart
-              v-if="actionData.startTime && actionData.endTime"
-              :start-time="parseInt(actionData.startTime)"
-              :end-time="parseInt(actionData.endTime)"
+              v-if="actionData.start_date && actionData.end_date"
+              :start-time="Math.floor(new Date(actionData.start_date).getTime() / 1000)"
+              :end-time="Math.floor(new Date(actionData.end_date).getTime() / 1000)"
               :phases="ganttPhases"
               :posts="actionData.post || []"
               :avatar="'student.png'"
@@ -131,8 +131,8 @@ const ganttPhases = computed(() => {
   return Object.entries(actionData.value.stage).map(([key, stage], index) => ({
     id: parseInt(key) + 1,
     name: stage.title,
-    startTime: parseInt(stage.startTime),
-    endTime: parseInt(stage.endTime),
+    startTime: Math.floor(new Date(stage.start_date).getTime() / 1000),
+    endTime: Math.floor(new Date(stage.end_date).getTime() / 1000),
     color: colors[index % colors.length],
   }));
 });
@@ -146,10 +146,10 @@ const loadActionData = () => {
   }
 };
 
-const formatDateRange = (startTime, endTime) => {
-  if (!startTime || !endTime) return "無";
-  const start = new Date(startTime * 1000).toLocaleDateString("zh-TW");
-  const end = new Date(endTime * 1000).toLocaleDateString("zh-TW");
+const formatDateRange = (startDate, endDate) => {
+  if (!startDate || !endDate) return "無";
+  const start = new Date(startDate).toLocaleDateString("zh-TW");
+  const end = new Date(endDate).toLocaleDateString("zh-TW");
   return `${start} ~ ${end}`;
 };
 

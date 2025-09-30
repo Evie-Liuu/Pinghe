@@ -58,7 +58,7 @@
                   >
                   <p class="text-gray-600 text-sm mt-1">
                     {{
-                      formatDateRange(actionData.startTime, actionData.endTime)
+                      formatDateRange(actionData.start_date, actionData.end_date)
                     }}
                   </p>
                 </div>
@@ -255,10 +255,10 @@ const loadPosts = () => {
   ];
 };
 
-const formatDateRange = (startTime, endTime) => {
-  if (!startTime || !endTime) return "無";
-  const start = new Date(startTime * 1000).toLocaleDateString();
-  const end = new Date(endTime * 1000).toLocaleDateString();
+const formatDateRange = (startDate, endDate) => {
+  if (!startDate || !endDate) return "無";
+  const start = new Date(startDate).toLocaleDateString();
+  const end = new Date(endDate).toLocaleDateString();
   return `${start} ~ ${end}`;
 };
 
