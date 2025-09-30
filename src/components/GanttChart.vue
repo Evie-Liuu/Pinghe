@@ -182,14 +182,14 @@
             :class="{
               'bg-gray-100': isHoliday(day),
               'bg-gray-50': isWeekend(day),
-              'has-posts': hasPostsOnDay(day),
+              'has-posts': hasPostsOnDayInPhase(day, index),
             }"
           >
             <!-- Post indicators -->
             <div
-              v-if="hasPostsOnDay(day)"
+              v-if="hasPostsOnDayInPhase(day, index)"
               class="post-indicator absolute right-2 top-1/2 transform -translate-y-1/2 z-10 cursor-pointer"
-              @click="showPostContent(day)"
+              @click.stop="showPostContent(day, index)"
             >
               <img
                 v-if="avatar"
@@ -200,9 +200,9 @@
               <div
                 v-else
                 class="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold shadow-md hover:scale-110 transition-transform"
-                :title="`${postsByDay[day.toDateString()].length} 則貼文`"
+                :title="`${getPostsForDayAndPhase(day, index).length} 則貼文`"
               >
-                {{ postsByDay[day.toDateString()].length }}
+                {{ getPostsForDayAndPhase(day, index).length }}
               </div>
             </div>
           </div>
@@ -401,6 +401,8 @@ const months = computed(() => {
 const postsByDay = computed(() => {
   const map = new Map();
 
+  console.log("Processing posts:", props.posts);
+
   try {
     props.posts.forEach((post) => {
       if (!post || typeof post.time === "undefined") {
@@ -429,6 +431,7 @@ const postsByDay = computed(() => {
       }
 
       const key = date.toDateString();
+      console.log(`Mapping post ${post.id} with current_stage="${post.current_stage}" to date: ${key}`);
 
       if (!map.has(key)) {
         map.set(key, []);
@@ -439,7 +442,9 @@ const postsByDay = computed(() => {
     console.error("Error processing posts:", error);
   }
 
-  return Object.fromEntries(map);
+  const result = Object.fromEntries(map);
+  console.log("Final postsByDay:", result);
+  return result;
 });
 
 const formatDate = (date) => date.getDate();
@@ -508,6 +513,55 @@ const hasPostsOnDay = (day) => {
   }
 };
 
+const hasPostsOnDayInPhase = (day, phaseIndex) => {
+  if (!day || typeof day.toDateString !== "function") return false;
+
+  try {
+    const key = day.toDateString();
+    const postsOnDay = postsByDay.value[key] || [];
+
+    // Debug: Log phase information
+    if (postsOnDay.length > 0) {
+      console.log(`Day: ${key}, PhaseIndex: ${phaseIndex}`);
+      console.log('Posts on day:', postsOnDay);
+      console.log('Phase info:', props.phases[phaseIndex]);
+    }
+
+    // Check if any post on this day belongs to this phase
+    return postsOnDay.some(post => {
+      const postStage = parseInt(post.current_stage);
+      const match = postStage === phaseIndex;
+
+      if (postsOnDay.length > 0) {
+        console.log(`Post ${post.id}: current_stage="${post.current_stage}" -> ${postStage}, phaseIndex=${phaseIndex}, match=${match}`);
+      }
+
+      return match;
+    });
+  } catch (error) {
+    console.warn("Error checking posts for day and phase:", day, phaseIndex, error);
+    return false;
+  }
+};
+
+const getPostsForDayAndPhase = (day, phaseIndex) => {
+  if (!day || typeof day.toDateString !== "function") return [];
+
+  try {
+    const key = day.toDateString();
+    const postsOnDay = postsByDay.value[key] || [];
+
+    // Filter posts that belong to this phase
+    return postsOnDay.filter(post => {
+      const postStage = parseInt(post.current_stage);
+      return postStage === phaseIndex;
+    });
+  } catch (error) {
+    console.warn("Error getting posts for day and phase:", day, phaseIndex, error);
+    return [];
+  }
+};
+
 const onScroll = () => {
   if (!scrollContainer.value) return;
 
@@ -531,14 +585,23 @@ const yearMonthHint = computed(() => {
 });
 
 // Post click handler
-const showPostContent = (day) => {
+const showPostContent = (day, phaseIndex = null) => {
   const key = day.toDateString();
-  const postsForDay = postsByDay.value[key] || [];
+  let postsToShow = [];
 
-  if (postsForDay.length > 0) {
+  if (phaseIndex !== null) {
+    // Get posts for specific phase
+    postsToShow = getPostsForDayAndPhase(day, phaseIndex);
+  } else {
+    // Get all posts for the day (fallback)
+    postsToShow = postsByDay.value[key] || [];
+  }
+
+  if (postsToShow.length > 0) {
     emit('post-click', {
       date: day,
-      posts: postsForDay
+      posts: postsToShow,
+      phase: phaseIndex !== null ? props.phases[phaseIndex] : null
     });
   }
 };

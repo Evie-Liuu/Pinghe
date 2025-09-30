@@ -122,9 +122,14 @@
         <div
           class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50"
         >
-          <h3 class="text-lg font-semibold text-gray-800">
-            {{ formatModalDate(selectedPostDate) }} 的貼文
-          </h3>
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-gray-800">
+              {{ formatModalDate(selectedPostDate) }} 的貼文
+            </h3>
+            <p v-if="selectedPhase" class="text-sm text-gray-600 mt-1">
+              階段：{{ selectedPhase.name }}
+            </p>
+          </div>
           <button
             @click="closePostModal"
             class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
@@ -159,21 +164,29 @@
               <p class="text-gray-600 text-sm mb-3 leading-relaxed">
                 {{ post.content }}
               </p>
-              <div class="flex items-center text-xs text-gray-500">
-                <svg
-                  class="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-                {{ formatPostTime(post.time) }}
+              <div class="flex items-center justify-between text-xs text-gray-500">
+                <div class="flex items-center">
+                  <svg
+                    class="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  {{ formatPostTime(post.time) }}
+                </div>
+                <div v-if="post.current_stage" class="flex items-center bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  階段 {{ parseInt(post.current_stage) + 1 }}
+                </div>
               </div>
             </div>
           </div>
@@ -207,6 +220,7 @@ const actionData = ref(null);
 const showPostModal = ref(false);
 const selectedPostDate = ref(null);
 const selectedPosts = ref([]);
+const selectedPhase = ref(null);
 
 // Computed
 const actionId = computed(() => parseInt(route.params.id));
@@ -244,6 +258,7 @@ const formatDateRange = (startDate, endDate) => {
 const handlePostClick = (data) => {
   selectedPostDate.value = data.date;
   selectedPosts.value = data.posts;
+  selectedPhase.value = data.phase;
   showPostModal.value = true;
 };
 
@@ -251,6 +266,7 @@ const closePostModal = () => {
   showPostModal.value = false;
   selectedPostDate.value = null;
   selectedPosts.value = [];
+  selectedPhase.value = null;
 };
 
 const formatModalDate = (date) => {
@@ -261,6 +277,10 @@ const formatModalDate = (date) => {
     day: "numeric",
     weekday: "long",
   });
+};
+
+const getPhaseTitle = (phase) => {
+  return phase ? ` - ${phase.name}` : "";
 };
 
 const formatPostTime = (time) => {
