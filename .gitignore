@@ -21,7 +21,9 @@ dist-ssr
 .env.*
 
 # Firebase configuration
-src/firebase.js
+src/firebase.json
+# Firebase cache
+.firebase/
 
 # Editor directories and files
 .vscode/*

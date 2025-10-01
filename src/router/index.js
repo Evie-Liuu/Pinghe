@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import Home from "@/views/Home.vue";
 import { useAuth } from "@/stores/auth";
 
@@ -37,7 +37,8 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory('/Pinghe/'),
+  // history: createWebHashHistory('/Pinghe/'),
+  history: createWebHistory('/Pinghe/'),
   routes,
 });
 
